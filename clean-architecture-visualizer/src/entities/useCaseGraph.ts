@@ -2,12 +2,13 @@ import type { cleanNode } from "./types/cleanNode.js";
 import type { neighbourMap } from "./types/neighbourMap.js";
 
 export class useCaseGraph {
-    public name: string;
+    private readonly _name: string;
     private readonly _outNeighbours: neighbourMap;
-    private readonly _violationEdges: Array<[string, string]> = [];
+    private readonly _violationEdges: Array<[cleanNode, cleanNode]> = [];
+    private readonly _files = new Map<string, string>();
 
     constructor(name: string) {
-        this.name = name;
+        this._name = name;
         this._outNeighbours = useCaseGraph.createEmptyNeighbourMap();
     }
     
@@ -25,7 +26,20 @@ export class useCaseGraph {
             outputData: [],
             outputBoundary: [],
             useCaseInteractor: [],
+            dataAccessInterface: [],
         };
+    }
+
+    addFile(name: string, path: string): void {
+        this._files.set(name, path);
+    }
+
+    getFiles(): Map<string, string> {
+        return this._files;
+    }
+
+    getName(): string{
+        return this._name;
     }
 
     /**

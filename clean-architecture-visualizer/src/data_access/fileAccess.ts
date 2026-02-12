@@ -24,6 +24,11 @@ export class FileAccess implements FileAccessInterface {
         return useCases.filter(e => e.isDirectory()).map(e => e.name);
     }
 
+    /**
+     * Get the file paths of each file under the directory node.
+     * @param node an expected directory type.
+     * @param paths a map that takes file names to their relative paths.
+     */
     async getFilePaths(node: string, paths: Map<string, string>): Promise<void> {
         const currPath = process.cwd();
         const target = await this.findDirectory(currPath, node);
@@ -32,19 +37,33 @@ export class FileAccess implements FileAccessInterface {
             return;
         }
 
-        const files = await fs.readdir(target, {
-            withFileTypes: true,
-        });
-
-        const fileList = files.filter(e => e.isFile()).map(e => e.name);
-
-        fileList.forEach(element => {
-            paths.set(element, target + "/" + element);
-        });
+        await this.collectFiles(target, paths);
     }
 
     /**
-     * Find the path to the use case directory.
+     * Recursively collect all files, on encountering a directory, enter it and continue
+     * collecting files.
+     * @param dir the path leading to the current directory.
+     * @param paths a map that takes file names to their relative paths.
+     */
+    private async collectFiles(dir: string, paths: Map<string, string>): Promise<void> {
+        const files = await fs.readdir(dir, {
+            withFileTypes: true,
+        });
+
+        for (const entry of files) {
+            const fullPath = dir + "/" + entry.name;
+
+            if (entry.isFile()) {
+                paths.set(entry.name, fullPath);
+            } else if (entry.isDirectory()) {
+                await this.collectFiles(fullPath, paths);
+            }
+        }
+    }
+
+    /**
+     * Find the path to the targeted directory.
      * @param curr the path to the current directory (starting location).
      * @param target the name of the target directory (ending location).
      * @returns A list of the directories found within the target directory.
@@ -53,24 +72,24 @@ export class FileAccess implements FileAccessInterface {
     curr: string,
     target: string
     ): Promise<string | null> {
-    const entries = await fs.readdir(curr, { withFileTypes: true });
+        const entries = await fs.readdir(curr, { withFileTypes: true });
 
-    for (const entry of entries) {
-        if (!entry.isDirectory()) continue;
+        for (const entry of entries) {
+            if (!entry.isDirectory()) continue;
 
-        const fullPath = path.join(curr, entry.name);
+            const fullPath = path.join(curr, entry.name);
 
-        if (entry.name === target) {
-        return fullPath;
+            if (entry.name === target) {
+                return fullPath;
+            }
+
+            const found = await this.findDirectory(fullPath, target);
+            if (found) {
+                return found;
+            }
         }
 
-        const found = await this.findDirectory(fullPath, target);
-        if (found) {
-            return found;
-        }
-    }
-
-    return null;
+        return null;
     }
 
     /**

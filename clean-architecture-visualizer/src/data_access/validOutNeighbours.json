@@ -24,6 +24,7 @@
     "inputBoundary": [],
     "outputData": [],
     "outputBoundary": [],
+    "dataAccessInterface": [],
     "useCaseInteractor": [
         "inputData", 
         "inputBoundary", 

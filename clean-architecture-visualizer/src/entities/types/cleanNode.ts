@@ -4,6 +4,7 @@ export type cleanNode =
     | 'viewModel'
     | 'view'
     | 'dataAccess'
+    | 'dataAccessInterface'
     | 'database'
     | 'entities'
     | 'inputData'
