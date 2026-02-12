@@ -1,5 +1,5 @@
-import { cleanNode } from "./types/cleanNode";
-import type { neighbourMap } from "./types/neighbourMap";
+import type { cleanNode } from "./types/cleanNode.js";
+import type { neighbourMap } from "./types/neighbourMap.js";
 
 export class useCaseGraph {
     public name: string;
@@ -13,18 +13,18 @@ export class useCaseGraph {
     
     private static createEmptyNeighbourMap(): neighbourMap {
         return {
-        controller: [],
-        presenter: [],
-        viewModel: [],
-        view: [],
-        dataAccess: [],
-        database: [],
-        entities: [],
-        inputData: [],
-        inputBoundary: [],
-        outputData: [],
-        outputBoundary: [],
-        useCaseInteractor: [],
+            controller: [],
+            presenter: [],
+            viewModel: [],
+            view: [],
+            dataAccess: [],
+            database: [],
+            entities: [],
+            inputData: [],
+            inputBoundary: [],
+            outputData: [],
+            outputBoundary: [],
+            useCaseInteractor: [],
         };
     }
 

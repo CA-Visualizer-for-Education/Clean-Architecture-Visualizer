@@ -90,6 +90,7 @@ lerna-debug.log
 
 # Compiled Files
 dist/
+.docusaurus/
 
 # System Files
 .DS_Store
