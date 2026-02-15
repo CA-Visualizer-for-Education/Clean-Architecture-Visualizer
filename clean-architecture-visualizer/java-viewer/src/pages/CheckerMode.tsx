@@ -9,58 +9,36 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
 import SearchIcon from '@mui/icons-material/Search';
+import CircularProgress from '@mui/material/CircularProgress';
 import { HomeIcon, InfoIcon, CheckCircleIcon, ErrorIcon } from '../assets/icons';
-
-// TODO: delete dummy data for use cases and interactions once endpoint is settled
-const dummyUseCases = [
-    {
-        name: 'Sign In',
-        interactions: [
-            { id: '1', name: 'Sign In' },
-        ],
-    },
-    {
-        name: 'Sign Out',
-        interactions: [
-            { id: '2', name: 'Sign Out' },
-        ],
-    },
-    {
-        name: 'Multi-Factor Authentication',
-        interactions: [
-            { id: '3', name: 'Initiate Authentication' },
-            { id: '4', name: 'Confirm Authentication' },
-        ],
-    },
-    {
-        name: 'Use Case #4',
-        interactions: [],
-    },
-    {
-        name: 'Use Case #5',
-        interactions: [],
-    },
-];
-
+import { useAnalysisSummary } from '../actions/useAnalysis';
 
 const CheckerMode: React.FC = () => {
     const { t } = useTranslation('checker');
-    // TODO: Dummy counts (replace with API data in future)
-    const [useCases] = useState(dummyUseCases);
-    const [useCaseCount] = useState(20); 
-    const [violationCount] = useState(6); 
     const [search, setSearch] = useState('');
 
-    // Filter use cases and interactions by search
-    const filteredUseCases = useCases
-        .map((uc) => ({
+    const { data, isLoading, isError } = useAnalysisSummary();
+
+    if (isLoading) {
+        return (
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+                <CircularProgress color="inherit" />
+            </div>
+        );
+    }
+
+    if (isError || !data) {
+        return <div style={{ textAlign: 'center', marginTop: 50 }}>Error loading analysis data.</div>;
+    }
+    const filteredUseCases = data.use_cases
+        .map((uc: any) => ({
             ...uc,
-            interactions: uc.interactions.filter((i) =>
-                i.name.toLowerCase().includes(search.toLowerCase())
+            interactions: (uc.interactions || []).filter((i: any) =>
+                i.interaction_name.toLowerCase().includes(search.toLowerCase())
             ),
         }))
         .filter(
-            (uc) =>
+            (uc: any) =>
                 uc.name.toLowerCase().includes(search.toLowerCase()) ||
                 uc.interactions.length > 0 ||
                 search === ''
@@ -88,14 +66,23 @@ const CheckerMode: React.FC = () => {
                     <InfoIcon style={{ width: 28, height: 28, verticalAlign: 'middle', color: '#222' }} />
                 </button>
             </div>
-            <h1 style={{ textAlign: 'center', fontSize: 40, margin: '16px 0 24px' }}>{t('title')}</h1>
+
+            <h1 style={{ textAlign: 'center', fontSize: 40, margin: '16px 0 24px' }}>
+                {data.project_name || t('title')}
+            </h1>
+
+            {/* Use the counts from the API response */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 24, justifyContent: 'center', marginBottom: 8 }}>
                 <CheckCircleIcon style={{ width: 28, height: 28, fill: '#4caf50', verticalAlign: 'middle' }} />
-                <span style={{ fontWeight: 600, fontSize: 26, color: '#555' }}>{t('useCasesDetected', { count: useCaseCount })}</span>
+                <span style={{ fontWeight: 600, fontSize: 26, color: '#555' }}>
+                    {t('useCasesDetected', { count: data.total_use_cases })}
+                </span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 24, justifyContent: 'center', marginBottom: 24 }}>
                 <ErrorIcon style={{ width: 28, height: 28, fill: '#e65100', verticalAlign: 'middle' }} />
-                <span style={{ fontWeight: 700, fontSize: 26, color: '#e65100' }}>{t('violationsPresent', { count: violationCount })}</span>
+                <span style={{ fontWeight: 700, fontSize: 26, color: '#e65100' }}>
+                    {t('violationsPresent', { count: data.total_violations })}
+                </span>
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
@@ -117,9 +104,9 @@ const CheckerMode: React.FC = () => {
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                {filteredUseCases.map((useCase) => (
+                {filteredUseCases.map((useCase: any) => (
                     <Accordion
-                        key={useCase.name}
+                        key={useCase.id}
                         sx={{ mb: 2, borderRadius: 2, width: '100%', maxWidth: 600 }}
                     >
                         <AccordionSummary
@@ -127,20 +114,27 @@ const CheckerMode: React.FC = () => {
                             aria-controls={`${useCase.name}-content`}
                             id={`${useCase.name}-header`}
                         >
-                            <span style={{ fontWeight: 600, fontSize: 20 }}>{useCase.name}</span>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center', paddingRight: 16 }}>
+                                <span style={{ fontWeight: 600, fontSize: 20 }}>{useCase.name}</span>
+                                {useCase.violation_count > 0 && (
+                                    <span style={{ color: '#e65100', fontWeight: 700, fontSize: 14 }}>
+                                        {useCase.violation_count} {t('violationsPresent', { count: useCase.violation_count })}
+                                    </span>
+                                )}
+                            </div>
                         </AccordionSummary>
                         <AccordionDetails>
                             {useCase.interactions.length === 0 ? (
                                 <span style={{ color: '#888', fontStyle: 'italic' }}>{t('noInteractions')}</span>
                             ) : (
                                 <ul style={{ margin: 0, paddingLeft: 18 }}>
-                                    {useCase.interactions.map((interaction) => (
-                                        <li key={interaction.id} style={{ margin: '8px 0' }}>
+                                    {useCase.interactions.map((interaction: any) => (
+                                        <li key={interaction.interaction_id} style={{ margin: '8px 0' }}>
                                             <Link
-                                                to={`/use-case/${encodeURIComponent(useCase.name)}/interaction/${interaction.id}`}
+                                                to={`/use-case/${encodeURIComponent(useCase.name)}/interaction/${interaction.interaction_id}`}
                                                 style={{ textDecoration: 'underline', color: '#1976d2', fontSize: 17 }}
                                             >
-                                                {interaction.name}
+                                                {interaction.interaction_name}
                                             </Link>
                                         </li>
                                     ))}
