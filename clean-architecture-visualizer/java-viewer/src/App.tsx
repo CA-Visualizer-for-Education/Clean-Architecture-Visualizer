@@ -1,11 +1,11 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Home from './pages/Home';
-import LearningMode from './pages/LearningMode';
-import CheckerMode from './pages/CheckerMode';
-import ProjectStarter from './pages/ProjectStarter';
-import UseCaseInteractionDiagram from './pages/UseCaseInteractionDiagram';
-import UseCaseInteractionCode from './pages/UseCaseInteractionCode';
+import Home from './pages/Home.tsx';
+import LearningMode from './pages/LearningMode.tsx';
+import CheckerMode from './pages/CheckerMode.tsx';
+import ProjectStarter from './pages/ProjectStarter.tsx';
+import UseCaseInteractionDiagram from './pages/UseCaseInteractionDiagram.tsx';
+import UseCaseInteractionCode from './pages/UseCaseInteractionCode.tsx';
 
 const App: React.FC = () => {
     return (

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import Dropdown from './Dropdown';
+import Dropdown from './Dropdown.tsx';
 
 const Header: React.FC = () => {
     const navigate = useNavigate();
