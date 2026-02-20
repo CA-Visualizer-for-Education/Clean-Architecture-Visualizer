@@ -53,7 +53,7 @@ npm run build
 npm run preview
 ```
 
-Then open the URL shown (e.g. `http://localhost:4173`). Again, content comes from `public/cave-java-payload.json` if present.
+Then open the URL shown (e.g. `http://localhost:5173`). Again, content comes from `public/cave-java-payload.json` if present.
 
 ## Wiring to `cave read-java <filePath>`
 

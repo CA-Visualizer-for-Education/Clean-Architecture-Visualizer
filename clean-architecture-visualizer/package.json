@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "tsc",
-    "start": "ts-node ./src/app/index.ts",
-    "cave": "tsx ./src/app/index.ts"
+    "build": "tsc && npm run build_frontend",
+    "build_frontend": "cd java-viewer && npm install && npm run build",
+    "start": "node ./dist/src/app/index.js"
   },
   "keywords": [],
   "author": "",
@@ -18,15 +18,14 @@
     "cave": "./dist/app/index.js"
   },
   "devDependencies": {
+    "@types/node": "^25.0.10",
     "jest": "^30.2.0",
-    "tsx": "^4.19.2"
+    "tsx": "^4.19.2",
+    "typescript": "^5.9.3"
   },
   "dependencies": {
-    "@aws-sdk/client-signer": "^3.975.0",
-    "@types/node": "^25.0.10",
     "chalk": "^5.6.2",
-    "commander": "^14.0.2",
-    "typescript": "^5.9.3"
+    "commander": "^14.0.2"
   },
   "type": "module"
 }
