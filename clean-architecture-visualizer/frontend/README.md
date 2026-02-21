@@ -60,10 +60,3 @@ npm run preview
 ```
 
 Then open the URL shown (e.g. `http://localhost:5173`).
-
-## Wiring to `cave view <filePath>`
-
-The command is already wired:
-
-- **Command:** `cave view <filePath>`
-- **Behavior:** Reads the Java file, writes a JSON payload into `frontend/public/cave-view-payload.json`, starts the React app’s dev server, and opens the browser to the viewer.
