@@ -96,4 +96,4 @@ dist/
 # System Files
 .DS_Store
 Thumbs.db
-clean-architecture-visualizer/java-viewer/public/cave-java-payload.json
+clean-architecture-visualizer/frontend/public/

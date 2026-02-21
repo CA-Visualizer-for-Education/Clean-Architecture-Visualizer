@@ -4,17 +4,17 @@ import * as fs from "fs";
 import * as path from "path";
 import { fileURLToPath } from "url";
 import chalk from "chalk";
-import { exec, spawn, spawnSync } from "child_process";
+import { exec, spawn } from "child_process";
 
 // Load package.json synchronously for compatibility with compiled output
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const packageJsonPath = path.resolve(__dirname, "../../package.json");
 const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf-8"));
-const JAVA_VIEWER_DIR = path.resolve(__dirname, "../../java-viewer");
+const FRONTEND_DIR = path.resolve(__dirname, "../../frontend");
 const PAYLOAD_PATH = path.join(
-  JAVA_VIEWER_DIR,
+  FRONTEND_DIR,
   "public",
-  "cave-java-payload.json",
+  "cave-view-payload.json",
 );
 const VIEWER_PORT = 5173;
 
@@ -23,33 +23,11 @@ const program = new Command();
 program.version(packageJson.version);
 
 program
-  .command("init")
-  .description("Install front-end dependencies (npm install in frontend)")
-  .action(() => {
-    const isWindows = process.platform === "win32";
-    const npmCmd = isWindows ? "npm.cmd" : "npm";
-    const result = spawnSync(npmCmd, ["install"], {
-      cwd: JAVA_VIEWER_DIR,
-      stdio: "inherit",
-      shell: isWindows,
-    });
-    if (result.status !== 0) {
-      console.error(chalk.red("frontend install failed"));
-      process.exitCode = 1;
-    } else {
-      console.log(chalk.green("frontend dependencies installed"));
-    }
-  });
-
-program
   .command("view <filePath>")
   .description(
-    "Read a Java file and open it in the React viewer (or print to console with --console)",
+    "Read a file and open it in the React frontend (or print to console with --console)",
   )
-  .option(
-    "--console",
-    "Only print file contents to the terminal (no React app)",
-  )
+  .option("--console", "Only print file contents to the terminal (no frontend)")
   .action((filePath: string, options: { console?: boolean }) => {
     try {
       const fullPath = path.resolve(filePath);
@@ -72,20 +50,22 @@ program
         content: contents,
         error: null as string | null,
       };
+      // Create public directory if it doesn't exist
+      fs.mkdirSync(path.dirname(PAYLOAD_PATH), { recursive: true });
       fs.writeFileSync(PAYLOAD_PATH, JSON.stringify(payload, null, 2));
 
-      // Start React dev server (npm run dev in java-viewer)
+      // Start React dev server (npm run dev in frontend)
       const isWindows = process.platform === "win32";
       const npmCmd = isWindows ? "npm.cmd" : "npm";
       const devProcess = spawn(npmCmd, ["run", "dev"], {
-        cwd: JAVA_VIEWER_DIR,
+        cwd: FRONTEND_DIR,
         stdio: "inherit",
         shell: isWindows,
         windowsHide: true,
       });
 
       devProcess.on("error", (err) => {
-        console.error(chalk.red("Failed to start Java viewer:"), err.message);
+        console.error(chalk.red("Failed to start frontend:"), err.message);
         process.exitCode = 1;
       });
 
@@ -104,7 +84,7 @@ program
               viewerUrl,
             );
           } else {
-            console.log(chalk.green("Java viewer opened at"), viewerUrl);
+            console.log(chalk.green("Frontend opened at"), viewerUrl);
           }
         });
       }, 2500);
