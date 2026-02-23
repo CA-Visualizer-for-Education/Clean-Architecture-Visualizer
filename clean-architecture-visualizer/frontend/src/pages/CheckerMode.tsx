@@ -12,17 +12,13 @@ import SearchIcon from '@mui/icons-material/Search';
 import CircularProgress from '@mui/material/CircularProgress';
 import { HomeIcon, InfoIcon, CheckCircleIcon, ErrorIcon } from '../assets/icons';
 import { useAnalysisSummary } from '../actions/useAnalysis';
-import { AnalysisSummary, UseCase, Interaction } from '../lib/types';
+import { UseCase, Interaction } from '../lib/types';
 
 const CheckerMode: React.FC = () => {
     const { t } = useTranslation('checker');
     const [search, setSearch] = useState('');
 
-    const { data, isLoading, isError } = useAnalysisSummary() as { 
-        data: AnalysisSummary | undefined, 
-        isLoading: boolean, 
-        isError: boolean 
-    };
+    const { data, isLoading, isError } = useAnalysisSummary();
 
     if (isLoading) {
         return (
@@ -122,7 +118,7 @@ const CheckerMode: React.FC = () => {
                                 <span style={{ fontWeight: 600, fontSize: 20 }}>{useCase.name}</span>
                                 {useCase.violation_count > 0 && (
                                     <span style={{ color: '#e65100', fontWeight: 700, fontSize: 14 }}>
-                                        {useCase.violation_count} {t('violationsPresent', { count: useCase.violation_count })}
+                                        {t('violationsPresent', { count: useCase.violation_count })}
                                     </span>
                                 )}
                             </div>
