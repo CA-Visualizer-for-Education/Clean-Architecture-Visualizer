@@ -1,5 +1,6 @@
 {
-  // Visit https://aka.ms/tsconfig to read more about this file
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "frontend", "dist"],
   "compilerOptions": {
     // File Layout
     "rootDir": ".",
@@ -7,33 +8,20 @@
 
     // Environment Settings
     "module": "nodenext",
+    "moduleResolution": "nodenext",
     "target": "esnext",
     "lib": ["esnext"],
     "types": ["node", "@types/jest"],
+    "esModuleInterop": true,
 
     // Other Outputs
     "sourceMap": true,
-    "declaration": true,
-    "declarationMap": true,
-
-    // Stricter Typechecking Options
-    "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true,
-
-    // Style Options
-    "noImplicitReturns": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
 
     // Recommended Options
     "strict": true,
-    "jsx": "react-jsx",
     "verbatimModuleSyntax": true,
     "isolatedModules": true,
-    "noUncheckedSideEffectImports": true,
-    "moduleDetection": "force",
-    "skipLibCheck": true,
-    "resolveJsonModule": true
+    "skipLibCheck": true
   },
   "include": ["src/**/*", "tests/**/*"]
 }

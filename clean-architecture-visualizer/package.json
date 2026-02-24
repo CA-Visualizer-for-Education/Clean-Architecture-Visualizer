@@ -1,15 +1,12 @@
 {
   "name": "clean-architecture-visualizer",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && npm run build_frontend",
+    "build_frontend": "cd frontend && npm install && npm run build",
     "start": "node ./dist/app/index.js",
     "test": "node --experimental-vm-modules node_modules/.bin/jest"
   },
-  "keywords": [],
-  "author": "",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/paulgries/Clean-Architecture-Visualizer/issues"
@@ -25,6 +22,7 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
+    "chalk": "^5.6.2",
     "commander": "^14.0.2"
   },
   "type": "module"
