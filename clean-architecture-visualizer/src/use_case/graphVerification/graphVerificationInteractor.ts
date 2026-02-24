@@ -8,7 +8,7 @@ import { useCaseGraph } from "../../entities/useCaseGraph.js";
 export class GraphVerificationInteractor implements GraphVerificationInputBoundary{
     private readonly internalDirectories = [
         "use_case",
-        "interface_adapters",
+        "interface_adapter",
     ];
     private readonly externalDirectories = [
         "entities",

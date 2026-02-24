@@ -14,7 +14,6 @@ export class FileAccess implements FileAccessInterface {
 
         const srcPath = await this.bfsFindSrc(currPath);
         if (!srcPath) return [];
-        console.log(srcPath);
         const useCasePath = await this.findDirectory(srcPath, "use_case");
         if (!useCasePath) return [];
 
