@@ -1,0 +1,36 @@
+{
+    "controller": [
+        "inputData",
+        "inputBoundary"
+    ],
+    "presenter": [
+        "viewModel",
+        "outputBoundary",
+        "outputData"
+    ],
+    "viewModel": [],
+    "view": [
+        "viewModel",
+        "controller"
+    ],
+    "dataAccess": [
+        "dataAccessInterface",
+        "database",
+        "entities"
+    ],
+    "database": [],
+    "entities": [],
+    "inputData": [],
+    "inputBoundary": [],
+    "outputData": [],
+    "outputBoundary": [],
+    "dataAccessInterface": [],
+    "useCaseInteractor": [
+        "inputData", 
+        "inputBoundary", 
+        "outputBoundary", 
+        "outputData",
+        "dataAccessInterface",
+        "entities"
+    ]
+}
