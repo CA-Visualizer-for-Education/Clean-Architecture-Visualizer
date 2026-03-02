@@ -1,16 +1,16 @@
 {
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "frontend", "dist"],
+  "exclude": ["node_modules", "frontend", "dist", "tests"],
   "compilerOptions": {
     // File Layout
-    "rootDir": "./src",
+    "rootDir": ".",
     "outDir": "./dist",
 
     // Environment Settings
     "module": "nodenext",
     "moduleResolution": "nodenext",
     "target": "esnext",
-    "types": ["node"],
+    "lib": ["esnext"],
+    "types": ["node", "@types/jest"],
     "esModuleInterop": true,
 
     // Other Outputs
@@ -21,5 +21,6 @@
     "verbatimModuleSyntax": true,
     "isolatedModules": true,
     "skipLibCheck": true
-  }
+  },
+  "include": ["src/**/*", "tests/**/*"]
 }

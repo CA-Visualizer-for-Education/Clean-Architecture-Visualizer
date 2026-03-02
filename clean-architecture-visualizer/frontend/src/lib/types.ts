@@ -37,7 +37,7 @@ export interface CANode {
   type: CAComponentType;
   layer: CALayer;
   file_path?: string;
-  status: 'VALID' | 'INVALID' | 'MISSING' | 'VIOLATION';
+  status: 'VALID' | 'MISSING' | 'VIOLATION';
 }
 
 export interface CAEdge {
@@ -45,7 +45,7 @@ export interface CAEdge {
   source: string;
   target: string;
   type: 'DEPENDENCY' | 'ASSOCIATION' | 'INHERITANCE';
-  status: 'VALID' | 'VIOLATION';
+  status: 'VALID' | 'VIOLATION' | 'INCORRECT_DEPENDENCY';
 }
 
 export interface InteractionDetail {
