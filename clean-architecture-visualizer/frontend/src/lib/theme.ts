@@ -114,7 +114,6 @@ export const defaultTheme: Theme = {
         code: {
             fontFamily: "Consolas, Monaco, \"Courier New\", monospace",
             fontSize: "0.875rem",
-            backgroundColor: "#F5F5F5",
             padding: "0.125rem 0.25rem",
             borderRadius: "0.1875rem",
         },
