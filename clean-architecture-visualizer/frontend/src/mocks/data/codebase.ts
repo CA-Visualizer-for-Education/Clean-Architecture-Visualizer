@@ -26,7 +26,7 @@ export const mockFileTree = {
           path: "src/use_case/signup/",
           children: [
             { id: "src/use_case/signup/SignupInputBoundary.java", name: "SignupInputBoundary.java", type: "file", path: "src/use_case/signup/SignupInputBoundary.java", hasViolation: false },
-            { id: "src/use_case/signup/SignupInputData.java", name: "SignupInputData.java", type: "file", path: "src/use_case/signup/SignupInputData.java", hasViolation: false }
+            { id: "src/use_case/signup/SignupInputData.java", name: "SignupInputData.java", type: "file", path: "src/use_case/signup/SignupInputData.java", hasViolation: true }
           ]
         }
       ]
@@ -252,7 +252,7 @@ export const mockFileRelationsByPath: Record<string, FileRelation[]> = {
   "src/interface_adapter/signup/SignupController.java": [
     {
       type: "IMPORT",
-      target_file: "src/interface_adapter/signup/SignupInputData.java",
+     target_file: "src/use_case/signup/SignupInputData.java",
       line: 4,
       description: "Imports SignupInputData from controller arguments." 
     },
@@ -260,14 +260,14 @@ export const mockFileRelationsByPath: Record<string, FileRelation[]> = {
       type: "INSTANTIATION",
       target_file: "src/use_case/signup/SignupInputBoundary.java",
       line: 7,
-      description: "Instantiates SignInputData"
+      description: "Instantiates SignInputBoundary"
     }
   ],
   "src/data_access/UserSignupDataAccessInterface.java": [
     {
       type: "DEPENDENCY",
-      target_file: "src/data_access/UserSignupDataAccessInterface.java",
-      line: 4,
+      target_file: "src/entity/User.java",
+      line: 2,
       description: "Depends on Entity/User interface."
     }
   ]
