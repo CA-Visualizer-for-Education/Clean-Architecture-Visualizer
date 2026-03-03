@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { getFileTree, getFileContent, getComponentRelations } from '../api/codebase.api';
+import { getFileTree, getFileContent, getFileRelations } from '../api/codebase.api';
 
 export const useFileTree = () => {
   return useQuery({
@@ -16,10 +16,10 @@ export const useFileViewer = (interactionId: string, filePath: string | null) =>
   });
 };
 
-export const useComponentRelations = (interactionId: string, componentId: string | null) => {
+export const useFileRelations = (interactionId: string, filePath: string | null) => {
   return useQuery({
-    queryKey: ['relations', interactionId, componentId],
-    queryFn: () => getComponentRelations(interactionId, componentId!),
-    enabled: !!interactionId && !!componentId,
+    queryKey: ['relations', interactionId, filePath],
+    queryFn: () => getFileRelations(interactionId, filePath!),
+    enabled: !!interactionId && !!filePath,
   });
 };

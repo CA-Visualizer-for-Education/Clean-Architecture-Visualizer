@@ -14,14 +14,14 @@ export const getFileTree = async () => {
  * @param path - The specific file path (e.g., src/entities/User.java)
  */
 export const getFileContent = async (interactionId: string, path: string) => {
-  const { data } = await apiClient.get(`/codebase/interactions/${interactionId}/files/${path}`); 
+  const { data } = await apiClient.get(`/codebase/interactions/${interactionId}/files/${encodeURIComponent(path)}`); 
   return data;
 };
 
 /**
- * Fetches cross-file relations for a specific component.
+ * Fetches cross-file relations for a specific file.
  */
-export const getComponentRelations = async (interactionId: string, componentId: string) => {
-  const { data } = await apiClient.get(`/codebase/interactions/${interactionId}/relations/${componentId}`); 
+export const getFileRelations = async (interactionId: string, filePath: string) => {
+  const { data } = await apiClient.get(`/codebase/interactions/${interactionId}/files/${encodeURIComponent(filePath)}/relations`); 
   return data;
 };
