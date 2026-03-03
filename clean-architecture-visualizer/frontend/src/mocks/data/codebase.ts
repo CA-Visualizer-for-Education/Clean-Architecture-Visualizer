@@ -64,7 +64,7 @@ export const mockFileTree = {
   ]
 };
 
-export const mockFiles: Record<string, any> = {
+export const mockFiles: Record<string, MockFile> = {
   "src/entity/User.java": {
     file_path: "src/entity/User.java",
     content: `package entity;
@@ -248,7 +248,7 @@ public class LoginView extends JPanel implements ActionListener, PropertyChangeL
 };
 
 
-export const mockFileRelationsByPath: Record<string, any[]> = {
+export const mockFileRelationsByPath: Record<string, FileRelation[]> = {
   "src/interface_adapter/signup/SignupController.java": [
     {
       type: "IMPORT",
@@ -272,3 +272,17 @@ export const mockFileRelationsByPath: Record<string, any[]> = {
     }
   ]
 };
+
+interface MockFile {
+  file_path: string;
+  content: string;
+  language: string;
+  lines_with_violations: number[];
+}
+
+interface FileRelation {
+  type: string;
+  target_file: string;
+  line: number;
+  description: string;
+}
