@@ -1,4 +1,4 @@
-export { CANodeView as CANode } from './CANodeView/CANodeView.tsx';
+export { CANodeView } from './CANodeView/CANodeView.tsx';
 export { Legend } from './Legend.tsx';
 // export { LearningPopup } from './LearningPopup.tsx';
 // export { Popover } from './Popover.tsx';

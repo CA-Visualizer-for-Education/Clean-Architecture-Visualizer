@@ -1,5 +1,5 @@
 import { Typography, Container, Box } from '@mui/material';
-import { CANodeView } from './CANodeView/CANodeView';
+import { CANodeView } from './index';
 
 export function CADiagram() {
     return (
