@@ -12,18 +12,18 @@ import { lightTheme } from './lib';
 
 const App: React.FC = () => {
     return (
-    <ThemeProvider theme={lightTheme}>
-      {<Router>
-            <Routes>
-                <Route path='/' element={<Home />} />
-                <Route path='/learning' element={<LearningMode />} />
-                <Route path='/checker' element={<CheckerMode />} />
-                <Route path='/project-starter' element={<ProjectStarter />} />
-                <Route path='/use-case/:useCaseId/interaction/:interactionId/diagram' element={<UseCaseInteractionDiagram />} />
-                <Route path='/use-case/:useCaseId/interaction/:interactionId/code' element={<UseCaseInteractionCode />} />
-            </Routes>
-        </Router>}
-    </ThemeProvider>
+        <ThemeProvider theme={lightTheme}>
+        <Router>
+                <Routes>
+                    <Route path='/' element={<Home />} />
+                    <Route path='/learning' element={<LearningMode />} />
+                    <Route path='/checker' element={<CheckerMode />} />
+                    <Route path='/project-starter' element={<ProjectStarter />} />
+                    <Route path='/use-case/:useCaseId/interaction/:interactionId/diagram' element={<UseCaseInteractionDiagram />} />
+                    <Route path='/use-case/:useCaseId/interaction/:interactionId/code' element={<UseCaseInteractionCode />} />
+                </Routes>
+            </Router>
+        </ThemeProvider>
   );
 }
 

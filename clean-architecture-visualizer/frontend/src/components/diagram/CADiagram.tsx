@@ -9,7 +9,7 @@ export function CADiagram() {
                 Clean Architecture Diagram
             </Typography>
             <Container sx={{
-                bgcolor: 'adapters.light', justifyContent: 'center', borderStyle: 'solid', borderColor: 'adapters.contrast', borderRadius: 2, borderWidth: 2,
+                bgcolor: 'adapters.light', justifyContent: 'center', borderStyle: 'solid', borderColor: 'adapters.contrastText', borderRadius: 2, borderWidth: 2,
             }}>
                 <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 2, justifyItems: 'center' }}>
                     <Box>
@@ -34,7 +34,7 @@ export function CADiagram() {
             </Container>
 
             <Container sx={{
-                bgcolor: 'useCases.light', justifyContent: 'center', borderStyle: 'solid', borderColor: 'useCases.contrast', borderRadius: 2, borderWidth: 2,
+                bgcolor: 'useCases.light', justifyContent: 'center', borderStyle: 'solid', borderColor: 'useCases.contrastText', borderRadius: 2, borderWidth: 2,
             }}>
                 <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 2, justifyItems: 'center' }}>
                     <Box>
@@ -59,7 +59,7 @@ export function CADiagram() {
             </Container>
 
             <Container sx={{
-                bgcolor: 'entities.light', justifyContent: 'center', borderStyle: 'solid', borderColor: 'entities.contrast', borderRadius: 2, borderWidth: 2,
+                bgcolor: 'entities.light', justifyContent: 'center', borderStyle: 'solid', borderColor: 'entities.contrastText', borderRadius: 2, borderWidth: 2,
             }}>
                 <Box sx={{ display: 'flex', justifyContent: 'center' }}>
                 <CANodeView node={{
@@ -73,7 +73,7 @@ export function CADiagram() {
             </Container>  
 
             <Container sx={{
-                bgcolor: 'drivers.light', justifyContent: 'center', borderStyle: 'solid', borderColor: 'drivers.contrast', borderRadius: 2, borderWidth: 2,
+                bgcolor: 'drivers.light', justifyContent: 'center', borderStyle: 'solid', borderColor: 'drivers.contrastText', borderRadius: 2, borderWidth: 2,
             }}>
                 <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 2, justifyItems: 'center' }}>
                     <Box>

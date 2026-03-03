@@ -2,7 +2,7 @@
 
 This React app displays a Java file with function-name highlighting. It is used by the CAVE CLI command `cave view <filePath>`.
 
-**Note:** This application uses Vite and requires **Node.js 18+** (or 20+ recommended). If `npm run dev` fails, upgrade Node and run `npm install` again.
+**Note:** This application uses Vite and requires **Node.js 20.19+** . If `npm run dev` fails, upgrade Node and run `npm install` again.
 
 ## Launching the React app
 
