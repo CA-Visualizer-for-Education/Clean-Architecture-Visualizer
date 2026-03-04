@@ -1,32 +1,45 @@
 import { styled } from '@mui/material/styles';
 import FolderIcon from '@mui/icons-material/Folder';
 import DescriptionIcon from '@mui/icons-material/Description';
+import { FileNode } from '../../../lib';
 
-const NodeContainer = styled('div')<{ isActive?: boolean; depth: number; theme: any }>(
-  ({ isActive, depth, theme }) => ({
-    display: 'flex',
-    alignItems: 'center',
-    paddingTop: 4,
-    paddingBottom: 4,
-    paddingLeft: depth * 16,
-    fontWeight: isActive ? 600 : 400,
-    cursor: 'pointer',
-    backgroundColor: isActive ? theme.palette.action.selected : 'transparent',
-    '&:hover': {
-      backgroundColor: theme.palette.action.hover,
-    },
-  })
-);
+interface NodeContainerProps {
+  isActive?: boolean;
+  depth: number;
+}
 
-export const TreeNode = ({
+interface TreeNodeProps {
+  node: FileNode;
+  onSelect: (path: string) => void;
+  activeFilePath: string | null;
+  expandedFolders: Set<string>;
+  toggleFolder: (path: string) => void;
+  depth: number;
+}
+
+
+const NodeContainer = styled('div')<NodeContainerProps>(({ isActive, depth, theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  paddingTop: 4,
+  paddingBottom: 4,
+  paddingLeft: depth * 16,
+  fontWeight: isActive ? 600 : 400,
+  cursor: 'pointer',
+  backgroundColor: isActive ? theme.palette.action.selected : 'transparent',
+  '&:hover': {
+    backgroundColor: theme.palette.action.hover,
+  },
+}));
+
+export const TreeNode: React.FC<TreeNodeProps> = ({
   node,
   onSelect,
   activeFilePath,
   expandedFolders,
   toggleFolder,
-  theme,
   depth,
-}: any) => {
+}) => {
   const isDir = node.type === 'directory';
   const isExpanded = expandedFolders.has(node.path);
   const isActive = node.path === activeFilePath;
@@ -36,7 +49,6 @@ export const TreeNode = ({
       <NodeContainer
         isActive={isActive}
         depth={depth}
-        theme={theme}
         onClick={() => (isDir ? toggleFolder(node.path) : onSelect(node.path))}
       >
         <span style={{ width: 16 }}>{isDir ? (isExpanded ? '▾' : '▸') : ''}</span>
@@ -45,8 +57,9 @@ export const TreeNode = ({
         </span>
       </NodeContainer>
 
-      {isDir && isExpanded &&
-        node.children?.map((child: any) => (
+      {isDir &&
+        isExpanded &&
+        node.children?.map((child) => (
           <TreeNode
             key={child.id}
             node={child}
@@ -54,7 +67,6 @@ export const TreeNode = ({
             activeFilePath={activeFilePath}
             expandedFolders={expandedFolders}
             toggleFolder={toggleFolder}
-            theme={theme}
             depth={depth + 1}
           />
         ))}

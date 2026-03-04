@@ -1,12 +1,12 @@
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useMemo } from 'react';
 import type * as Monaco from 'monaco-editor';
 import { useFileViewer, useFileRelations } from '../../../actions/useCodebase';
-
-type UseMonacoDecorationsProps = {
+import { FileRelation } from '../../../lib';
+interface UseMonacoDecorationsProps {
   interactionId: string;
-  filePath: string | null;
+  filePath: string;
   onFileChange: (newPath: string) => void;
-};
+}
 
 export const useMonacoDecorations = ({
   interactionId,
@@ -18,25 +18,14 @@ export const useMonacoDecorations = ({
   const decorationIds = useRef<string[]>([]);
   const linkProviderRef = useRef<Monaco.IDisposable | null>(null);
 
-  const { data, isLoading, isError } = useFileViewer(
-    interactionId,
-    filePath ?? ''
-  );
+  const { data, isLoading, isError } = useFileViewer(interactionId, filePath);
+  const { data: relationsData } = useFileRelations(interactionId, filePath);
 
-  const { data: relationsData } = useFileRelations(
-    interactionId,
-    filePath ?? ''
-  );
+  const relations = useMemo(() => {
+  if (!relationsData) return [];
+  return Array.isArray(relationsData) ? relationsData : relationsData.relations ?? [];
+}, [relationsData]);
 
-  const relations = useRef<any[]>([]);
-  useEffect(() => {
-    if (!relationsData) return;
-    relations.current = Array.isArray(relationsData)
-      ? relationsData
-      : relationsData.relations ?? [];
-  }, [relationsData]);
-
-  // Apply decorations
   const applyDecorations = useCallback(() => {
     if (!editorRef.current || !monacoRef.current || !data) return;
     const model = editorRef.current.getModel();
@@ -44,6 +33,7 @@ export const useMonacoDecorations = ({
 
     const newDecorations: Monaco.editor.IModelDeltaDecoration[] = [];
 
+    // Violations
     data.lines_with_violations?.forEach((line: number) => {
       newDecorations.push({
         range: new monacoRef.current!.Range(line, 1, line, model.getLineMaxColumn(line)),
@@ -55,7 +45,8 @@ export const useMonacoDecorations = ({
       });
     });
 
-    relations.current.forEach((rel: any) => {
+    // Relations
+    relations.forEach((rel: { line?: number; type?: string; target_file?: string }) => {
       if (!rel.line) return;
       newDecorations.push({
         range: new monacoRef.current!.Range(rel.line, 1, rel.line, model.getLineMaxColumn(rel.line)),
@@ -67,20 +58,17 @@ export const useMonacoDecorations = ({
       });
     });
 
-    decorationIds.current = editorRef.current.deltaDecorations(
-      decorationIds.current,
-      newDecorations
-    );
-  }, [data]);
+    decorationIds.current = editorRef.current.deltaDecorations(decorationIds.current, newDecorations);
+  }, [data, relations]);
 
-  // Editor mount handler
-  const handleEditorDidMount = useCallback(
+  const handleEditorMount = useCallback(
     (editor: Monaco.editor.IStandaloneCodeEditor, monaco: typeof Monaco) => {
       editorRef.current = editor;
       monacoRef.current = monaco;
 
       applyDecorations();
 
+      // Cmd/Ctrl click navigation
       editor.onMouseUp((e) => {
         const evt = e.event.browserEvent;
         if (!(evt.metaKey || evt.ctrlKey)) return;
@@ -88,14 +76,14 @@ export const useMonacoDecorations = ({
         const line = e.target.position?.lineNumber;
         if (!line) return;
 
-        const match = relations.current.find((rel) => rel.line === line);
+        const match = relations.find((rel: FileRelation) => rel.line === line);
         if (match?.target_file) onFileChange(match.target_file);
       });
     },
-    [applyDecorations, onFileChange]
+    [applyDecorations, onFileChange, relations]
   );
 
-  // Reapply decorations whenever data changes
+  // Re-apply decorations when data changes
   useEffect(() => {
     applyDecorations();
   }, [applyDecorations]);
@@ -103,40 +91,28 @@ export const useMonacoDecorations = ({
   // Register link provider
   useEffect(() => {
     if (!monacoRef.current || !data?.language) return;
-
     linkProviderRef.current?.dispose();
-    linkProviderRef.current = monacoRef.current.languages.registerLinkProvider(
-      data.language,
-      {
-        provideLinks: (model) => {
-          const links = relations.current
-            .filter((rel) => rel.line && rel.target_file)
-            .map((rel) => ({
-              range: new monacoRef.current!.Range(
-                rel.line,
-                1,
-                rel.line,
-                model.getLineMaxColumn(rel.line)
-              ),
-              url: `file://${rel.target_file}`,
-            }));
-          return { links };
-        },
-      }
-    );
 
-    return () => {
-      linkProviderRef.current?.dispose();
-    };
-  }, [data?.language]);
+    linkProviderRef.current = monacoRef.current.languages.registerLinkProvider(data.language, {
+      provideLinks: (model) => {
+        const links = relations
+          .filter((rel: FileRelation) => rel.line && rel.target_file)
+          .map((rel: FileRelation) => ({
+            range: new monacoRef.current!.Range(rel.line!, 1, rel.line!, model.getLineMaxColumn(rel.line!)),
+            url: `file://${rel.target_file}`,
+          }));
+        return { links };
+      },
+    });
 
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      decorationIds.current = [];
-      linkProviderRef.current?.dispose();
-    };
+    return () => linkProviderRef.current?.dispose();
+  }, [data?.language, relations]);
+
+  // Cleanup
+  useEffect(() => () => {
+    decorationIds.current = [];
+    linkProviderRef.current?.dispose();
   }, []);
 
-  return { handleEditorDidMount, isLoading, isError, fileData: data };
+  return { editorRef, monacoRef, handleEditorMount, data, isLoading, isError };
 };

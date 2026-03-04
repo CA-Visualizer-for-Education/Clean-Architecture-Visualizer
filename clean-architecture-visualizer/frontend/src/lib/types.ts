@@ -91,3 +91,9 @@ export interface FileContent {
   language: string;
   lines_with_violations: number[];
 }
+
+export type FileRelation = {
+  line: number;
+  target_file: string;
+  type: string;
+};
