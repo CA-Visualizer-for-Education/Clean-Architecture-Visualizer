@@ -5,7 +5,7 @@ export interface SessionDBAccessInterface {
     setProjectName(name: string): void;
     setNumUseCases(count: number): void;
     setNumViolations(count: number): void;
-    setUseCase(useCaseList: object[]): void;
+    setUseCases(useCaseList: object[]): void;
 
     // Getters
     getProjectName(): string;

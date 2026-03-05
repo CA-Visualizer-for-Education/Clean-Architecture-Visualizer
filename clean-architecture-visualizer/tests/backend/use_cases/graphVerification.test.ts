@@ -1,15 +1,20 @@
 import { GraphVerificationInteractor } from "../../../src/use_case/graphVerification/graphVerificationInteractor.js";
 import { FileAccess } from "../../../src/data_access/fileAccess.js";
-import { CleanArchAccess } from "../../../src/data_access/cleanArchInfoAccess.js"
+import { CleanArchAccess } from "../../../src/data_access/cleanArchInfoAccess.js";
+import { SessionDBAccess } from "../../../src/data_access/sessionDBAccess.js";
 
 import { useCaseGraph } from "../../../src/entities/useCaseGraph.js";
 
 const genericFileAccess = new FileAccess();
 const genericNeighbourAccess = new CleanArchAccess();
+const genericDBAccess = new SessionDBAccess();
 
 describe("Ensures that resolveLayer correctly identifies nodes from thier file path", () => {
 
-    const genericInteractor = new GraphVerificationInteractor( genericFileAccess, genericNeighbourAccess);
+    const genericInteractor = new GraphVerificationInteractor(genericFileAccess,
+         genericNeighbourAccess,
+         genericDBAccess
+        );
     const testUseCase: [string, string][] = [
         ["view", "/src/views/test/testView.ts"],
         ["viewModel", "/src/views/test/testViewModel.ts"],
@@ -91,10 +96,56 @@ describe("Ensures that verifyOutNeighbours correctly classifies the number of Cl
 
     it.each(testCases)(
         "%s" , async (_, useCaseGraphList, expectedViolations) => {
-            const interactor = new GraphVerificationInteractor(genericFileAccess, genericNeighbourAccess, (useCaseGraphList as useCaseGraph[]));
+            const interactor = new GraphVerificationInteractor(genericFileAccess,
+                genericNeighbourAccess,
+                genericDBAccess,
+                (useCaseGraphList as useCaseGraph[])
+            );
             await (interactor as any).verifyOutNeighbours();
             const violationCount = getAllViolations((interactor as any).useCaseGraphList);
             expect(violationCount).toBe(expectedViolations);
         }
     )
+});
+
+describe("Ensures that populateDatabase correctly populates the database", () => {
+
+    const genericFileAccess = new FileAccess();
+    const genericNeighbourAccess = new CleanArchAccess();
+    const genericDBAccess = new SessionDBAccess();
+
+    const emptyUseCase = new useCaseGraph("empty");
+    const singleViolation = new useCaseGraph("single");
+    const multipleViolations = new useCaseGraph("multiple");
+
+    singleViolation.setNodeNeighbour("view", "entities");         // 1 violation
+    multipleViolations.setNodeNeighbour("entities", "view");      // 2 violations
+    multipleViolations.setNodeNeighbour("controller", "entities");
+
+    const testCases = [
+        ["Empty use case list sets 0 use cases and 0 violations", [], 0, 0],
+        ["Single use case with no violations", [emptyUseCase], 1, 0],
+        ["Single use case with 1 violation", [singleViolation], 1, 1],
+        ["Multiple use cases with violations are summed correctly", [singleViolation, multipleViolations], 2, 3],
+    ];
+
+    afterEach(() => {
+        [emptyUseCase, singleViolation, multipleViolations].forEach(g => g.resetViolations());
+    });
+
+    it.each(testCases)(
+        "%s", async (_, useCaseGraphList, expectedUseCases, expectedViolations) => {
+            const interactor = new GraphVerificationInteractor(
+                genericFileAccess,
+                genericNeighbourAccess,
+                genericDBAccess,
+                (useCaseGraphList as useCaseGraph[])
+            );
+            await (interactor as any).verifyOutNeighbours();
+            (interactor as any).populateDatabase();
+
+            expect(genericDBAccess.getNumUseCases()).toBe(expectedUseCases);
+            expect(genericDBAccess.getNumViolations()).toBe(expectedViolations);
+        }
+    );
 });

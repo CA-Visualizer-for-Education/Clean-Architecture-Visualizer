@@ -26,7 +26,7 @@ export class SessionDBAccess implements SessionDBAccessInterface {
         this.db.set("numViolations", count);
     }
 
-    setUseCase(useCaseList: useCaseGraph[]): void {
+    setUseCases(useCaseList: useCaseGraph[]): void {
         // add all new files to the "database"
         const existingFiles = this.db.get("files") ?? {};
 

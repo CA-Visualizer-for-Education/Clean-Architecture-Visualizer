@@ -1,5 +1,6 @@
 import type { FileAccessInterface } from "../../data_access/fileAccessInterface.js";
 import type { CleanArchInfoAccessInterface } from "../../data_access/cleanArchInfoAccessInterface.js";
+import type { SessionDBAccessInterface } from "../../data_access/sessionDBAccessInterface.js";
 import type { GraphVerificationInputBoundary } from "./graphVerificationInputBoundary.js";
 import type { cleanNode } from "../../types/cleanNode.js";
 
@@ -24,6 +25,7 @@ export class GraphVerificationInteractor implements GraphVerificationInputBounda
     constructor(
         private readonly fileAccess: FileAccessInterface,
         private readonly cleanArchInfoAccess: CleanArchInfoAccessInterface,
+        private readonly db: SessionDBAccessInterface,
         private readonly useCaseGraphList: useCaseGraph[] = []
     ) {}
 
@@ -32,6 +34,7 @@ export class GraphVerificationInteractor implements GraphVerificationInputBounda
         await this.buildUseCaseGraphs();
         await this.developOutNeighbours();
         await this.verifyOutNeighbours();
+        this.populateDatabase();
     }
 
     /**
@@ -163,5 +166,18 @@ export class GraphVerificationInteractor implements GraphVerificationInputBounda
                 }
             }
         }
+    }
+
+    private populateDatabase(): void {
+        const totalUseCases = this.useCaseGraphList.length;
+        let violationCount = 0;
+
+        this.useCaseGraphList.forEach(useCase => {
+            violationCount += useCase.getViolationCount();
+        });
+
+        this.db.setNumUseCases(totalUseCases);
+        this.db.setNumViolations(violationCount);
+        this.db.setUseCases(this.useCaseGraphList);
     }
 }

@@ -1,10 +1,9 @@
 import express from "express";
 import { createProxyMiddleware } from "http-proxy-middleware";
-// import { sessionDb } from "./sessionDb.js";
 import chalk from "chalk";
 
-const API_PORT  = 3131;          // your server's port
-const VITE_PORT = 5173;          // where Vite/React is running
+const API_PORT  = 3131;
+const VITE_PORT = 5173;
 
 export function startDevServer() {
   const app = express();
