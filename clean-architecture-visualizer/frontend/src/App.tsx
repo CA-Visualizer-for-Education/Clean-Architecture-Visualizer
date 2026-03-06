@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { AppGlobalStyles } from './styles/AppGlobalStyles';
 import Home from './pages/Home';
 import LearningMode from './pages/LearningMode';
 import CheckerMode from './pages/CheckerMode';
@@ -13,6 +14,7 @@ import { lightTheme } from './lib';
 const App: React.FC = () => {
     return (
         <ThemeProvider theme={lightTheme}>
+            <AppGlobalStyles />
         <Router>
                 <Routes>
                     <Route path='/' element={<Home />} />
