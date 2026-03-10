@@ -87,20 +87,26 @@ export class GraphVerificationInteractor implements GraphVerificationInputBounda
         for (const [, filePath] of this.externalFilePaths) {
             const fromLayer = this.resolveLayer(filePath);
             if (!fromLayer) continue;
+
             const imports = await this.fileAccess.getFileImports(filePath);
 
-            for (const importPath of imports) {
-                // Find which use case owns the file being imported
-                for (const graph of this.useCaseGraphList) {
-                    for (const [targetFileName] of graph.getFiles()) {
-                        if (importPath.toLowerCase().includes(targetFileName.toLowerCase())) {
-                            const toLayer = this.resolveLayer(
-                                graph.getFiles().get(targetFileName)!
-                            );
-                            if (toLayer) {
-                                graph.setNodeNeighbour(fromLayer, toLayer);
-                            }
-                        }
+            // Find all graphs that own any of this file's imports
+            const owningGraphs = this.useCaseGraphList.filter(graph =>
+                imports.some(importPath =>
+                    [...graph.getFiles().keys()].some(targetFileName =>
+                        importPath.toLowerCase().includes(targetFileName.toLowerCase())
+                    )
+                )
+            );
+
+            if (owningGraphs.length === 0) continue;
+
+            // Add ALL imports to every owning graph
+            for (const graph of owningGraphs) {
+                for (const importPath of imports) {
+                    const toLayer = this.resolveLayer(importPath);
+                    if (toLayer) {
+                        graph.setNodeNeighbour(fromLayer, toLayer);
                     }
                 }
             }

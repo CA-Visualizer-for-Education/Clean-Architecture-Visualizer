@@ -6,7 +6,7 @@ export class APIOutputData {
         this.apiOutputData = outputData;
     }
     
-    getOuptutData(): object {
+    getOutputData(): object {
         if (this.apiOutputData) return this.apiOutputData;
         return {};
     }
