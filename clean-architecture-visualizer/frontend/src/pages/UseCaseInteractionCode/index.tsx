@@ -13,10 +13,12 @@ import {
 import { useResizableSidebar } from './useResizableSidebar.tsx';
 import { CtaButton } from '../../components/common/Button.tsx';
 import { Box } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 
 const UseCaseInteractionCode: React.FC = () => {
   const { useCaseId, interactionId } =
     useParams<{ useCaseId: string; interactionId: string }>();
+  const { t } = useTranslation('useCaseInteractionCode');
 
   const navigate = useNavigate();
 
@@ -66,7 +68,7 @@ const UseCaseInteractionCode: React.FC = () => {
               startIcon={<span>←</span>}
               onClick={() => navigate(`/use-case/${useCaseId}/interaction/${interactionId}/diagram`)}
             >
-              Back to Diagram
+              {t('actions.backToDiagram')}
             </CtaButton>
 
             <CtaButton
@@ -75,7 +77,7 @@ const UseCaseInteractionCode: React.FC = () => {
               onClick={handleBack}
               disabled={!history.length}
             >
-              Back to Previous File
+              {t('actions.backToPrevious')}
             </CtaButton>
           </Box>
 

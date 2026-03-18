@@ -7,6 +7,7 @@ import { LAYER_METADATA, CALayer, FileRelation, FileContent } from '../../../lib
 import { Breadcrumbs } from '@mui/material';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import { ViewerContainer, HeaderContainer, EditorCard, LayerChip, StatusContainer, BreadcrumbPath } from './styles';
+import { useTranslation } from 'react-i18next';
 
 const getMonacoThemeConfig = (theme: Theme): Monaco.editor.IStandaloneThemeData => ({
   base: 'vs',
@@ -29,6 +30,7 @@ type CodeViewerProps = {
 
 export const CodeViewer = ({ interactionId, filePath, onFileChange }: CodeViewerProps) => {
   const muiTheme = useTheme();
+  const { t } = useTranslation('codeViewer');
   const editorRef = useRef<Monaco.editor.IStandaloneCodeEditor | null>(null);
   const monacoRef = useRef<typeof Monaco | null>(null);
   const decorationIds = useRef<string[]>([]);
@@ -92,7 +94,7 @@ const layerInfo = useMemo(() =>
         options: {
           isWholeLine: true,
           className: `relation-highlight-${relMeta.paletteKey}`,
-          hoverMessage: { value: `Layer: ${relMeta.label}` },
+          hoverMessage: { value: t('layerLabel', { label: relMeta.label }) },
         },
       });
     });
@@ -118,9 +120,15 @@ const layerInfo = useMemo(() =>
   useEffect(() => { applyDecorations(); }, [data, relations, applyDecorations]);
   useEffect(() => { return () => { linkProviderRef.current?.dispose(); }; }, []);
 
-  if (!filePath) return <StatusContainer>Select a file to view content.</StatusContainer>;
-  if (isLoading) return <StatusContainer>Loading code...</StatusContainer>;
-  if (isError || !data) return <StatusContainer isError>Error loading file: {filePath}</StatusContainer>;
+  if (!filePath) return <StatusContainer>{t('selectFile')}</StatusContainer>;
+  if (isLoading) return <StatusContainer>{t('loading')}</StatusContainer>;
+  if (isError || !data) {
+    return (
+      <StatusContainer isError>
+        {t('errorLoading', { path: filePath })}
+      </StatusContainer>
+    );
+  }
 
   return (
     <ViewerContainer>
