@@ -99,7 +99,7 @@ const layerInfo = useMemo(() =>
       });
     });
     decorationIds.current = editorRef.current.deltaDecorations(decorationIds.current, newDecorations);
-  }, [data, relations]);
+  }, [data, relations, t]);
 
   const handleEditorDidMount: OnMount = (editor, monaco) => {
     editorRef.current = editor;
