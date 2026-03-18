@@ -144,7 +144,7 @@ public interface UserSignupDataAccessInterface {
     void save(User user);
 }`,
     language: "java",
-    layer: "FrameworksDrivers",
+    layer: "Frameworks",
     lines_with_violations: [] 
   },
   "src/view/LoginView.java": {
@@ -250,7 +250,7 @@ public class LoginView extends JPanel implements ActionListener, PropertyChangeL
 
 }`,
     language: "java",
-    layer: "FrameworksDrivers",
+    layer: "Frameworks",
     lines_with_violations: [] 
   }
 };

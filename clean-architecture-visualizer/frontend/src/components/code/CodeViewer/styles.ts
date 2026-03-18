@@ -1,5 +1,5 @@
 import { styled } from '@mui/material/styles';
-import { Box, Paper, Chip, Typography } from '@mui/material';
+import { Box, Paper, Chip } from '@mui/material';
 import { CALayerKey } from '../../../lib';
 
 export const ViewerContainer = styled(Box)({

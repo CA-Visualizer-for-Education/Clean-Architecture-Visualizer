@@ -41,12 +41,18 @@ export const CodeViewer = ({ interactionId, filePath, onFileChange }: CodeViewer
 
   const relations = useMemo(() => {
     if (!relationsData) return [];
-    const rels = Array.isArray(relationsData) ? relationsData : relationsData.relations ?? [];
-    relationsRef.current = rels;
-    return rels;
+    return Array.isArray(relationsData) ? relationsData : relationsData.relations ?? [];
   }, [relationsData]);
 
-  const layerInfo = useMemo(() => data?.layer ? LAYER_METADATA[data.layer as CALayer] : null, [data?.layer]);
+  useEffect(() => {
+    relationsRef.current = relations;
+  }, [relations]);
+
+  const layer = data?.layer;
+
+const layerInfo = useMemo(() => 
+  layer ? LAYER_METADATA[layer as CALayer] : null
+, [layer]);
 
   // Link Provider & Decoration logic remains same to preserve "Cmd+Click" functionality
   useEffect(() => {

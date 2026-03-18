@@ -1,4 +1,4 @@
-export type CALayer = 'FrameworksDrivers' | 'InterfaceAdapters' | 'ApplicationBusinessRules' | 'EnterpriseBusinessRules';
+export type CALayer = 'Frameworks' | 'InterfaceAdapters' | 'ApplicationBusinessRules' | 'EnterpriseBusinessRules';
 
 export type CALayerKey = 'entities' | 'useCases' | 'adapters' | 'drivers';
 
@@ -20,7 +20,7 @@ export const LAYER_METADATA: Record<CALayer, LayerMetadata> = {
     paletteKey: 'adapters',
     label: 'Interface Adapter',
   },
-  FrameworksDrivers: {
+  Frameworks: {
     paletteKey: 'drivers',
     label: 'Frameworks & Drivers',
   },
