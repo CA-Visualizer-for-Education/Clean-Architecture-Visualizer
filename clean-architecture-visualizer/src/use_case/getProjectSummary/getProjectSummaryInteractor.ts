@@ -6,7 +6,7 @@ export class GetProjectSummaryInteractor implements GetProjectSummaryInputBounda
 
     constructor(
             private readonly db: SessionDBAccessInterface,
-            private readonly outputData: GetProjectSummaryOutputData
+            private readonly outputData: GetProjectSummaryOutputData,
         ) {}
 
     async getProjectSummary(): Promise<void> {

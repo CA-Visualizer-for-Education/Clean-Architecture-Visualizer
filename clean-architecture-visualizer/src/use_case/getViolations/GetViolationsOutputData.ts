@@ -1,8 +1,8 @@
-export class APIOutputData {
+export class GetViolationsOutputData {
 
     private apiOutputData?: { [key: string]: any }
 
-    setOutputData(outputData: { [key: string]: any }) {
+    setOutputData(outputData: { [key: string]: any }[]) {
         this.apiOutputData = outputData;
     }
     

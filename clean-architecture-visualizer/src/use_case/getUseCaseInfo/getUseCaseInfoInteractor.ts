@@ -2,6 +2,7 @@ import type { SessionDBAccessInterface } from "../../data_access/sessionDBAccess
 import type { NodeStorage, EdgeStorage } from "../../types/sessionData.js";
 import type { GetUseCaseInfoInputBoundary } from "./getUseCaseInfoInputBoundary.js";
 import type { GetUseCaseInfoInputData } from "./getUseCaseInfoInputData.js";
+import type { GetUseCaseInfoOutputData } from "./getUseCaseInfoOutputData.js";
 
 export type UseCaseInfoResponse = {
     interaction_name: string;
@@ -30,7 +31,8 @@ export class GetUseCaseInfoInteractor implements GetUseCaseInfoInputBoundary {
 
     constructor(
         private readonly db: SessionDBAccessInterface,
-        private readonly inputData: GetUseCaseInfoInputData
+        private readonly inputData: GetUseCaseInfoInputData,
+        private readonly outputData: GetUseCaseInfoOutputData
     ) {}
 
     async execute(): Promise<void> {
@@ -46,6 +48,8 @@ export class GetUseCaseInfoInteractor implements GetUseCaseInfoInputBoundary {
             ndoes: nodes,
             edges: edges,
         };
+
+        this.outputData.setOutputData(result);
     }
 
     /**
