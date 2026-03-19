@@ -5,7 +5,7 @@ export class GetProjectSummaryController {
             private readonly inputBoundary: GetProjectSummaryInputBoundary
         ) {}
     
-    getLearningMode(): void {
+    execute(): void {
         this.inputBoundary.getProjectSummary();
     }
 }

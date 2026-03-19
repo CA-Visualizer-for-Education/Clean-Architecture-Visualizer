@@ -5,7 +5,7 @@ export class GetUseCaseInfoController {
             private readonly inputBoundary: GetUseCaseInfoInputBoundary
         ) {}
     
-    getLearningMode(): void {
+    execute(): void {
         this.inputBoundary.execute();
     }
 }

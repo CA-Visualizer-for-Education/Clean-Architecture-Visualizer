@@ -5,7 +5,7 @@ export class GetRelationsController {
             private readonly inputBoundary: GetRelationsInputBoundary
         ) {}
     
-    getLearningMode(): void {
+    execute(): void {
         this.inputBoundary.execute();
     }
 }

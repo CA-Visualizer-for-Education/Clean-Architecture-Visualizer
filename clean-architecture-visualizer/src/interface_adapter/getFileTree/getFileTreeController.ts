@@ -5,7 +5,7 @@ export class GetFileTreeController {
             private readonly inputBoundary: GetFileTreeInputBoundary
         ) {}
     
-    getLearningMode(): void {
+    execute(): void {
         this.inputBoundary.getFileTree();
     }
 }

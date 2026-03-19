@@ -5,7 +5,7 @@ export class GetViolationsController {
             private readonly inputBoundary: GetViolationsInputBoundary
         ) {}
     
-    getLearningMode(): void {
+    execute(): void {
         this.inputBoundary.execute();
     }
 }

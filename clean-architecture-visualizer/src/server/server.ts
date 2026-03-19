@@ -4,6 +4,7 @@ import chalk from "chalk";
 
 import learningMode from "./routes/learningMode.js"
 import analysis from "./routes/analysis.js"
+import codebase from "./routes/codebase.js"
 
 const API_PORT  = 3131;
 const VITE_PORT = 5173;
@@ -15,6 +16,7 @@ export function startServer() {
   // Routes
   app.use("/api", learningMode);
   app.use("/api", analysis);
+  app.use("/api", codebase);
 
   // Requests non - express related
   app.use(

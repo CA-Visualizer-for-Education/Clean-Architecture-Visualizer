@@ -5,7 +5,7 @@ export class GetFileContentController {
             private readonly inputBoundary: GetFileContentInputBoundary
         ) {}
     
-    getLearningMode(): void {
+    execute(): void {
         this.inputBoundary.getFileContent();
     }
 }
