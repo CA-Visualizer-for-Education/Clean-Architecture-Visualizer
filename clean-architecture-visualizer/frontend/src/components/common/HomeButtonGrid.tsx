@@ -15,7 +15,7 @@ interface HomeButtonGridProps {
   items: GridItem[];
 }
 
-const HomeButtonGrid: React.FC<HomeButtonGridProps> = ({ items }) => {
+const HomeButtonGrid = ({ items }: HomeButtonGridProps) => {
   return (
     <Grid 
       container 

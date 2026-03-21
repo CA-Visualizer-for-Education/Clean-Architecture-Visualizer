@@ -11,7 +11,14 @@ interface HomeButtonCardProps {
   iconColor?: string;
 }
 
-const HomeButtonCard: React.FC<HomeButtonCardProps> = ({ title, description, to, icon, bgColor, iconColor = 'white' }) => {
+const HomeButtonCard = ({ 
+  title, 
+  description, 
+  to, 
+  icon, 
+  bgColor, 
+  iconColor = 'white' 
+}: HomeButtonCardProps) => {
   return (
     <Card elevation={0} sx={{ background: 'transparent', width: '100%' }}>
       <CardActionArea 

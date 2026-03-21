@@ -19,14 +19,14 @@ interface InfoDialogProps {
   onButtonClick?: () => void;
 }
 
-const InfoDialog: React.FC<InfoDialogProps> = ({ 
+const InfoDialog = ({ 
   open, 
   onClose, 
   title, 
   content, 
   buttonText = "Close", 
   onButtonClick 
-}) => {
+}: InfoDialogProps) => {
 
   return (
     <Dialog 

@@ -9,7 +9,7 @@ import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
 import HomeButtonGrid from '../components/common/HomeButtonGrid';
 import InfoDialog from '../components/common/InfoDialog';
 
-const Home: React.FC = () => {
+const Home = () => {
     const { t } = useTranslation('home');
     const [infoOpen, setInfoOpen] = React.useState(false);
 
