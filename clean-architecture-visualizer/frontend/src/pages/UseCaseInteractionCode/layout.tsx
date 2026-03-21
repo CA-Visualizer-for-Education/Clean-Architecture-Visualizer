@@ -5,6 +5,7 @@ export const PageContainer = styled(Box)({
   display: 'flex',
   flexDirection: 'column',
   height: '100vh',
+  overflow: 'hidden',
 });
 
 export const Workspace = styled(Box)({
@@ -33,6 +34,9 @@ export const Resizer = styled('div')({
 
 export const MainViewContainer = styled('main')(({ theme }) => ({
   flexGrow: 1,
-  overflowY: 'auto',
+  height: '100%',
+  display: 'flex',
+  flexDirection: 'column',
+  overflow: 'hidden',
   padding: theme.spacing(3),
 }));
