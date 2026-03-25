@@ -1,8 +1,8 @@
 # Learning objectives
 
-## 1. Develop comprehensive full-stack engineering proficiency
+## 1. Implement frontend and design frontend architecture
 
-Develop a holistic understanding of software architecture by actively contributing to both server-side logic and client-side interfaces, ensuring seamless integration between data management and user interaction layers.
+Develop expertise in engineering modular, responsive, and accessible user interfaces (frontend). Focus on establishing a clear separation between client-side logic and backend services through interface-first design, enabling concurrent development and ensuring long-term project maintainability.
 
 ## 2. Master high-fidelity prototyping and design tooling
 
@@ -12,12 +12,15 @@ Acquire proficiency in Figma to create detailed UI mockups and prototypes, servi
 
 Establish good code review standards by submitting feature Pull Requests that utilize detailed templates—including technical summaries, test plans, and visual evidence—to streamline the review process and reduce ambiguity for peers.
 
-## 4. Implement an iterative stakeholder feedback loop
-
-Translate user needs into technical requirements by conducting structured client or user feedback sessions, systematically documenting insights, and ensuring those insights directly influence subsequent engineering tasks and code iterations.
+## 4. Ensure good testing practices for frontend
+Implement a comprehensive testing strategy using Vitest to maintain high code stability. Integrate these tests into automated CI/CD pipelines to ensure that every feature is validated before merging into main (or releasing to production).
 
 ## 5. Write technical documentation
 
 Ensure long-term project maintainability by generating clear, comprehensive documentation for architectural decisions and code logic, facilitating future scalability and seamless knowledge transfer within the team.
+
+## 6. Cultivate issue-driven project momentum
+
+Foster a disciplined, task-oriented workflow. Instead of relying on external pressure and deadlines, prioritize the use of project board and issues to define, track, and execute weekly goals.
 
 AI use: Learning goals were refined for clarity and formatting with the assistance of Gemini.
