@@ -1,5 +1,31 @@
 export type CALayer = 'Frameworks' | 'InterfaceAdapters' | 'ApplicationBusinessRules' | 'EnterpriseBusinessRules';
 
+export type CALayerKey = 'entities' | 'useCases' | 'adapters' | 'drivers';
+
+interface LayerMetadata {
+  paletteKey: CALayerKey;
+  label: string;
+}
+
+export const LAYER_METADATA: Record<CALayer, LayerMetadata> = {
+  EnterpriseBusinessRules: {
+    paletteKey: 'entities',
+    label: 'Enterprise Entity',
+  },
+  ApplicationBusinessRules: {
+    paletteKey: 'useCases',
+    label: 'Use Case',
+  },
+  InterfaceAdapters: {
+    paletteKey: 'adapters',
+    label: 'Interface Adapter',
+  },
+  Frameworks: {
+    paletteKey: 'drivers',
+    label: 'Frameworks & Drivers',
+  },
+};
+
 export type CAComponentType = 
   | 'Controller' 
   | 'Presenter' 
@@ -73,3 +99,30 @@ export interface AnalysisSummary {
   total_violations: number; 
   use_cases: UseCase[]; 
 }
+
+// --- CodeView Types ---
+export interface FileNode {
+  id: string;
+  name: string;
+  type: 'directory' | 'file';
+  path: string;
+  children?: FileNode[];
+  hasViolation?: boolean;
+  layer?: CALayer;
+}
+
+export interface FileContent {
+  file_path: string;
+  content: string;
+  language: string;
+  layer: CALayer;
+  lines_with_violations: number[];
+}
+
+export type FileRelation = {
+  line: number;
+  target_file: string;
+  type: string;
+  description?: string;
+  layer: CALayer;
+};

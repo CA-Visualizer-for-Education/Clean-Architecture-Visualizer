@@ -1,3 +1,5 @@
+import { FileRelation, FileContent } from "../../lib";
+
 export const mockFileTree = {
   id: "src",
   name: "src",
@@ -64,7 +66,7 @@ export const mockFileTree = {
   ]
 };
 
-export const mockFiles: Record<string, MockFile> = {
+export const mockFiles: Record<string, FileContent> = {
   "src/entity/User.java": {
     file_path: "src/entity/User.java",
     content: `package entity;
@@ -75,6 +77,7 @@ public interface User {
     LocalDateTime getCreationTime();
 }`,
     language: "java",
+    layer: "EnterpriseBusinessRules",
     lines_with_violations: [], 
   },
   "src/use_case/signup/SignupInputBoundary.java": {
@@ -84,6 +87,7 @@ public interface SignupInputBoundary {
     void execute(SignupInputData signupInputData);
 }`,
     language: "java",
+    layer: "ApplicationBusinessRules",
     lines_with_violations: [], 
   },
   "src/use_case/signup/SignupInputData.java": {
@@ -106,6 +110,7 @@ public class SignupInputData {
     public String getRepeatPassword() { return repeatPassword; }
 }`,
     language: "java",
+    layer: "ApplicationBusinessRules",
     lines_with_violations: [3], 
   },
   "src/interface_adapter/signup/SignupController.java": {
@@ -127,6 +132,7 @@ public class SignupController {
     }
 }`,
     language: "java", 
+    layer: "InterfaceAdapters",
     lines_with_violations: [] 
   },
   "src/data_access/UserSignupDataAccessInterface.java": {
@@ -138,6 +144,7 @@ public interface UserSignupDataAccessInterface {
     void save(User user);
 }`,
     language: "java",
+    layer: "Frameworks",
     lines_with_violations: [] 
   },
   "src/view/LoginView.java": {
@@ -243,6 +250,7 @@ public class LoginView extends JPanel implements ActionListener, PropertyChangeL
 
 }`,
     language: "java",
+    layer: "Frameworks",
     lines_with_violations: [] 
   }
 };
@@ -254,13 +262,15 @@ export const mockFileRelationsByPath: Record<string, FileRelation[]> = {
       type: "IMPORT",
      target_file: "src/use_case/signup/SignupInputData.java",
       line: 4,
-      description: "Imports SignupInputData from controller arguments." 
+      description: "Imports SignupInputData from controller arguments.",
+      layer: "ApplicationBusinessRules",
     },
     {
       type: "INSTANTIATION",
       target_file: "src/use_case/signup/SignupInputBoundary.java",
       line: 7,
-      description: "Instantiates SignInputBoundary"
+      description: "Instantiates SignInputBoundary",
+      layer: "InterfaceAdapters",
     }
   ],
   "src/data_access/UserSignupDataAccessInterface.java": [
@@ -268,21 +278,8 @@ export const mockFileRelationsByPath: Record<string, FileRelation[]> = {
       type: "DEPENDENCY",
       target_file: "src/entity/User.java",
       line: 2,
-      description: "Depends on Entity/User interface."
+      description: "Depends on Entity/User interface.",
+      layer: "EnterpriseBusinessRules",
     }
   ]
 };
-
-interface MockFile {
-  file_path: string;
-  content: string;
-  language: string;
-  lines_with_violations: number[];
-}
-
-interface FileRelation {
-  type: string;
-  target_file: string;
-  line: number;
-  description: string;
-}

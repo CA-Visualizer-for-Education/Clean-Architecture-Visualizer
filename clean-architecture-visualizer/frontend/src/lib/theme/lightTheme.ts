@@ -5,6 +5,7 @@ export const lightTheme = createTheme({
         mode: 'light',
         primary: {
             main: '#CCE0FF',
+            dark: '#1A73E8',
         },
         entities: {
             main: '#fbc02d',
