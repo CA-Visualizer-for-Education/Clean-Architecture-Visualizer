@@ -38,56 +38,174 @@ const getNodeByType = (nodes: CANode[], type: CAComponentType): CANode => {
 };
 
 export function CADiagram() {
+    let controller: CANode;
+    let presenter: CANode;
+    let viewModel: CANode;
+    let inputData: CANode;
+    let inputBoundary: CANode;
+    let interactor: CANode;
+    let outputBoundary: CANode;
+    let outputData: CANode;
+    let dataAccessInterface: CANode;
+    let entities: CANode;
+    let view: CANode;
+    let dataAccess: CANode;
+    let database: CANode;
+
+    let edges: CAEdge[] = [];
+
     const { interactionId } = useParams<{ interactionId: string }>();
-    const {
-        data: interactionData,
-        isLoading,
-        isError,
-        error,
-    } = useInteraction(interactionId ?? '');
 
-    if (!interactionId) {
-        return (
-            <Container maxWidth="lg">
-                <Typography color="error">Missing interaction id in URL.</Typography>
-            </Container>
-        );
-    }
+    if (interactionId === undefined) {
+        if (!window.location.pathname.endsWith('/learning')) {
+            return <Typography color="error">CA Diagram not supported for this view.</Typography>;
+        }
+        controller = {
+            id: 'controller-learning',
+            name: 'Controller',
+            type: 'Controller',
+            layer: 'InterfaceAdapters',
+            status: 'VALID',
+        };
+        presenter = {
+            id: 'presenter-learning',
+            name: 'Presenter', 
+            type: 'Presenter',
+            layer: 'InterfaceAdapters',
+            status: 'VALID',
+        };
+        viewModel = {
+            id: 'viewmodel-learning',
+            name: 'View Model',  
+            type: 'ViewModel',
+            layer: 'InterfaceAdapters',
+            status: 'VALID',
+        };
+        inputData = {
+            id: 'inputdata-learning',
+            name: 'Input Data',
+            type: 'InputData',
+            layer: 'ApplicationBusinessRules',
+            status: 'VALID',
+        };
+        inputBoundary = {
+            id: 'inputboundary-learning',
+            name: 'Input Boundary', 
+            type: 'InputBoundary',
+            layer: 'ApplicationBusinessRules',
+            status: 'VALID',
+        };
+        interactor = {
+            id: 'interactor-learning',
+            name: 'Interactor',
+            type: 'Interactor',
+            layer: 'ApplicationBusinessRules',
+            status: 'VALID',
+        };
+        outputBoundary = {
+            id: 'outputboundary-learning',
+            name: 'Output Boundary',
+            type: 'OutputBoundary',
+            layer: 'ApplicationBusinessRules',
+            status: 'VALID',
+        };
+        outputData = {
+            id: 'outputdata-learning',
+            name: 'Output Data',
+            type: 'OutputData',
+            layer: 'ApplicationBusinessRules',
+            status: 'VALID',
+        };
+        dataAccessInterface = {
+            id: 'dataaccessinterface-learning',
+            name: 'Data Access Interface',
+            type: 'DataAccessInterface',
+            layer: 'ApplicationBusinessRules',
+            status: 'VALID',
+        };
+        entities = {
+            id: 'entities-learning',
+            name: 'Entities',
+            type: 'Entity',
+            layer: 'EnterpriseBusinessRules',
+            status: 'VALID',
+        };
+        view = {
+            id: 'view-learning',
+            name: 'View',
+            type: 'View',
+            layer: 'Frameworks',
+            status: 'VALID',
+        };
+        dataAccess = {
+            id: 'dataaccess-learning',
+            name: 'Data Access',
+            type: 'DataAccess',
+            layer: 'Frameworks',
+            status: 'VALID',
+        };
+        database = {
+            id: 'database-learning',
+            name: 'Database',
+            type: 'Database',
+            layer: 'Frameworks',
+            status: 'VALID',
+        };
 
-    if (isLoading) {
-        return (
-            <Container maxWidth="lg" sx={{ py: 4, display: 'flex', justifyContent: 'center' }}>
-                <CircularProgress />
-            </Container>
-        );
-    }
 
-    if (isError || !interactionData) {
-        return (
-            <Container maxWidth="lg">
-                <Typography color="error">
-                    {error instanceof Error ? error.message : 'Failed to load interaction data.'}
-                </Typography>
-            </Container>
-        );
-    }
+    } else {
+        
 
-    const nodes = interactionData.nodes ?? [];
-    const edges = interactionData.edges ?? [];
+        const {
+            data: interactionData,
+            isLoading,
+            isError,
+            error,
+        } = useInteraction(interactionId ?? '');
 
-    const controller = getNodeByType(nodes, 'Controller');
-    const presenter = getNodeByType(nodes, 'Presenter');
-    const viewModel = getNodeByType(nodes, 'ViewModel');
-    const inputData = getNodeByType(nodes, 'InputData');
-    const inputBoundary = getNodeByType(nodes, 'InputBoundary');
-    const interactor = getNodeByType(nodes, 'Interactor');
-    const outputBoundary = getNodeByType(nodes, 'OutputBoundary');
-    const outputData = getNodeByType(nodes, 'OutputData');
-    const dataAccessInterface = getNodeByType(nodes, 'DataAccessInterface');
-    const entities = getNodeByType(nodes, 'Entity');
-    const view = getNodeByType(nodes, 'View');
-    const dataAccess = getNodeByType(nodes, 'DataAccess');
-    const database = getNodeByType(nodes, 'Database');
+        if (!interactionId) {
+            return (
+                <Container maxWidth="lg">
+                    <Typography color="error">Missing interaction id in URL.</Typography>
+                </Container>
+            );
+        }
+
+        if (isLoading) {
+            return (
+                <Container maxWidth="lg" sx={{ py: 4, display: 'flex', justifyContent: 'center' }}>
+                    <CircularProgress />
+                </Container>
+            );
+        }
+
+        if (isError || !interactionData) {
+            return (
+                <Container maxWidth="lg">
+                    <Typography color="error">
+                        {error instanceof Error ? error.message : 'Failed to load interaction data.'}
+                    </Typography>
+                </Container>
+            );
+        }
+
+        const nodes = interactionData.nodes ?? [];
+        edges = interactionData.edges ?? [];
+
+        controller = getNodeByType(nodes, 'Controller');
+        presenter = getNodeByType(nodes, 'Presenter');
+        viewModel = getNodeByType(nodes, 'ViewModel');
+        inputData = getNodeByType(nodes, 'InputData');
+        inputBoundary = getNodeByType(nodes, 'InputBoundary');
+        interactor = getNodeByType(nodes, 'Interactor');
+        outputBoundary = getNodeByType(nodes, 'OutputBoundary');
+        outputData = getNodeByType(nodes, 'OutputData');
+        dataAccessInterface = getNodeByType(nodes, 'DataAccessInterface');
+        entities = getNodeByType(nodes, 'Entity');
+        view = getNodeByType(nodes, 'View');
+        dataAccess = getNodeByType(nodes, 'DataAccess');
+        database = getNodeByType(nodes, 'Database');
+    } 
 
     return (
         <CADiagramView
