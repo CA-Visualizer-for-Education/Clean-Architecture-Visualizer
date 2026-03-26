@@ -1,7 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { getAnalysisSummary, getInteractionDetails, getViolations } from '../api/analysis.api.ts';
-import { getUseCaseDiagramData, type UseCaseDiagramData } from '../api/getUseCaseDiagramData';
-import { AnalysisSummary, InteractionDetail, Violation } from '../lib/types.ts';
+import type { AnalysisSummary, InteractionDetail, Violation } from '../lib/types.ts';
 
 export const useAnalysisSummary = () => {
   return useQuery<AnalysisSummary, Error>({

@@ -23,6 +23,7 @@ export class SessionDB<T extends object> {
     load(): void {
         if (!fs.existsSync(SESSION_FILE)) return;
         const raw = fs.readFileSync(SESSION_FILE, "utf-8");
+        if (!raw.trim()) return;
         this.data = JSON.parse(raw) as Partial<T>;
     }
 
