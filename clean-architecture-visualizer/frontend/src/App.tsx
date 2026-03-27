@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AppGlobalStyles } from './styles/AppGlobalStyles';
 import Home from './pages/Home';
 import LearningMode from './pages/LearningMode';
-import CheckerMode from './pages/CheckerMode'
+import CheckerMode from './pages/CheckerMode';
 import ProjectStarter from './pages/ProjectStarter';
 import UseCaseInteractionDiagram from './pages/UseCaseInteractionDiagram';
 import UseCaseInteractionCode from './pages/UseCaseInteractionCode';
