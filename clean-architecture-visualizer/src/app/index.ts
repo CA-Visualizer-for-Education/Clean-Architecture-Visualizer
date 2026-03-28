@@ -146,7 +146,7 @@ program
 program
   .command('start')
   .description('Start backend server and frontend dev server')
-  .action(async() => {
+  .action(async () => {
     app.runGraphVerification();
     const backendServer = startServer();
 
@@ -160,38 +160,38 @@ program
       windowsHide: true,
     });
 
+    let openTimer: NodeJS.Timeout;
+
     devProcess.on("error", (err) => {
-      console.error(chalk.red("Failed to start frontend:"), err.message);
-      console.log(
-        chalk.yellow("Run manually:"),
-        `cd ${FRONTEND_DIR} && npm run dev:backend`,
-      );
+      console.error(chalk.red("CRITICAL: Failed to start frontend:"), err.message);
+      if (openTimer) clearTimeout(openTimer);
+      shutdown("INTERNAL_ERROR"); 
     });
 
     const closeFrontend = () => {
-      if (!devProcess.killed) {
+      if (devProcess && !devProcess.killed) {
         devProcess.kill();
       }
     };
 
     let shutdownStarted = false;
     const shutdown = (signal: string) => {
-      if (shutdownStarted) {
-        return;
-      }
+      if (shutdownStarted) return;
       shutdownStarted = true;
 
-      console.log(chalk.dim(`\nReceived ${signal}. Shutting down...`));
+      if (signal !== "INTERNAL_ERROR") {
+        console.log(chalk.dim(`\nReceived ${signal}. Shutting down...`));
+      }
+      
       closeFrontend();
 
       const forceExitTimer = setTimeout(() => {
-        console.warn(chalk.yellow("Forcing shutdown..."));
         process.exit(1);
       }, 3000);
 
       backendServer.close(() => {
         clearTimeout(forceExitTimer);
-        process.exit(0);
+        process.exit(signal === "INTERNAL_ERROR" ? 1 : 0);
       });
     };
 
@@ -206,19 +206,18 @@ program
           : "xdg-open";
     const appUrl = `http://localhost:${API_PORT}`;
 
-    setTimeout(() => {
-      exec(`${openCommand} "${appUrl}"`, (error) => {
-        if (error) {
-          console.warn(
-            chalk.yellow("Could not open browser. Visit manually:"),
-            appUrl,
-          );
-        } else {
-          console.log(chalk.green("App opened at"), appUrl);
-        }
-      });
+    openTimer = setTimeout(() => {
+      if (!shutdownStarted) { // Only open if we haven't crashed
+        exec(`${openCommand} "${appUrl}"`, (error) => {
+          if (error) {
+            console.warn(chalk.yellow("Could not open browser. Visit manually:"), appUrl);
+          } else {
+            console.log(chalk.green("App opened at"), appUrl);
+          }
+        });
+      }
     }, 2500);
-  })
+  });
 
 program
   .command('verify')
