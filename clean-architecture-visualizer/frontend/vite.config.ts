@@ -6,6 +6,12 @@ export default defineConfig({
   plugins: [react(), svgr({include: "**/*.svg?react"})],
   server: {
     port: 5173,
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3131',
+        changeOrigin: true,
+      },
+    },
   },
   build: {
     outDir: 'dist',
