@@ -4,8 +4,8 @@ import type { GetRelationsOutputData } from "../../use_case/getRelations/GetRela
 export class GetRelationsPresenter implements GetRelationsOutputBoundary {
     
     constructor(private readonly outputData: GetRelationsOutputData) {}
-    getOutputData(): string {
-        return JSON.stringify(this.outputData.getOutputData(), null, 2);
+    getOutputData(): object {
+        return this.outputData.getOutputData();
     }
     
 }

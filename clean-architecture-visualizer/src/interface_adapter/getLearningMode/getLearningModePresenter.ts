@@ -4,8 +4,8 @@ import type { GetLearningModeOutputData } from "../../use_case/getLearningMode/g
 export class GetLearningModePresenter implements GetLearningModeOutputBoundary {
     
     constructor(private readonly outputData: GetLearningModeOutputData) {}
-    getOutputData(): string {
-        return JSON.stringify(this.outputData.getOutputData(), null, 2);
+    getOutputData(): object {
+        return this.outputData.getOutputData();
     }
     
 }

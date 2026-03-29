@@ -216,6 +216,9 @@ program
           }
         });
       }
+
+      // app.runGraphVerification();
+
     }, 2500);
   });
 

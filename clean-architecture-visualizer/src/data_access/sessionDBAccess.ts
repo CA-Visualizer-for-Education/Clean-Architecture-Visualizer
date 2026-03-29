@@ -256,7 +256,6 @@ export class SessionDBAccess implements SessionDBAccessInterface {
         return this.getAllNodes().find(n => n.name === name);
     }
 
-    // ONLY USE FOR TESTING
     resetDB(): undefined {
         this.db.clear();
     }

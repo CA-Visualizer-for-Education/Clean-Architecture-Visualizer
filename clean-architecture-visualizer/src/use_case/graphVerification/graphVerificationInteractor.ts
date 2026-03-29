@@ -34,6 +34,10 @@ export class GraphVerificationInteractor implements GraphVerificationInputBounda
     ) {}
 
     async execute(): Promise<void> {
+        // restart db
+        this.db.resetDB();
+
+        // main use case logic
         await this.buildFilePaths();
         await this.buildUseCaseGraphs();
         await this.developOutNeighbours();
@@ -370,6 +374,8 @@ export class GraphVerificationInteractor implements GraphVerificationInputBounda
         this.db.setUseCases(this.useCaseGraphList, files);
         this.db.setNodes(nodes);
         this.db.setEdges(edges);
+        const projectName = await this.fileAccess.getProjectName();
+        console.log("Project name: " + projectName);
         this.db.setProjectName(await this.fileAccess.getProjectName());
     }
 }
