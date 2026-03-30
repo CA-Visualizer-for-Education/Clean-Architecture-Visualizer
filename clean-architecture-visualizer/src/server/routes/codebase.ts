@@ -50,8 +50,6 @@ router.get("/codebase/interactions/:interactionId/files/:filepath", async (req, 
 
     await controller.execute();
     const result = presenter.getOutputData()
-    console.log("Hello")
-    console.log(result)
  
     if (!result) {
         res.status(404).json({ error: `File '${filepath}' not found for interaction '${interactionId}'.` });
