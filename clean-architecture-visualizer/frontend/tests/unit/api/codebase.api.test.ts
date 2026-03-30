@@ -1,34 +1,59 @@
 import { describe, it, expect } from 'vitest';
-import { getFileTree, getFileContent } from '@/api/codebase.api';
-import { server } from '@/mocks/server';
 import { http, HttpResponse } from 'msw';
+import { server } from '@/mocks/server';
+import { 
+  getFileTree, 
+  getFileContent, 
+  getFileRelations 
+} from '@/api/codebase.api';
 
 describe('Codebase API', () => {
-  it('getFileTree calls the correct endpoint', async () => {
+  it('getFileTree fetches the full directory structure', async () => {
+    const mockTree = { name: 'root', children: [] };
     server.use(
-      http.get('*/api/codebase/file-tree', () => {
-        return HttpResponse.json({ name: 'root', children: [] });
-      })
+      http.get('*/api/codebase/file-tree', () => HttpResponse.json(mockTree))
     );
 
-    const data = await getFileTree();
-    expect(data.name).toBe('root');
+    const result = await getFileTree();
+    expect(result).toEqual(mockTree);
   });
 
-  it('getFileContent encodes the file path correctly', async () => {
-    const interactionId = 'int-1';
-    const filePath = 'src/User.ts';
-
+  it('getFileContent correctly encodes complex file paths', async () => {
+    const interactionId = 'flow-1';
+    const filePath = 'src/entities/User.java';
+    const encodedPath = encodeURIComponent(filePath);
+    
     server.use(
-      http.get('*/api/codebase/interactions/:id/files/:path', ({ params }) => {
-        if (params.id === interactionId && params.path === filePath) {
-          return HttpResponse.json({ content: 'test code' });
-        }
-        return new HttpResponse(null, { status: 404 });
+      http.get(`*/api/codebase/interactions/${interactionId}/files/${encodedPath}`, () => {
+        return HttpResponse.json({ content: 'class User {}' });
       })
     );
 
-    const data = await getFileContent(interactionId, filePath);
-    expect(data.content).toBe('test code');
+    const result = await getFileContent(interactionId, filePath);
+    expect(result.content).toBe('class User {}');
+  });
+
+  it('getFileRelations hits the nested relations endpoint', async () => {
+    const interactionId = 'flow-1';
+    const filePath = 'src/Controller.ts';
+    const encodedPath = encodeURIComponent(filePath);
+
+    server.use(
+      http.get(`*/api/codebase/interactions/${interactionId}/files/${encodedPath}/relations`, () => {
+        return HttpResponse.json({ dependencies: ['Service.ts'] });
+      })
+    );
+
+    const result = await getFileRelations(interactionId, filePath);
+    expect(result.dependencies).toContain('Service.ts');
+  });
+
+  it('throws an error when the API returns a 404', async () => {
+    server.use(
+      http.get('*/api/codebase/file-tree', () => new HttpResponse(null, { status: 404 }))
+    );
+
+    // Axios helper: should reject when status is not 2xx
+    await expect(getFileTree()).rejects.toThrow();
   });
 });
