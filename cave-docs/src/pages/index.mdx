@@ -1,0 +1,52 @@
+## Verifying Clean Architecture in Your Repository
+
+This is a tool to help develop your CSC207 Project! With this tool you can initiate your project, create new use cases, and verify your project's adherence to Clean Architecture. 
+
+### Installation
+
+You can install the `cave` package from Github with:
+```bash
+$ npm install git+https://github.com/paulgries/Clean-Architecture-Visualizer.git
+```
+
+---
+
+### `Feature` Component
+
+Each item in the list is rendered by a `Feature` component. `col--4` is a Docusaurus/Infima grid class that makes each card take up 1/3 of the row (4 out of 12 columns).
+```tsx
+function Feature({title, Svg, description}: FeatureItem) {
+  return (
+    <div className={clsx('col col--4')}>
+      <div className="text--center">
+        <Svg className={styles.featureSvg} role="img" />
+      </div>
+      <div className="text--center padding-horiz--md">
+        <Heading as="h3">{title}</Heading>
+        <p>{description}</p>
+      </div>
+    </div>
+  );
+}
+```
+
+---
+
+### Rendering the List
+
+The default export maps over `FeatureList` and renders a `Feature` for each entry. The `{...props}` spread passes all three fields (`title`, `Svg`, `description`) directly into `Feature` without naming them individually.
+```tsx
+export default function HomepageFeatures(): ReactNode {
+  return (
+    <section className={styles.features}>
+      <div className="container">
+        <div className="row">
+          {FeatureList.map((props, idx) => (
+            <Feature key={idx} {...props} />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+```

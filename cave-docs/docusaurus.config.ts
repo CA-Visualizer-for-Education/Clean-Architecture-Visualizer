@@ -88,7 +88,7 @@ const config: Config = {
           position: 'left',
           label: 'Students',
         },
-        {to: '/blog', label: 'Developers', position: 'left'},
+        {to: '/developers', label: 'Developers', position: 'left'},
         {
           href: 'https://github.com/paulgries/Clean-Architecture-Visualizer',
           label: 'GitHub',
