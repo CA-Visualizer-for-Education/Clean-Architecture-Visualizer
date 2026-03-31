@@ -8,7 +8,7 @@ import MenuBookIcon from '@mui/icons-material/MenuBook';
 import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
 import HomeButtonGrid from '../components/common/HomeButtonGrid';
 import InfoDialog from '../components/common/InfoDialog';
-import CaveLogo from '../assets/locales/logo_dark.svg'
+import CaveLogo from '../assets/locales/logo_dark.svg';
 
 const Home = () => {
     const { t } = useTranslation('home');
