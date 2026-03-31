@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Dropdown, { DropdownOption } from './Dropdown.tsx';
 import { Box, Paper, Typography } from '@mui/material';
@@ -8,11 +8,15 @@ import { Interaction, UseCase } from '../../lib/types.ts';
 
 export default function Header() {
     const navigate = useNavigate();
+    const location = useLocation();
     const { t } = useTranslation('common');
     const { data, isLoading } = useAnalysisSummary();
 
+    // Detect if we're on a code view route
+    const isCodeView = location.pathname.includes('/code');
+
     const navigationOptions: DropdownOption[] = [
-        { key: 'learning-mode', label: t('navigation.pages.learningMode'), to: '/learning' },
+        ...(isCodeView ? [] : [{ key: 'learning-mode', label: t('navigation.pages.learningMode'), to: '/learning' }]),
         ...(isLoading
             ? [{ key: 'loading-interactions', label: t('navigation.status.loadingInteractions'), to: '', disabled: true }]
             : []),
@@ -20,7 +24,7 @@ export default function Header() {
             (useCase.interactions ?? []).map((interaction: Interaction) => ({
                 key: `interaction-${interaction.interaction_id}`,
                 label: `${useCase.name}: ${interaction.interaction_name}`,
-                to: `/use-case/${useCase.id}/interaction/${interaction.interaction_id}/diagram`,
+                to: `/use-case/${useCase.id}/interaction/${interaction.interaction_id}/${isCodeView ? 'code' : 'diagram'}`,
             }))
         )),
     ];
