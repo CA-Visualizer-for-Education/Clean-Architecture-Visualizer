@@ -10,7 +10,7 @@
 - [x] Get a minimally functional PR for the CA diagram done
 - [ ] frontend docs if time
 - [x] Update the learning mode page to include the descriptions
-- [ ] make the header
+- [x] make the header
 - [ ] add the side panel with errors on use case interaction diagrams
 - [ ] make a legend for the arrows and node states
 - [ ] write tests --> moving to next week
