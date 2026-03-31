@@ -46,7 +46,7 @@ export const DarkButton = styled(Button)(({ theme }) => ({
   },
 }));
 
-export const InputContainer = styled(Box)(({}) => ({
+export const InputContainer = styled(Box)(() => ({
   width: '100%',
   maxWidth: 450,
   margin: '0 auto',
