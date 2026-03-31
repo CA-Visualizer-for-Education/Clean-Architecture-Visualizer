@@ -6,6 +6,7 @@ import type { cleanNode } from "../../types/cleanNode.js";
 import { useCaseGraph } from "../../entities/useCaseGraph.js";
 import type { EdgeStorage, FileStorage, NodeStorage } from "../../types/sessionData.js";
 import type { cleanLayer } from "../../types/cleanLayer.js";
+import { GraphVerificationOutputData } from "./graphVerificationOutputData.js";
 
 export class GraphVerificationInteractor implements GraphVerificationInputBoundary{
     private readonly internalDirectories = [
@@ -26,12 +27,18 @@ export class GraphVerificationInteractor implements GraphVerificationInputBounda
     // The node of files <File Name, Node>
     private readonly externalNodes : Record<string, cleanNode> = {};
 
+    private toCommandLine: boolean = false;
+    private outputData: GraphVerificationOutputData;
+
     constructor(
         private readonly fileAccess: FileAccessInterface,
         private readonly cleanArchInfoAccess: CleanArchInfoAccessInterface,
         private readonly db: SessionDBAccessInterface,
+        outputData: GraphVerificationOutputData = new GraphVerificationOutputData(),
         private readonly useCaseGraphList: useCaseGraph[] = []
-    ) {}
+    ) {
+        this.outputData = outputData;
+    }
 
     async execute(): Promise<void> {
         await this.buildFilePaths();
@@ -39,6 +46,9 @@ export class GraphVerificationInteractor implements GraphVerificationInputBounda
         await this.developOutNeighbours();
         await this.verifyOutNeighbours();
         await this.populateDatabase();
+        if (this.toCommandLine) {
+            this.prepareOutput();
+        }
     }
 
     /**
@@ -371,5 +381,31 @@ export class GraphVerificationInteractor implements GraphVerificationInputBounda
         this.db.setNodes(nodes);
         this.db.setEdges(edges);
         this.db.setProjectName(await this.fileAccess.getProjectName());
+    }
+
+    private prepareOutput(): void {
+        const lines: string[] = [];
+        const lineColours: boolean[] = [];
+
+        for (const graph of this.useCaseGraphList) {
+            const violations = graph.getViolationEdges();
+            const hasViolations = violations.length > 0;
+            const prefix = hasViolations ? "✗" : "✓";
+
+            lines.push(`${prefix} ${graph.getName()}`);
+            lineColours.push(!hasViolations);
+
+            if (hasViolations) {
+                for (const [from, to] of violations) {
+                    lines.push(`    ${from} → ${to}`);
+                    lineColours.push(false);
+                }
+            }
+        }
+        this.outputData.setOutputData(lines, lineColours);
+    }
+
+    toggleCommandLine(): void {
+        this.toCommandLine = !this.toCommandLine;
     }
 }
