@@ -1,0 +1,15 @@
+{
+  "name": "clean-architecture-visualizer-full",
+  "version": "1.0.0",
+  "description": "Root for Clean Architecture Visualizer and documentation",
+  "engines": { "node": ">=20.0" },
+  "bin": {
+    "cave": "./clean-architecture-visualizer/dist/src/app/index.js"
+  },
+  "scripts": {
+    "install:all": "npm install --prefix clean-architecture-visualizer && npm install --prefix cave-docs",
+    "build:all": "npm run build --prefix clean-architecture-visualizer && npm run build --prefix cave-docs",
+    "prepare": "npm run install:all && npm run build:all",
+    "docs": "npm run start --prefix cave-docs"
+  }
+}
