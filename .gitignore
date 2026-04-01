@@ -1,0 +1,11 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+.docusaurus/
+*.tsbuildinfo
+clean-architecture-visualizer/frontend/public/
+
+# Secrets
+.env

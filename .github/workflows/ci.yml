@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'clean-architecture-visualizer/**'
+      - '.github/workflows/ci.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'clean-architecture-visualizer/**'
+      - '.github/workflows/ci.yml'
+
+jobs:
+  jest-tests:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./clean-architecture-visualizer
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - uses: ./.github/actions/setup-node-env
+        with:
+          working-directory: ./clean-architecture-visualizer
+
+      - name: Run jest
+        run: npm test
+    
+  frontend-typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - uses: ./.github/actions/setup-node-env
+        with:
+          working-directory: ./clean-architecture-visualizer/frontend
+
+      - name: Run lint
+        run: npm run lint
+        working-directory: ./clean-architecture-visualizer/frontend
+        
+      - name: Run type check
+        run: npm run type-check
+        working-directory: ./clean-architecture-visualizer/frontend

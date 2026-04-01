@@ -1,0 +1,96 @@
+{
+    "nodes": {
+        "controller": {
+            "outNeighbours": [
+                "inputData",
+                "inputBoundary"
+            ],
+            "nodeDescription": "lorem ipsum",
+            "layer": "interfaceAdapters"
+        },
+        "presenter": {
+            "outNeighbours": [
+                "viewModel",
+                "outputBoundary",
+                "outputData"
+            ],
+            "nodeDescription": "lorem ipsum",
+            "layer": "interfaceAdapters"
+        },
+        "viewModel": {
+            "outNeighbours": [],
+            "nodeDescription": "lorem ipsum",
+            "layer": "interfaceAdapters"
+        },
+        "view": {
+            "outNeighbours": [
+                "viewModel",
+                "controller"
+            ],
+            "nodeDescription": "lorem ipsum",
+            "layer": "frameworksAndDrivers"
+        },
+        "dataAccess": {
+            "outNeighbours": [
+                "dataAccessInterface",
+                "database",
+                "entities"
+            ],
+            "nodeDescription": "lorem ipsum",
+            "layer": "frameworksAndDrivers"
+        },
+        "database": {
+            "outNeighbours": [],
+            "nodeDescription": "lorem ipsum",
+            "layer": "frameworksAndDrivers"
+        },
+        "entities": {
+            "outNeighbours": [],
+            "nodeDescription": "lorem ipsum",
+            "layer": "enterpriseBusinessRules"
+        },
+        "inputData": {
+            "outNeighbours": [],
+            "nodeDescription": "lorem ipsum",
+            "layer": "applicationBusinessRules"
+        },
+        "inputBoundary": {
+            "outNeighbours": [],
+            "nodeDescription": "lorem ipsum",
+            "layer": "applicationBusinessRules"
+        },
+        "outputData": {
+            "outNeighbours": [],
+            "nodeDescription": "lorem ipsum",
+            "layer": "applicationBusinessRules"
+        },
+        "outputBoundary": {
+            "outNeighbours": [],
+            "nodeDescription": "lorem ipsum",
+            "layer": "applicationBusinessRules"
+        },
+        "dataAccessInterface": {
+            "outNeighbours": [],
+            "nodeDescription": "lorem ipsum",
+            "layer": "applicationBusinessRules"
+        },
+        "useCaseInteractor": {
+            "outNeighbours": [
+                "inputData",
+                "inputBoundary",
+                "outputBoundary",
+                "outputData",
+                "dataAccessInterface",
+                "entities"
+            ],
+            "nodeDescription": "lorem ipsum",
+            "layer": "applicationBusinessRules"
+        }
+    },
+    "layers": {
+        "interfaceAdapters": "lorem ipsum",
+        "frameworksAndDrivers": "lorem ipsum",
+        "enterpriseBusinessRules": "lorem ipsum",
+        "applicationBusinessRules": "lorem ipsum"
+    }
+}

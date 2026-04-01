@@ -1,0 +1,21 @@
+{"title": "Clean Architecture Visualizer \n for Education",
+    "infoDialog": {
+      "title": "How do I use CAVE?",
+      "content": "TBD",
+      "button": "Got it!"
+    },
+    "cards": {
+      "checker": {
+        "title": "Checker",
+        "description": "Verify clean architecture consistency in your codebase"
+      },
+      "learn": {
+        "title": "Learn CA",
+        "description": "Learn core concepts of clean architecture with our interactive visualizer"
+      },
+      "starter": {
+        "title": "Project Starter",
+        "description": "Download clean architecture starter file to get started on your project!"
+      }
+    }
+  }
