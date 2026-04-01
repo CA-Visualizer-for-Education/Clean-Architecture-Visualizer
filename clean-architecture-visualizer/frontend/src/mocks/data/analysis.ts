@@ -34,126 +34,217 @@ export const mockAnalysisSummary = {
       name: "Create User", 
       violation_count: 0,
       interactions: [
-        { interaction_id: "uc4in1", interaction_name: "Registration Flow" }
+        { interaction_id: "uc4in1", interaction_name: "Registration Flow" },
+        { interaction_id: "uc4in2", interaction_name: "Standard User Onboarding (Silly Goose Variant)" },
+        { interaction_id: "uc4in3", interaction_name: "Provision Honk-Enabled Profile" },
+        { interaction_id: "uc4in4", interaction_name: "Activate Playful Persona Flag" },
+        { interaction_id: "uc4in5", interaction_name: "Initialize User With Goose Traits" },
+        { interaction_id: "uc4in6", interaction_name: "Register Goose Mode User" }
       ]
     }
   ]
 };
 
 export const mockInteractionDetails = {
-  interaction_name: "Sign Out",
+  interaction_name: "Standard User Onboarding (Silly Goose Variant)",
   nodes: [
     {
-      id: "usecasename-UserSignOutController",
-      name: "Controller",
+      id: "GooseUserController",
+      name: "Goose User Controller",
       type: "Controller",
       layer: "InterfaceAdapters",
-      file_path: "src/interface_adapters/UserSignOutController.java",
+      file_path: "src/interface_adapters/GooseUserController.java",
       status: "VALID"
     },
     {
-      id: "Entities",
-      name: "Entities",
+      id: "GooseEntity",
+      name: "Goose Entity",
       type: "Entity",
       layer: "EnterpriseBusinessRules",
-      status: "MISSING"
+      status: "VALID"
     },
     {
-      id: "UserSignOutPresenter",
-      name: "Presenter",
+      id: "GoosePresenter",
+      name: "Goose Presenter",
       type: "Presenter",
       layer: "InterfaceAdapters",
       status: "VIOLATION"
     },
     {
-      id: "UserSignOutViewModel",
-      name: "View Model",
+      id: "GooseViewModel",
+      name: "Goose View Model",
       type: "ViewModel",
       layer: "InterfaceAdapters",
       status: "VIOLATION"
     },
     {
-      id: "UserSignOutInputBoundary",
+      id: "GooseInputBoundary",
       name: "Input Boundary",
       type: "InputBoundary",
       layer: "ApplicationBusinessRules",
       status: "VALID"
     },
     {
-      id: "UserSignOutInputData",
+      id: "GooseInputData",
       name: "Input Data",
       type: "InputData",
       layer: "ApplicationBusinessRules",
       status: "VALID"
     },
     {
-      id: "UserSignOutInteractor",
+      id: "GooseInteractor",
       name: "Use Case Interactor",
       type: "Interactor",
       layer: "ApplicationBusinessRules",
-      file_path: "src/use_cases/UserSignOutInteractor.java",
+      file_path: "src/use_cases/GooseUserOnboardingInteractor.java",
       status: "VIOLATION"
     },
     {
-      id: "UserSignOutOutputBoundary",
+      id: "GooseOutputBoundary",
       name: "Output Boundary",
       type: "OutputBoundary",
       layer: "ApplicationBusinessRules",
       status: "VALID"
     },
     {
-      id: "UserSignOutOutputData",
+      id: "GooseOutputData",
       name: "Output Data",
       type: "OutputData",
       layer: "ApplicationBusinessRules",
       status: "VALID"
     },
     {
-      id: "UserSignOutDataAccessInterface",
+      id: "GooseDataAccessInterface",
       name: "Data Access Interface",
       type: "DataAccessInterface",
       layer: "ApplicationBusinessRules",
-      status: "MISSING"
+      status: "VALID"
     },
     {
-      id: "UserSignOutView",
-      name: "View",
+      id: "GooseView",
+      name: "Goose View",
       type: "View",
       layer: "Frameworks",
-      file_path: "src/views/UserSignOutView.java",
+      file_path: "src/views/GooseUserView.java",
       status: "VALID"
     },
     {
-      id: "UserSignOutDataAccess",
-      name: "Data Access",
+      id: "GooseDataAccess",
+      name: "Goose Data Access",
       type: "DataAccess",
       layer: "Frameworks",
-      file_path: "src/framework_drivers/UserSignOutDataAccess.java",
+      file_path: "src/framework_drivers/GooseDataAccess.java",
       status: "VALID"
     },
     {
-      id: "Database",
+      id: "GooseDatabase",
       name: "Database",
       type: "Database",
       layer: "Frameworks",
-      file_path: "src/framework_drivers/Database.java",
+      file_path: "src/framework_drivers/GooseDatabase.java",
+      status: "VALID"
+    },
+    {
+      id: "LegacyFeatureToggleService",
+      name: "Legacy Feature Toggle Service",
+      type: "DataAccess",
+      layer: "Frameworks",
+      file_path: "src/framework_drivers/LegacyFeatureToggleService.java",
+      status: "VIOLATION"
+    },
+    {
+      id: "GooseTelemetryController",
+      name: "Telemetry Controller",
+      type: "Controller",
+      layer: "InterfaceAdapters",
+      file_path: "src/interface_adapters/GooseTelemetryController.java",
       status: "VALID"
     },
   ],
   edges: [
     {
       id: "edge-1",
-      source: "UserSignOutController",
-      target: "UserSignOutInputBoundary",
+      source: "GooseUserController",
+      target: "GooseInputBoundary",
       type: "DEPENDENCY",
       status: "VALID"
     },
     {
       id: "edge-2",
-      source: "UserSignOutInteractor",
-      target: "Database",
+      source: "GooseInteractor",
+      target: "GooseDatabase",
       type: "DEPENDENCY",
       status: "VIOLATION"
+    },
+    {
+      id: "edge-3",
+      source: "GooseEntity",
+      target: "GooseDatabase",
+      type: "DEPENDENCY",
+      status: "VIOLATION"
+    },
+    {
+      id: "edge-4",
+      source: "GooseView",
+      target: "GooseEntity",
+      type: "DEPENDENCY",
+      status: "VIOLATION"
+    },
+    {
+      id: "edge-5",
+      source: "GoosePresenter",
+      target: "GooseDatabase",
+      type: "DEPENDENCY",
+      status: "VIOLATION"
+    },
+    {
+      id: "edge-6",
+      source: "GooseUserController",
+      target: "LegacyFeatureToggleService",
+      type: "DEPENDENCY",
+      status: "VIOLATION"
+    },
+    {
+      id: "edge-7",
+      source: "GooseTelemetryController",
+      target: "GooseInteractor",
+      type: "DEPENDENCY",
+      status: "VIOLATION"
+    },
+    {
+      id: "edge-8",
+      source: "GooseDataAccess",
+      target: "GooseInputBoundary",
+      type: "DEPENDENCY",
+      status: "VIOLATION"
+    },
+    {
+      id: "edge-9",
+      source: "GooseInteractor",
+      target: "GooseOutputBoundary",
+      type: "DEPENDENCY",
+      status: "VALID"
+    },
+    {
+      id: "edge-10",
+      source: "GooseOutputBoundary",
+      target: "GoosePresenter",
+      type: "DEPENDENCY",
+      status: "VALID"
+    },
+    {
+      id: "edge-11",
+      source: "GoosePresenter",
+      target: "GooseViewModel",
+      type: "DEPENDENCY",
+      status: "VALID"
+    },
+    {
+      id: "edge-12",
+      source: "GooseViewModel",
+      target: "GooseView",
+      type: "DEPENDENCY",
+      status: "VALID"
     }
   ]
 };
