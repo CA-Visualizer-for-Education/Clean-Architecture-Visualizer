@@ -12,12 +12,11 @@ const isTestMode =
   new URLSearchParams(window.location.search).get('lng') === 'cimode';
 
 i18n.use(initReactI18next).init({
-  resources: { en: { checker: enChecker, home: enHome, common: enCommon, useCaseInteractionCode: enUseCaseInteractionCode, codeViewer: enCodeViewer} },
-  lng: 'en',
   resources: {
     en: {
       checker: enChecker,
       home: enHome,
+      common: enCommon,
       useCaseInteractionCode: enUseCaseInteractionCode,
       codeViewer: enCodeViewer,
       learning: enLearning,
