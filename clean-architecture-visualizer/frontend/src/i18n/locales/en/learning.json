@@ -1,0 +1,125 @@
+{
+  "components": {
+    "controller": {
+      "name": "Controller",
+      "description": "A Controller is responsible for receiving input from the external world (such as user actions or HTTP requests), validating or lightly transforming that input, and packaging it into a format suitable for the application layer. It does not contain business logic; instead, it delegates work to the appropriate Use Case via an input boundary, ensuring that external concerns like frameworks or UI details do not leak into the core system.",
+      "diagramRelations": [
+        "Receives input from → View / Frameworks",
+        "Calls → Input Boundary",
+        "Converts → Raw input → Input Data"
+      ]
+    },
+    "presenter": {
+      "name": "Presenter",
+      "description": "A Presenter takes the raw output produced by a Use Case and transforms it into a format that is convenient for display by the View. It ensures that UI concerns (formatting, structuring, or adapting data) are handled outside the core business logic, often creating a View Model that the View can directly render.",
+      "diagramRelations": [
+        "Implements → Output Boundary",
+        "Receives → Output Data from Interactor",
+        "Produces → View Model",
+        "Sends to → View"
+      ]
+    },
+    "view": {
+      "name": "View",
+      "description": "The View is the user-facing component responsible for rendering information and capturing user interactions. It is intentionally kept simple, delegating user actions to the Controller and displaying data provided by the Presenter via a View Model, without containing business logic.",
+      "diagramRelations": [
+        "Sends user input to → Controller",
+        "Receives display data from → Presenter (via View Model)",
+        "Renders → View Model"
+      ]
+    },
+    "viewModel": {
+      "name": "View Model",
+      "description": "A View Model is a data structure tailored specifically for presentation, containing only the information the View needs in a format that is easy to render. It decouples the UI from the internal data structures of the application, allowing the Presenter to shape output without exposing business logic or entities.",
+      "diagramRelations": [
+        "Instantiated by → Presenter",
+        "Consumed by → View",
+        "Derived from → Output Data"
+      ]
+    },
+    "inputBoundary": {
+      "name": "Input Boundary",
+      "description": "The Input Boundary is an interface defined by the application layer that specifies how external actors can invoke a Use Case. It abstracts the execution of the Use Case, allowing Controllers to depend on this interface rather than concrete implementations, preserving the Dependency Rule.",
+      "diagramRelations": [
+        "Implemented by → Interactor",
+        "Called by → Controller",
+        "Receives → Input Data"
+      ]
+    },
+    "outputBoundary": {
+      "name": "Output Boundary",
+      "description": "The Output Boundary is an interface that defines how a Use Case communicates its results to the outside world. It allows the Interactor to remain independent of presentation concerns by depending on an abstraction, which is implemented by the Presenter.",
+      "diagramRelations": [
+        "Defined by → Use Case",
+        "Implemented by → Presenter",
+        "Called by → Interactor",
+        "Receives → Output Data"
+      ]
+    },
+    "inputData": {
+      "name": "Input Data",
+      "description": "Input Data is a simple data structure that carries the information required to execute a Use Case. It is instantiated by the Controller and passed through the Input Boundary, ensuring that the Interactor receives all necessary inputs in a consistent and decoupled format.",
+      "diagramRelations": [
+        "Instantiated by → Controller",
+        "Passed to → Input Boundary / Interactor",
+        "Consumed by → Interactor"
+      ]
+    },
+    "outputData": {
+      "name": "Output Data",
+      "description": "Output Data is a data structure produced by the Interactor that contains the results of executing a Use Case Interactor. It is intentionally free of presentation concerns and is passed through the Output Boundary to be transformed into a View Model by the Presenter.",
+      "diagramRelations": [
+        "Instantiated by → Interactor",
+        "Passed to → Output Boundary",
+        "Consumed by → Presenter"
+      ]
+    },
+    "interactor": {
+      "name": "Interactor",
+      "description": "The Interactor is the concrete implementation of a Use Case Interactor, containing the application-specific business logic that orchestrates Entities and enforces rules. It receives Input Data, performs the necessary operations, interacts with data access interfaces, and produces Output Data, all while depending only on abstractions to maintain independence from external systems.",
+      "diagramRelations": [
+        "Implements → Input Boundary",
+        "Calls → Output Boundary",
+        "Uses → Entities",
+        "Depends on → Data Access Interface",
+        "Produces → Output Data"
+      ]
+    },
+    "entity": {
+      "name": "Entity",
+      "description": "An Entity represents core business objects and rules that are central to the domain and independent of application-specific workflows. It encapsulates invariant logic and critical data, ensuring that the most important business policies remain stable regardless of changes in surrounding layers.",
+      "diagramRelations": [
+        "Used by → Interactor",
+        "Independent of → All outer layers",
+        "Contains → Core business rules"
+      ]
+    },
+    "dataAccessInterface": {
+      "name": "Data Access Interface",
+      "description": "The Data Access Interface defines an abstraction for retrieving and persisting data required by a Use Case. It is declared in the application layer so that the Interactor can depend on it without knowing the details of how data is stored or retrieved.",
+      "diagramRelations": [
+        "Defined for → Interactor",
+        "Implemented by → Data Access",
+        "Abstracts → Database operations"
+      ]
+    },
+    "dataAccess": {
+      "name": "Data Access",
+      "description": "Data Access is the concrete implementation of the Data Access Interface, responsible for interacting with the underlying data storage mechanisms. It translates between database-specific representations and the formats expected by the application, keeping persistence concerns out of the core logic.",
+      "diagramRelations": [
+        "Implements → Data Access Interface",
+        "Communicates with → Database",
+        "Used by → Interactor (via interface)"
+      ]
+    },
+    "database": {
+      "name": "Database",
+      "description": "The Database is the external system responsible for storing and retrieving persistent data. It is considered a low-level detail in Clean Architecture and is fully isolated from the core business logic through the Data Access layer.",
+      "diagramRelations": [
+        "Used by → Data Access",
+        "External to → Entire core system",
+        "Provides → Persistent storage"
+      ]
+    }
+  }
+}

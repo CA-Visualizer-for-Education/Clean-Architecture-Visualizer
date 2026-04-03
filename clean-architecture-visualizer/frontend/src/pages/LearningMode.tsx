@@ -1,14 +1,32 @@
-import { Link } from 'react-router-dom';
-import { CADiagram } from '../components/diagram';
+import { useState } from 'react';
+import { CADiagram, SideBar, Legend, LearningSideBarContent, type NodeClickInfo } from '../components/diagram';
 import Header from '../components/common/Header';
+import { PageContainer, Workspace, MainViewContainer } from '../components/diagram/CADiagramPageLayout';
 
 export default function LearningMode() {
+    const [isOpen, setIsOpen] = useState(false);
+    const [currentNodeInfo, setCurrentNodeInfo] = useState<NodeClickInfo | null>(null);
+
+    const updateLearningModePopup = (info: NodeClickInfo) => {
+        // Update the current node info to display in the sidebar
+        setCurrentNodeInfo(info);
+        // Open the sidebar
+        setIsOpen(true);
+    };
+
     return (
-        <div style={{ padding: '20px' }}>
-              <Header />
-              <CADiagram />
-            
-            <Link to="/">Back to Home</Link>
-        </div>
+        <PageContainer>
+            <Header />
+            <Workspace>
+                <MainViewContainer>
+                    <CADiagram onNodeClick={updateLearningModePopup} />
+                    <Legend />
+                </MainViewContainer>
+
+                <SideBar isOpen={isOpen} onOpenChange={setIsOpen}>
+                    <LearningSideBarContent nodeInfo={currentNodeInfo} />
+                </SideBar>
+            </Workspace>
+        </PageContainer>
     );
 }

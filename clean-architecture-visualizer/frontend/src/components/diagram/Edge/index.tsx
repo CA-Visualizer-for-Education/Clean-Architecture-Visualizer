@@ -1,5 +1,6 @@
 import { useEffect, useId, useMemo, useState } from 'react';
 import type { RefObject } from 'react';
+import { useTheme } from '@mui/material/styles';
 import type { CANode, CAEdge } from '../../../lib/types';
 import { EdgeSvg } from './styles';
 
@@ -25,6 +26,7 @@ type EdgeProps = {
     arrowHeadType: ArrowHeadType;
     containerRef: RefObject<HTMLElement | null>;
     routeHint?: EdgeRouteHint;
+    layoutVersion?: number;
 };
 
 type Point = { x: number; y: number };
@@ -61,10 +63,13 @@ function getPointOnRectSide(rect: DOMRect, side: RectSide): Point {
     return { x: center.x, y: rect.bottom };
 }
 
-export function Edge({ startNode, endNode, status, arrowHeadType, containerRef, routeHint }: EdgeProps) {
+export function Edge({ startNode, endNode, status, arrowHeadType, containerRef, routeHint, layoutVersion = 0 }: EdgeProps) {
     const markerId = useId().replace(/:/g, '_');
+    const theme = useTheme();
     // Violations are emphasized in red; valid/default edges use neutral dark stroke.
-    const strokeColor = status === 'VIOLATION' || status === 'INCORRECT_DEPENDENCY' ? '#d32f2f' : '#1a1a1a';
+    const strokeColor = status === 'VIOLATION' || status === 'INCORRECT_DEPENDENCY'
+        ? theme.palette.error.main
+        : theme.palette.text.primary;
     const [line, setLine] = useState<{ x1: number; y1: number; x2: number; y2: number; direction: RouteDirection } | null>(null);
 
     // Marker id is unique per edge instance to avoid collisions in shared SVG defs.
@@ -120,34 +125,24 @@ export function Edge({ startNode, endNode, status, arrowHeadType, containerRef, 
             const from = getPointOnRectSide(startRect, resolvedStartSide);
             const to = getPointOnRectSide(endRect, resolvedEndSide);
 
-            // Convert viewport coordinates into container-local SVG coordinates.
+            // Convert viewport coordinates into container content coordinates.
+            // The SVG layer scrolls with the container content, so we must add
+            // the current scroll offset to keep anchors stable while scrolling.
             setLine({
-                x1: from.x - containerRect.left,
-                y1: from.y - containerRect.top,
-                x2: to.x - containerRect.left,
-                y2: to.y - containerRect.top,
+                x1: from.x - containerRect.left + container.scrollLeft,
+                y1: from.y - containerRect.top + container.scrollTop,
+                x2: to.x - containerRect.left + container.scrollLeft,
+                y2: to.y - containerRect.top + container.scrollTop,
                 direction,
             });
         };
 
         animationFrameId = requestAnimationFrame(updateLine);
 
-        const resizeObserver = new ResizeObserver(updateLine);
-        resizeObserver.observe(container);
-        resizeObserver.observe(startElement);
-        resizeObserver.observe(endElement);
-
-        // Recompute path when layout shifts due to viewport or scroll changes.
-        window.addEventListener('resize', updateLine);
-        container.addEventListener('scroll', updateLine, { passive: true });
-
         return () => {
             if (animationFrameId !== null) {
                 cancelAnimationFrame(animationFrameId);
             }
-            resizeObserver.disconnect();
-            window.removeEventListener('resize', updateLine);
-            container.removeEventListener('scroll', updateLine);
         };
     }, [
         containerRef,
@@ -157,6 +152,7 @@ export function Edge({ startNode, endNode, status, arrowHeadType, containerRef, 
         routeHint?.viaRatio,
         routeHint?.startSide,
         routeHint?.endSide,
+        layoutVersion,
     ]);
 
     if (!line) {
