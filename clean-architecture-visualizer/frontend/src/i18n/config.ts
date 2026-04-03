@@ -4,6 +4,7 @@ import enChecker from './locales/en/checker.json';
 import enHome from './locales/en/home.json';
 import enCodeViewer from './locales/en/codeViewer.json';
 import enUseCaseInteractionCode from './locales/en/useCaseInteractionCode.json';
+import enProjectStarter from './locales/en/projectStarter.json';
 import enLearning from './locales/en/learning.json';
 
 const isTestMode = 
@@ -17,6 +18,7 @@ i18n.use(initReactI18next).init({
       home: enHome,
       useCaseInteractionCode: enUseCaseInteractionCode,
       codeViewer: enCodeViewer,
+      projectStarter: enProjectStarter,
       learning: enLearning,
     },
   },
@@ -26,5 +28,3 @@ i18n.use(initReactI18next).init({
     escapeValue: false,
   },
 });
-
-export default i18n;
