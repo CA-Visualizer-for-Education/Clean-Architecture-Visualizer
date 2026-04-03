@@ -1,3 +1,3 @@
 export interface GetLearningModeOutputBoundary {
-    getOutputData(): string;
+    getOutputData(): object;
 }

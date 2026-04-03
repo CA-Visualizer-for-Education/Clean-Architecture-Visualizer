@@ -1,3 +1,3 @@
 export interface GetUseCaseInfoOutputBoundary {
-    getOutputData(): string;
+    getOutputData(): object;
 }

@@ -2,8 +2,8 @@
   "name": "clean-architecture-visualizer",
   "version": "1.0.0",
   "scripts": {
-    "build": "tsc && cp package.json dist/ && npm run build_frontend",
-    "build_frontend": "cd frontend && npm install && npm run build",
+    "build": "tsc && node -e \"require('fs').copyFileSync('package.json', 'dist/package.json')\" && npm run build_frontend",
+    "build_frontend": "npm install --prefix frontend && npm run build --prefix frontend",
     "start": "node ./dist/src/app/index.js",
     "test": "node --experimental-vm-modules node_modules/.bin/jest"
   },

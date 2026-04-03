@@ -64,4 +64,7 @@ export interface SessionDBAccessInterface {
     getNodesByStatus(status: NodeStorage["status"]): NodeStorage[];
     getNodeByFilePath(filePath: string): NodeStorage | undefined;
     getNodeByName(name: string): NodeStorage | undefined;
+
+    // reset db
+    resetDB(): undefined;
 }

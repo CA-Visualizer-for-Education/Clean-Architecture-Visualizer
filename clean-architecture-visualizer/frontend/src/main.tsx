@@ -7,7 +7,14 @@ import './index.css';
 const queryClient = new QueryClient();
 
 async function enableMocking() {
-  if (process.env.NODE_ENV !== 'development') {
+  const isDev = import.meta.env.DEV;
+  const explicitMswToggle = import.meta.env.VITE_USE_MSW;
+  const isBackendMode = import.meta.env.MODE === 'backend';
+  const useMsw = isBackendMode
+    ? false
+    : (explicitMswToggle ? explicitMswToggle === 'true' : true);
+
+  if (!isDev || !useMsw) {
     return;
   }
 

@@ -1,0 +1,2 @@
+// TODO: This can be used when there is more than one of a component to show all the different instances and their details.
+// to be implemented in a future iteration when we have more node details to show and potentially multiple nodes of the same type.

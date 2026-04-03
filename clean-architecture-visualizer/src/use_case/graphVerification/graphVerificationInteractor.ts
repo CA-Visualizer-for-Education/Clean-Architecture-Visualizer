@@ -34,6 +34,10 @@ export class GraphVerificationInteractor implements GraphVerificationInputBounda
     ) {}
 
     async execute(): Promise<void> {
+        // restart db
+        this.db.resetDB();
+
+        // main use case logic
         await this.buildFilePaths();
         await this.buildUseCaseGraphs();
         await this.developOutNeighbours();

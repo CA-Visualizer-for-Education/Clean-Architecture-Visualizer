@@ -9,7 +9,27 @@ import enProjectStarter from './locales/en/projectStarter.json';
 i18n.use(initReactI18next).init({
   resources: { en: { checker: enChecker, home: enHome, useCaseInteractionCode: enUseCaseInteractionCode, codeViewer: enCodeViewer, projectStarter: enProjectStarter} },
   lng: 'en',
+import enLearning from './locales/en/learning.json';
+
+const isTestMode = 
+  import.meta.env.VITE_TEST_MODE === 'true' || 
+  new URLSearchParams(window.location.search).get('lng') === 'cimode';
+
+i18n.use(initReactI18next).init({
+  resources: {
+    en: {
+      checker: enChecker,
+      home: enHome,
+      useCaseInteractionCode: enUseCaseInteractionCode,
+      codeViewer: enCodeViewer,
+      learning: enLearning,
+    },
+  },
+  lng: isTestMode ? 'cimode' : 'en',
   fallbackLng: 'en',
+  interpolation: {
+    escapeValue: false,
+  },
 });
 
 export default i18n;

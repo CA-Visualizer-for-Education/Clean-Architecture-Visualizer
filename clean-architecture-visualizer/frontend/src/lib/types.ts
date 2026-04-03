@@ -78,7 +78,7 @@ export interface InteractionDetail {
   edges: CAEdge[];
 }
 
-// Violation payloads attached to analysis and code navigation views.
+// --- Violation Types ---
 export interface Violation {
   id: string;
   type: string;

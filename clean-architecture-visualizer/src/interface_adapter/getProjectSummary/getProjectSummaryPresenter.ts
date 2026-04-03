@@ -4,8 +4,8 @@ import type { GetProjectSummaryOutputData } from "../../use_case/getProjectSumma
 export class GetProjectSummaryPresenter implements GetProjectSummaryOutputBoundary {
     
     constructor(private readonly outputData: GetProjectSummaryOutputData) {}
-    getOutputData(): string {
-        return JSON.stringify(this.outputData.getOutputData(), null, 2);
+    getOutputData(): object {
+        return this.outputData.getOutputData();
     }
     
 }

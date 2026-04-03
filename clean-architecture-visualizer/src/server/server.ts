@@ -28,9 +28,11 @@ export function startServer() {
     })
   );
 
-  app.listen(API_PORT, () => {
+  const server = app.listen(API_PORT, () => {
     console.log(chalk.green(`Dev server running at http://localhost:${API_PORT}`));
     console.log(chalk.dim(`  → Proxying frontend from :${VITE_PORT}`));
     console.log(chalk.dim(`  → Session API at /api/session`));
   });
+
+  return server;
 }
