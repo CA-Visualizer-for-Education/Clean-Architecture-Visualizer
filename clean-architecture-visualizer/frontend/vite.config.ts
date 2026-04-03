@@ -73,4 +73,3 @@ export default defineConfig({
     root: path.resolve(__dirname, './'), 
   },
 })
->>>>>>> 5422c923be79c147ca698340152dd87f63dff6a3
