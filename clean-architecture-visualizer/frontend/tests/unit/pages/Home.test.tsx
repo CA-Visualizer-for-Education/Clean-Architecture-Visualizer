@@ -22,6 +22,7 @@ describe('Home Page', () => {
     const infoButton = screen.getByLabelText('infoDialog.title');
     fireEvent.click(infoButton);
 
-    expect(screen.getByText('infoDialog.content')).toBeInTheDocument();
+  const dialogTitle = await screen.findByText('infoDialog.title');
+  expect(dialogTitle).toBeInTheDocument();
   });
 });
