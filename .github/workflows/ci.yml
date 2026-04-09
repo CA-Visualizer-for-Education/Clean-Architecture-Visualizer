@@ -27,7 +27,7 @@ jobs:
           working-directory: ./clean-architecture-visualizer
 
       - name: Run jest
-        run: npm test
+        run: npm test -- runInBand
     
   frontend-validation:
     runs-on: ubuntu-latest
