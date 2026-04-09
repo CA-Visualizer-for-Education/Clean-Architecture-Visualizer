@@ -34,8 +34,8 @@ export class GraphVerificationInteractor implements GraphVerificationInputBounda
         private readonly fileAccess: FileAccessInterface,
         private readonly cleanArchInfoAccess: CleanArchInfoAccessInterface,
         private readonly db: SessionDBAccessInterface,
+         private readonly useCaseGraphList: useCaseGraph[] = [],
         outputData: GraphVerificationOutputData = new GraphVerificationOutputData(),
-        private readonly useCaseGraphList: useCaseGraph[] = []
     ) {
         this.outputData = outputData;
     }
