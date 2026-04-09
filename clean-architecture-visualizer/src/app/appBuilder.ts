@@ -8,7 +8,7 @@ import { GraphVerificationController } from "../interface_adapter/graphVerificat
 import type { GraphVerificationInputBoundary } from "../use_case/graphVerification/graphVerificationInputBoundary.js";
 import { GraphVerificationOutputData } from "../use_case/graphVerification/graphVerificationOutputData.js";
 import { GraphVerificationPresenter } from "../interface_adapter/graphVerification/graphVerificationPresenter.js";
-import { GraphVerificationInputData } from "../use_case/graphVerification/graphVerificationInputData.js";
+import type { useCaseGraph } from "../entity/useCaseGraph.js";
 
 
 export class AppBuilder {
@@ -41,6 +41,7 @@ export class AppBuilder {
             fileAccess: FileAccess,
             cleanArchAccess: CleanArchAccess,
             db: SessionDBAccess,
+            useCaseGraphList: useCaseGraph[],
             outputData: GraphVerificationOutputData
         ) => GraphVerificationInputBoundary
         ): this {
@@ -53,6 +54,7 @@ export class AppBuilder {
             this.fileAccess,
             this.cleanArchAccess,
             this.db,
+            [],
             this.graphVerificationOutputData
             );
         return this;

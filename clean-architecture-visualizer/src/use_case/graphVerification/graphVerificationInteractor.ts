@@ -14,7 +14,7 @@ export class GraphVerificationInteractor implements GraphVerificationInputBounda
         "interface_adapter",
     ];
     private readonly externalDirectories = [
-        "entities",
+        "entity",
         "views",
         "data_access",
         "database",
@@ -34,7 +34,7 @@ export class GraphVerificationInteractor implements GraphVerificationInputBounda
         private readonly fileAccess: FileAccessInterface,
         private readonly cleanArchInfoAccess: CleanArchInfoAccessInterface,
         private readonly db: SessionDBAccessInterface,
-         private readonly useCaseGraphList: useCaseGraph[] = [],
+        private readonly useCaseGraphList: useCaseGraph[] = [],
         outputData: GraphVerificationOutputData = new GraphVerificationOutputData(),
     ) {
         this.outputData = outputData;
