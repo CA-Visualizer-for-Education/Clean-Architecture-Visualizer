@@ -22,7 +22,9 @@ type LegendEdgeItemProps = {
 
 function LegendEdgeItem({ label, arrowHeadType, status }: LegendEdgeItemProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
+  // Forces a redraw when the preview size changes.
   const [layoutVersion, setLayoutVersion] = useState(0);
+  // Keeps the generated IDs unique and safe for DOM use.
   const id = useId().replace(/:/g, '_');
 
   const startNode: CANode = {
@@ -39,6 +41,7 @@ function LegendEdgeItem({ label, arrowHeadType, status }: LegendEdgeItemProps) {
     status: 'VALID',
   };
 
+  // Recompute the edge layout whenever the preview container resizes.
   useEffect(() => {
     const container = containerRef.current;
     if (!container) {
