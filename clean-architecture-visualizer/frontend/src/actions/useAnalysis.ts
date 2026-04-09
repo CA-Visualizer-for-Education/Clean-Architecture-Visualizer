@@ -6,6 +6,9 @@ export const useAnalysisSummary = () => {
   return useQuery<AnalysisSummary, Error>({
     queryKey: ['analysis-summary'],
     queryFn: getAnalysisSummary,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes (formerly cacheTime)
+    refetchOnMount: false, // Don't refetch when hook mounts on a new route
   });
 };
 

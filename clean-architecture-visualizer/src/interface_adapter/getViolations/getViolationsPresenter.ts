@@ -4,8 +4,8 @@ import type { GetViolationsOutputData } from "../../use_case/getViolations/GetVi
 export class GetViolationsPresenter implements GetViolationsOutputBoundary {
     
     constructor(private readonly outputData: GetViolationsOutputData) {}
-    getOutputData(): string {
-        return JSON.stringify(this.outputData.getOutputData(), null, 2);
+    getOutputData(): object {
+        return this.outputData.getOutputData();
     }
     
 }

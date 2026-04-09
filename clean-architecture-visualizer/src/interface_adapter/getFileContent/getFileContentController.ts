@@ -6,6 +6,6 @@ export class GetFileContentController {
         ) {}
     
     async execute(): Promise<void> {
-        this.inputBoundary.getFileContent();
+        await this.inputBoundary.getFileContent();
     }
 }

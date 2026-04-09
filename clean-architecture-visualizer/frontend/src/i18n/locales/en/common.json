@@ -1,0 +1,17 @@
+{
+  "branding": {
+    "name": "CAVE"
+  },
+  "navigation": {
+    "pages": {
+      "home": "Home",
+      "learningMode": "Learning Mode",
+      "checkerMode": "Checker Mode",
+      "projectStarter": "Project Starter",
+      "currentPage": "Current page"
+    },
+    "status": {
+      "loadingInteractions": "Loading interactions..."
+    }
+  }
+}

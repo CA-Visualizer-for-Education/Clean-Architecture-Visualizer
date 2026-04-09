@@ -5,6 +5,7 @@ import chalk from "chalk";
 import learningMode from "./routes/learningMode.js"
 import analysis from "./routes/analysis.js"
 import codebase from "./routes/codebase.js"
+import template from "./routes/template.js"
 
 const API_PORT  = 3131;
 const VITE_PORT = 5173;
@@ -17,6 +18,7 @@ export function startServer() {
   app.use("/api", learningMode);
   app.use("/api", analysis);
   app.use("/api", codebase);
+  app.use("/api", template);
 
   // Requests non - express related
   app.use(
@@ -28,9 +30,11 @@ export function startServer() {
     })
   );
 
-  app.listen(API_PORT, () => {
+  const server = app.listen(API_PORT, () => {
     console.log(chalk.green(`Dev server running at http://localhost:${API_PORT}`));
     console.log(chalk.dim(`  → Proxying frontend from :${VITE_PORT}`));
     console.log(chalk.dim(`  → Session API at /api/session`));
   });
+
+  return server;
 }

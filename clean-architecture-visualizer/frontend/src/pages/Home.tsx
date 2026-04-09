@@ -1,6 +1,6 @@
 import React from 'react';
 import '../i18n/config';
-import { useTranslation } from 'react-i18next';
+import { useTranslation, Trans } from 'react-i18next';
 import { Box, Typography, Container, IconButton } from '@mui/material';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
@@ -8,6 +8,7 @@ import MenuBookIcon from '@mui/icons-material/MenuBook';
 import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
 import HomeButtonGrid from '../components/common/HomeButtonGrid';
 import InfoDialog from '../components/common/InfoDialog';
+import CaveLogo from '../assets/locales/logo_dark.svg';
 
 const Home = () => {
     const { t } = useTranslation('home');
@@ -41,9 +42,25 @@ const Home = () => {
 
     return (
         <Container maxWidth="lg" sx={{ py: 10, position: 'relative' }}>
+            <Box mb={12} display="flex" justifyContent="center" alignItems="center" gap={3}>
+                <Box 
+                    component="img"
+                    src={CaveLogo}
+                    alt="CAVE Logo"
+                    sx={{ height: 60 }} 
+                />
+                <Typography 
+                    variant="h3" 
+                    component="h1" 
+                    fontWeight="800"
+                >
+                    {t('title')}
+                </Typography>
+            </Box>
+
             {/* Info card */}
             <IconButton 
-                sx={{ position: 'absolute', top: 20, right: 20 }} 
+                sx={{ position: 'fixed', bottom: 20, right: 30 }} 
                 onClick={() => setInfoOpen(true)}
                 aria-label={t('infoDialog.title')}
                 title={t('infoDialog.title')}
@@ -55,20 +72,15 @@ const Home = () => {
                 open={infoOpen} 
                 onClose={() => setInfoOpen(false)}
                 title={t('infoDialog.title')}
-                content={t('infoDialog.content')}
                 buttonText={t('infoDialog.button')}
+                content={
+                    <Trans 
+                        i18nKey="infoDialog.content" 
+                        t={t} 
+                        components={{ br: <br />, strong: <strong /> }} 
+                    />
+                }
             />
-
-            <Box mb={12} textAlign="center">
-                <Typography 
-                    variant="h3" 
-                    component="h1" 
-                    fontWeight="800"
-                    sx={{ whiteSpace: 'pre-line' }}
-                >
-                    {t('title')}
-                </Typography>
-            </Box>
 
             {/* Reusable Grid Component for Nav Cards */}
             <HomeButtonGrid items={navItems} />

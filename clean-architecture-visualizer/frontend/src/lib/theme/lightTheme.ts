@@ -42,6 +42,12 @@ export const lightTheme = createTheme({
             default: '#FFFFFF',
             paper: '#FFFFFF',
         },
+        success: {
+            main: '#4caf50', 
+        },
+        info: {
+            main: '#222222', 
+        },
     },
     typography: {
         fontFamily: "'Inter', sans-serif",

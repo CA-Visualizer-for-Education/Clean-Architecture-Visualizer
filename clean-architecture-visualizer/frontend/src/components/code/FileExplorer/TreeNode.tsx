@@ -11,7 +11,7 @@ import {
   StyledFileIcon 
 } from './styles';
 
-interface TreeNodeProps {
+export interface TreeNodeProps {
   node: FileNode;
   onSelect: (path: string) => void;
   activeFilePath: string | null;

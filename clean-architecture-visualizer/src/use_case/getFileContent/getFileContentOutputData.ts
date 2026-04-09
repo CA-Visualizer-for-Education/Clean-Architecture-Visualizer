@@ -7,7 +7,6 @@ export class GetFileContentOutputData {
     }
     
     getOutputData(): object {
-        if (this.fileConentOutputData) return this.fileConentOutputData;
-        return {};
+        return this.fileConentOutputData ?? {};
     }
 }

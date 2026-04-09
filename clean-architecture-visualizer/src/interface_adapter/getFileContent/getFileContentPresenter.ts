@@ -4,8 +4,8 @@ import type { GetFileContentOutputData } from "../../use_case/getFileContent/get
 export class GetFileContentPresenter implements GetFileContentOutputBoundary {
     
     constructor(private readonly outputData: GetFileContentOutputData) {}
-    getOutputData(): string {
-        return JSON.stringify(this.outputData.getOutputData(), null, 2);
+    getOutputData(): object {
+        return this.outputData.getOutputData();
     }
     
 }

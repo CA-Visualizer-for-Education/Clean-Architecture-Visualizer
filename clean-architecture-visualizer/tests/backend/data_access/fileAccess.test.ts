@@ -1,4 +1,5 @@
 import { jest } from "@jest/globals";
+import { describe, it, expect, beforeEach, afterEach} from '@jest/globals';
 import type { Dirent } from "fs";
 
 type ReaddirFn = (
@@ -31,7 +32,7 @@ function mockFile(name: string): Dirent {
     return { name, isDirectory: () => false } as Dirent;
 }
 
-describe("bfsFindSrc functionality", () => {
+describe("bfsFindDir functionality", () => {
     const fileAccess = new FileAccess();
 
     beforeEach(() => {
@@ -41,7 +42,7 @@ describe("bfsFindSrc functionality", () => {
     it("returns the src directory when it exists at the top level", async () => {
         mockReaddir.mockResolvedValueOnce([mockDir("src"), mockDir("tests")] as any);
 
-        const result = await fileAccess.bfsFindSrc("/project");
+        const result = await fileAccess.bfsFindDir("/project", "src");
         expect(result).toBe("/project/src");
     });
 
@@ -50,7 +51,7 @@ describe("bfsFindSrc functionality", () => {
             .mockResolvedValueOnce([mockDir("packages")] as any)
             .mockResolvedValueOnce([mockDir("src")] as any);
 
-        const result = await fileAccess.bfsFindSrc("/project");
+        const result = await fileAccess.bfsFindDir("/project", "src");
         expect(result).toBe("/project/packages/src");
     });
 
@@ -60,7 +61,7 @@ describe("bfsFindSrc functionality", () => {
             .mockResolvedValueOnce([])
             .mockResolvedValueOnce([]);
 
-        const result = await fileAccess.bfsFindSrc("/project");
+        const result = await fileAccess.bfsFindDir("/project", "src");
         expect(result).toBeNull();
     });
 
@@ -71,21 +72,21 @@ describe("bfsFindSrc functionality", () => {
             mockDir("src"),
         ] as any);
 
-        const result = await fileAccess.bfsFindSrc("/project");
+        const result = await fileAccess.bfsFindDir("/project", "src");
         expect(result).toBe("/project/src");
     });
 
     it("returns null for an empty directory", async () => {
         mockReaddir.mockResolvedValueOnce([]);
 
-        const result = await fileAccess.bfsFindSrc("/project");
+        const result = await fileAccess.bfsFindDir("/project", "src");
         expect(result).toBeNull();
     });
 
     it("finds src at the starting directory itself", async () => {
         mockReaddir.mockResolvedValueOnce([mockDir("src")] as any);
 
-        const result = await fileAccess.bfsFindSrc("/project");
+        const result = await fileAccess.bfsFindDir("/project", "src");
         expect(result).toBe("/project/src");
     });
 });

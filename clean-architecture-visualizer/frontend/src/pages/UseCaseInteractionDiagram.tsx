@@ -1,6 +1,7 @@
 import { Link, useParams } from 'react-router-dom';
 import Header from '../components/common/Header';
 import { CADiagram } from '../components/diagram';
+import { Typography } from '@mui/material';
 
 export default function UseCaseInteractionDiagram() {
     const { useCaseId, interactionId } = useParams();
@@ -9,11 +10,11 @@ export default function UseCaseInteractionDiagram() {
             <Header />
             <main className="page-content">
                 <section>
-                    <p>
+                    <Typography variant="h4" gutterBottom align="center">
                         {useCaseId && interactionId
                             ? `Diagram for Use Case ${useCaseId}, Interaction ${interactionId}`
                             : 'Explore the use case interactions and their code implementations.'}
-                    </p>
+                    </Typography>
                     <CADiagram />
                     <Link
                         to={useCaseId && interactionId

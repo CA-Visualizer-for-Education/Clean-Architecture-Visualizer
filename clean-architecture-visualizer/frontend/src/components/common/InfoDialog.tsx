@@ -5,7 +5,8 @@ import {
   Typography, 
   IconButton, 
   Box, 
-  Button
+  Button,
+  Stack
 } from '@mui/material';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import CloseIcon from '@mui/icons-material/Close';
@@ -35,67 +36,50 @@ const InfoDialog = ({
       fullWidth
       maxWidth="sm"
       PaperProps={{
-        sx: { 
-          borderRadius: 4, 
-          p: 2,
-          bgcolor: 'background.paper' 
-        }
+        sx: { borderRadius: 4, p: 1 }
       }}
     >
       <IconButton
         onClick={onClose}
-        aria-label="Close"
-        sx={{ 
-          position: 'absolute', 
-          right: 16, 
-          top: 16, 
-          color: 'text.secondary' 
-        }}
+        sx={{ position: 'absolute', right: 16, top: 16, color: 'text.secondary' }}
       >
         <CloseIcon />
       </IconButton>
 
-      <DialogContent sx={{ mt: 2 }}>
-        <Box display="flex" gap={2} alignItems="flex-start">
-          {/* Info Icon using theme secondary text color */}
-          <InfoOutlinedIcon sx={{ fontSize: 32, mt: 0.5, color: 'text.secondary' }} />
-          
-          <Box>
-            <Typography variant="h5" fontWeight="bold" gutterBottom>
+      <DialogContent sx={{ mt: 1 }}>
+        <Stack spacing={3}>
+          {/* Header */}
+          <Box display="flex" alignItems="center" gap={2}>
+            <InfoOutlinedIcon color="primary" sx={{ fontSize: 32 }} />
+            <Typography variant="h5" fontWeight="800">
               {title}
             </Typography>
-            
-            <Box sx={{ mb: 3 }}>
-              {typeof content === 'string' ? (
-                <Typography variant="body1" color="text.secondary">
-                  {content}
-                </Typography>
-              ) : (
-                content
-              )}
-            </Box>
-
-            <Button 
-              variant="contained" 
-              onClick={onButtonClick || onClose}
-              sx={{ 
-                bgcolor: 'grey.200', 
-                color: 'text.primary',
-                boxShadow: 'none',
-                '&:hover': { 
-                    bgcolor: 'grey.300', 
-                    boxShadow: 'none' 
-                },
-                textTransform: 'none',
-                fontWeight: '600',
-                borderRadius: 2,
-                px: 3
-              }}
-            >
-              {buttonText}
-            </Button>
           </Box>
-        </Box>
+          
+          {/* Content - This will now render the HTML from i18n */}
+          <Box sx={{ color: 'text.secondary', lineHeight: 1.6 }}>
+            {content}
+          </Box>
+
+          {/* Action */}
+          <Button 
+            variant="contained" 
+            onClick={onButtonClick || onClose}
+            disableElevation
+            sx={{ 
+              bgcolor: 'grey.200', 
+              color: 'text.primary',
+              alignSelf: 'flex-start',
+              '&:hover': { bgcolor: 'grey.300' },
+              textTransform: 'none',
+              fontWeight: '700',
+              borderRadius: 2,
+              px: 4
+            }}
+          >
+            {buttonText}
+          </Button>
+        </Stack>
       </DialogContent>
     </Dialog>
   );

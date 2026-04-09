@@ -5,6 +5,7 @@
 import { Typography, Container, CircularProgress } from '@mui/material';
 import { useLocation, useParams } from 'react-router-dom';
 import { CADiagramView } from './CADiagramView';
+import { type NodeClickInfo } from './CANodeView';
 import type { CANode, CAEdge, CAComponentType, CALayer } from '../../lib/types';
 import { useInteraction } from '../../actions/useAnalysis';
 
@@ -37,7 +38,7 @@ const getNodeByType = (nodes: CANode[], type: CAComponentType): CANode => {
     );
 };
 
-export function CADiagram() {
+export function CADiagram({ onNodeClick }: { onNodeClick?: (info: NodeClickInfo) => void }) {
     let controller: CANode;
     let presenter: CANode;
     let viewModel: CANode;
@@ -333,6 +334,7 @@ export function CADiagram() {
             database={database}
             edges={edges}
             areNodesInteractive={isLearningMode}
+            onNodeClick={onNodeClick}
         />
     )
     

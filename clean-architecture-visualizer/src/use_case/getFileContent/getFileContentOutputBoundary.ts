@@ -1,3 +1,3 @@
 export interface GetFileContentOutputBoundary {
-    getOutputData(): string;
+    getOutputData(): object;
 }

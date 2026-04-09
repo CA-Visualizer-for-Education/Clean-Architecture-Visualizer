@@ -3,6 +3,7 @@ import type { SessionDBAccessInterface } from "../../data_access/sessionDBAccess
 import type { GetFileTreeOutputData } from "./getFileTreeOuptutData.js";
 import type { FileTreeNode } from "../../types/fileTreeNode.js";
 import type { FileStorage } from "../../types/sessionData.js";
+import { sep } from 'path';
 
 export class GetFileTreeInteractor implements GetFileTreeInputBoundary {
  
@@ -51,7 +52,7 @@ export class GetFileTreeInteractor implements GetFileTreeInputBoundary {
         for (let i = 1; i < parts.length - 1; i++) {
  
             const dirName = parts[i];
-            const dirPath = parts.slice(0, i + 1).join("/") + "/";
+            const dirPath = parts.slice(0, i + 1).join(sep) + sep;
  
             let next = current.children?.find(
                 child => child.type === "directory" && child.name === dirName

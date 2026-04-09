@@ -6,6 +6,6 @@ export class GetFileTreeController {
         ) {}
     
     async execute(): Promise<void> {
-        this.inputBoundary.getFileTree();
+        await this.inputBoundary.getFileTree();
     }
 }
