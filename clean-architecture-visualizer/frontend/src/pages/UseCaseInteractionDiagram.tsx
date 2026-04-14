@@ -33,6 +33,7 @@ export default function UseCaseInteractionDiagram() {
             <Header
                 actions={
                     <CtaButton
+                        variant="outlined"
                         onClick={() => navigate(codeRoute)}
                         startIcon={<span>{'</>'}</span>}
                     >

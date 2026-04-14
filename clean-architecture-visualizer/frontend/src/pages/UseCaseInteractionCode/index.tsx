@@ -20,31 +20,41 @@ import { useTranslation } from 'react-i18next';
 const UseCaseInteractionCode = () => {
   const { useCaseId, interactionId } =
     useParams<{ useCaseId: string; interactionId: string }>();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { t } = useTranslation('useCaseInteractionCode');
 
   const navigate = useNavigate();
 
   const { width, startResizing } = useResizableSidebar(300);
 
-  const [activeFilePath, setActiveFilePath] = useState<string | null>(
-    searchParams.get('file'),
-  );
+  const activeFilePath = searchParams.get('file');
   const [isOpen, setIsOpen] = useState(true);
   const [history, setHistory] = useState<string[]>([]);
+
+  const setFileQuery = (path: string | null) => {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      if (path) {
+        next.set('file', path);
+      } else {
+        next.delete('file');
+      }
+      return next;
+    }, { replace: true });
+  };
 
   const handleNavigate = (newPath: string) => {
     if (activeFilePath) {
       setHistory(prev => [...prev, activeFilePath]);
     }
-    setActiveFilePath(newPath);
+    setFileQuery(newPath);
   };
 
   const handleBack = () => {
     setHistory(prev => {
       if (!prev.length) return prev;
       const previousPath = prev[prev.length - 1];
-      setActiveFilePath(previousPath);
+      setFileQuery(previousPath);
       return prev.slice(0, -1);
     });
   };
