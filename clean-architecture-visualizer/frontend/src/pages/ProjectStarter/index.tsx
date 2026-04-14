@@ -3,13 +3,11 @@ import { Box, Divider, IconButton, Snackbar, Alert } from '@mui/material';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import '../../i18n/config'; 
 import { useGenerateProject, useCreateUseCase } from '../../actions/useTemplate';
 import {
   PageWrapper,
   Section,
   Title,
-  Description,
   ActionCenter,
   DarkButton,
   InputContainer,
@@ -17,56 +15,72 @@ import {
   StyledTextField,
 } from './layout';
 
-
 const ProjectStarter = () => {
     const { t } = useTranslation("projectStarter");
     const [useCaseName, setUseCaseName] = useState('');
     
-    // Snackbar State
-    const [snackbar, setSnackbar] = useState({ open: false, message: '' });
+    const [snackbar, setSnackbar] = useState({ 
+        open: false, 
+        message: '', 
+        severity: 'success' as 'success' | 'error' 
+    });
 
     const { mutate: triggerGenerate, isPending: isGenerating } = useGenerateProject();
     const { mutate: triggerCreateUseCase, isPending: isCreating } = useCreateUseCase();
 
     const isWorking = isGenerating || isCreating;
 
+    const getErrorMessage = (error: unknown, fallback: string) => {
+        if (typeof error === 'object' && error !== null && 'response' in error) {
+            const response = (error as { response?: { data?: { error?: string } } }).response;
+            return response?.data?.error || fallback;
+        }
+
+        return fallback;
+    };
+
     const handleCloseSnackbar = () => setSnackbar({ ...snackbar, open: false });
 
     const handleCreateProject = () => {
         triggerGenerate(undefined, {
-            onSuccess: () => {
-                // Notifies the user that the base directories (app, entity, etc.) were created
-                setSnackbar({ open: true, message: t('startNew.success') });
+            onSuccess: (data) => {
+                setSnackbar({ 
+                    open: true, 
+                    message: data.message || "Project structure created!", 
+                    severity: 'success' 
+                });
             },
-            onError: (err) => console.error("Failed to create project", err)
+            onError: (err: unknown) => {
+                const errorMsg = getErrorMessage(err, "Failed to initialize project");
+                setSnackbar({ open: true, message: errorMsg, severity: 'error' });
+            }
         });
     };
 
     const handleAddUseCase = () => {
-        const trimmedName = useCaseName.trim();
-        if (!trimmedName) return;
+    const trimmedName = useCaseName.trim();
+    if (!trimmedName) return;
 
-        triggerCreateUseCase(trimmedName, {
-            onSuccess: () => {
-                setSnackbar({ 
-                    open: true, 
-                    message: t('addUseCase.success', { name: trimmedName }) 
-                });
-                setUseCaseName(''); 
-            },
-            onError: (err) => console.error("Failed to add use case", err)
-        });
-    };
+    triggerCreateUseCase(trimmedName, {
+        onSuccess: (data) => {
+            setSnackbar({ 
+                open: true, 
+                message: data.message, 
+                severity: 'success' 
+            });
+            setUseCaseName('');
+        },
+        onError: (err: unknown) => {
+            const errorMsg = getErrorMessage(err, "Error adding use case");
+            setSnackbar({ open: true, message: errorMsg, severity: 'error' });
+        }
+    });
+};
 
     return (
         <PageWrapper maxWidth="md">
             <Box sx={{ mb: 4 }}>
-                <IconButton 
-                    component={Link} 
-                    to="/" 
-                    sx={{ color: 'text.primary', p: 0 }}
-                    aria-label="Home"
-                >
+                <IconButton component={Link} to="/" sx={{ color: 'text.primary', p: 0 }}>
                     <HomeOutlinedIcon sx={{ fontSize: 48 }} />
                 </IconButton>
             </Box>
@@ -74,14 +88,9 @@ const ProjectStarter = () => {
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4, alignItems: 'center' }}>
                 <Section sx={{ textAlign: 'center'}}>
                     <Title variant="h4">{t('startNew.title')}</Title>
-                    <Description variant="h5">{t('startNew.description')}</Description>
                     <ActionCenter>
-                        <DarkButton 
-                            variant="contained" 
-                            disabled={isWorking}
-                            onClick={handleCreateProject}
-                        >
-                            {isGenerating ? t('startNew.loading') : t('startNew.button')}
+                        <DarkButton variant="contained" disabled={isWorking} onClick={handleCreateProject}>
+                            {isGenerating ? "Generating..." : t('startNew.button')}
                         </DarkButton>
                     </ActionCenter>
                 </Section>
@@ -90,15 +99,9 @@ const ProjectStarter = () => {
 
                 <Section sx={{ textAlign: 'center'}}>
                     <Title variant="h4">{t('addUseCase.title')}</Title>
-                    <Description variant="h5">{t('addUseCase.description')}</Description>
-                    
                     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
                         <InputContainer>
-                            <FieldLabel 
-                                variant="body2" 
-                                component="label" 
-                                htmlFor="use-case-input"
-                            >
+                            <FieldLabel variant="body2" component="label" htmlFor="use-case-input">
                                 {t('addUseCase.inputLabel')}
                             </FieldLabel>
                             <StyledTextField
@@ -107,7 +110,7 @@ const ProjectStarter = () => {
                                 size="small"
                                 value={useCaseName}
                                 onChange={(e) => setUseCaseName(e.target.value)}
-                                placeholder={t('addUseCase.inputPlaceholder')}
+                                onKeyDown={(e) => e.key === 'Enter' && handleAddUseCase()}
                                 disabled={isWorking}
                             />
                         </InputContainer>
@@ -117,25 +120,19 @@ const ProjectStarter = () => {
                             disabled={isWorking || !useCaseName.trim()}
                             onClick={handleAddUseCase}
                         >
-                            {isCreating ? t('addUseCase.loading') : t('addUseCase.button')}
+                            {isCreating ? "Creating..." : t('addUseCase.button')}
                         </DarkButton>
                     </Box>
                 </Section>
             </Box>
 
-            {/* Success Popup */}
             <Snackbar 
                 open={snackbar.open} 
-                autoHideDuration={4000} 
+                autoHideDuration={6000} 
                 onClose={handleCloseSnackbar}
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
             >
-                <Alert 
-                    onClose={handleCloseSnackbar} 
-                    severity="success" 
-                    variant="filled"
-                    sx={{ width: '100%', borderRadius: 2 }}
-                >
+                <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} variant="filled">
                     {snackbar.message}
                 </Alert>
             </Snackbar>
