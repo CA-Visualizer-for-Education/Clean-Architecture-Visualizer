@@ -4,10 +4,6 @@ import { ThemeProvider } from '@mui/material/styles';
 import LearningMode from '@/pages/LearningMode';
 import { lightTheme } from '@/lib';
 
-vi.mock('../../../src/components/common/Header.tsx', () => ({
-  default: () => <div data-testid="mock-header" />,
-}));
-
 vi.mock('../../../src/components/diagram/CADiagram.tsx', () => ({
   CADiagram: ({ onNodeClick }: { onNodeClick?: (info: { id: string; title: string; type: 'Controller'; layer: 'InterfaceAdapters' }) => void }) => (
     <button
@@ -38,13 +34,17 @@ describe('LearningMode page', () => {
       </ThemeProvider>
     );
 
-  it('renders the diagram and legend, and keeps the sidebar closed by default', () => {
+  it('renders the header home link and dropdown, plus diagram/legend with sidebar closed by default', () => {
     renderWithTheme();
 
+    expect(screen.getByRole('link', { name: 'branding.name' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /navigation\.pages\./ })).toBeInTheDocument();
     expect(screen.getByTestId('mock-diagram')).toBeInTheDocument();
     expect(screen.getByTestId('mock-legend')).toBeInTheDocument();
     expect(screen.getByLabelText('Expand sidebar')).toBeInTheDocument();
     expect(screen.queryByLabelText('Collapse sidebar')).not.toBeInTheDocument();
+    expect(screen.queryByText('actions.viewUseCaseInteractionCode')).not.toBeInTheDocument();
+    
   });
 
   it('opens the sidebar and shows the selected node description when a node is clicked', () => {
@@ -58,6 +58,16 @@ describe('LearningMode page', () => {
     expect(screen.getByText('components.controller.description')).toBeInTheDocument();
   });
 
+  it('shows controller content when opening the sidebar without clicking a node', () => {
+    renderWithTheme();
+
+    fireEvent.click(screen.getByLabelText('Expand sidebar'));
+
+    expect(screen.getByLabelText('Collapse sidebar')).toBeInTheDocument();
+    expect(screen.getByText('components.controller.name')).toBeInTheDocument();
+    expect(screen.getByText('components.controller.description')).toBeInTheDocument();
+  });
+
   it('closes the sidebar when the close button is clicked', () => {
     renderWithTheme();
 
@@ -68,5 +78,6 @@ describe('LearningMode page', () => {
     expect(screen.queryByLabelText('Collapse sidebar')).not.toBeInTheDocument();
     expect(screen.getByLabelText('Expand sidebar')).toBeInTheDocument();
   });
+  
 
 });
