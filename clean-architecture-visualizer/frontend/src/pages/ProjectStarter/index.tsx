@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Box, Divider, IconButton, Snackbar, Alert } from '@mui/material';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import { Link } from 'react-router-dom';
+import '../../i18n/config';
 import { useTranslation } from 'react-i18next';
 import { useGenerateProject, useCreateUseCase } from '../../actions/useTemplate';
 import {
@@ -80,7 +81,12 @@ const ProjectStarter = () => {
     return (
         <PageWrapper maxWidth="md">
             <Box sx={{ mb: 4 }}>
-                <IconButton component={Link} to="/" sx={{ color: 'text.primary', p: 0 }}>
+                 <IconButton
+                     component={Link}
+                     to="/"
+                     aria-label={t('homeButtonAriaLabel', { defaultValue: 'Go to home' })}
+                     sx={{ color: 'text.primary', p: 0 }}
+                 >
                     <HomeOutlinedIcon sx={{ fontSize: 48 }} />
                 </IconButton>
             </Box>
@@ -90,7 +96,7 @@ const ProjectStarter = () => {
                     <Title variant="h4">{t('startNew.title')}</Title>
                     <ActionCenter>
                         <DarkButton variant="contained" disabled={isWorking} onClick={handleCreateProject}>
-                            {isGenerating ? "Generating..." : t('startNew.button')}
+                            {isGenerating ? t('startNew.loading') : t('startNew.button')}
                         </DarkButton>
                     </ActionCenter>
                 </Section>
@@ -120,7 +126,7 @@ const ProjectStarter = () => {
                             disabled={isWorking || !useCaseName.trim()}
                             onClick={handleAddUseCase}
                         >
-                            {isCreating ? "Creating..." : t('addUseCase.button')}
+                             {isCreating ? t('addUseCase.loading') : t('addUseCase.button')}
                         </DarkButton>
                     </Box>
                 </Section>

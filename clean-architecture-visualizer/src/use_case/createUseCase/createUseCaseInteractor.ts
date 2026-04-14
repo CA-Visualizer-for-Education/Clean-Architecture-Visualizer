@@ -19,12 +19,12 @@ export class CreateUseCaseinteractor implements CreateUseCaseInputBoundary {
             const currPath = await this.fileAccess.getCurrentPath();
 
             // Create directories
-            const javaPath = currPath + "/main/java"; 
-            let useCase = await this.fileAccess.bfsFindDir(javaPath, "use_case");
-            let interfaceAdapter = await this.fileAccess.bfsFindDir(javaPath, "interface_adapter");
+            let useCase = await this.fileAccess.bfsFindDir(currPath, "use_case");
+            let interfaceAdapter = await this.fileAccess.bfsFindDir(currPath, "interface_adapter");
+
 
             if (!useCase || !interfaceAdapter) {
-                throw new Error("Could not find use_case or interface_adapter, try intiating project first");
+                throw new Error("Could not find use_case or interface_adapter, try initiating project first");
             }
 
             useCase = useCase + "/" + useCaseName;

@@ -74,4 +74,25 @@ describe('ProjectStarter Page', () => {
 		expect(createButton).toBeDisabled();
 		expect(templateMock.createMutation).not.toHaveBeenCalled();
 	});
+
+	it('submits via Enter key when use case name is non-empty', async () => {
+		render(<ProjectStarter />);
+
+		const input = screen.getByLabelText('addUseCase.inputLabel');
+		fireEvent.change(input, { target: { value: 'ProcessPayment' } });
+		fireEvent.keyDown(input, { key: 'Enter' });
+
+		expect(templateMock.createMutation).toHaveBeenCalledWith('ProcessPayment', expect.any(Object));
+		expect(await screen.findByText("Use case 'ProcessPayment' created successfully")).toBeInTheDocument();
+		expect(input).toHaveValue('');
+	});
+
+	it('does not submit via Enter key when use case name is blank', () => {
+		render(<ProjectStarter />);
+
+		const input = screen.getByLabelText('addUseCase.inputLabel');
+		fireEvent.keyDown(input, { key: 'Enter' });
+
+		expect(templateMock.createMutation).not.toHaveBeenCalled();
+	});
 });
