@@ -226,7 +226,7 @@ program
   .command('verify')
   .description('Verify whether the use cases found in child directories adhere to Clean Architeccture')
   .action(async() => {
-    app.runGraphVerification();
+    app.runCLIGraphVerification();
   })
 
 program.parse(process.argv);

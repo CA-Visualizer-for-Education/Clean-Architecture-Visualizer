@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import '../../i18n/config';
 import Header from '../../components/common/Header';
 import { FileExplorer } from '../../components/code/FileExplorer';
 import { CodeViewer } from '../../components/code/CodeViewer';
@@ -12,7 +13,6 @@ import {
 } from './layout';
 import { useResizableSidebar } from './useResizableSidebar.tsx';
 import { CtaButton } from '../../components/common/Button.tsx';
-import { Box } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 
 const UseCaseInteractionCode = () => {
@@ -49,20 +49,9 @@ const UseCaseInteractionCode = () => {
 
   return (
     <PageContainer>
-      <Header />
-
-      <Workspace>
-        <SidebarContainer sidebarWidth={width}>
-          <FileExplorer
-            onSelect={handleNavigate}
-            activeFilePath={activeFilePath}
-          />
-        </SidebarContainer>
-
-        <Resizer onMouseDown={startResizing} />
-
-        <MainViewContainer>
-          <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
+      <Header
+        actions={
+          <>
             <CtaButton
               variant="outlined"
               startIcon={<span>←</span>}
@@ -79,8 +68,21 @@ const UseCaseInteractionCode = () => {
             >
               {t('actions.backToPrevious')}
             </CtaButton>
-          </Box>
+          </>
+        }
+      />
 
+      <Workspace>
+        <SidebarContainer sidebarWidth={width}>
+          <FileExplorer
+            onSelect={handleNavigate}
+            activeFilePath={activeFilePath}
+          />
+        </SidebarContainer>
+
+        <Resizer onMouseDown={startResizing} />
+
+        <MainViewContainer>
           <CodeViewer
             interactionId={interactionId}
             filePath={activeFilePath}

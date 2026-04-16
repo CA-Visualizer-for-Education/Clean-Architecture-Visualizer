@@ -1,10 +1,9 @@
 import { useEffect, useId, useMemo, useState } from 'react';
 import type { RefObject } from 'react';
 import { useTheme } from '@mui/material/styles';
-import type { CANode, CAEdge } from '../../../lib/types';
+import type { ArrowHeadType, CANode, CAEdge } from '../../../lib/types';
 import { EdgeSvg } from './styles';
 
-type ArrowHeadType = 'filledTriangle' | 'hollowTriangle' | 'none';
 type RectSide = 'left' | 'right' | 'top' | 'bottom';
 
 export type EdgeRouteHint = {
