@@ -22,7 +22,7 @@ vi.mock('../../../src/components/diagram/CADiagram.tsx', () => ({
   ),
 }));
 
-vi.mock('../../../src/components/diagram/Legend.tsx', () => ({
+vi.mock('../../../src/components/diagram/Legend/index.tsx', () => ({
   Legend: () => <div data-testid="mock-legend" />,
 }));
 
