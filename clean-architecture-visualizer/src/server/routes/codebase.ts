@@ -27,7 +27,7 @@ router.get("/codebase/file-tree", async (_req, res) => {
     const controller = new GetFileTreeController(interactor);
     const presenter = new GetFileTreePresenter(outputData);
 
-    controller.execute();
+    await controller.execute();
     const result = presenter.getOutputData()
 
     if (!result) {
@@ -48,8 +48,8 @@ router.get("/codebase/interactions/:interactionId/files/:filepath", async (req, 
     const controller = new GetFileContentController(interactor);
     const presenter = new GetFileContentPresenter(outputData);
 
-    controller.execute();
-    const result = presenter.getOutputData()
+    await controller.execute();
+    const result = presenter.getOutputData();
  
     if (!result) {
         res.status(404).json({ error: `File '${filepath}' not found for interaction '${interactionId}'.` });
@@ -68,7 +68,7 @@ router.get("/codebase/interactions/:interactionId/files/:filepath/relations", as
     const controller = new GetRelationsController(interactor);
     const presenter = new GetRelationsPresenter(outputData);
 
-    controller.execute();
+    await controller.execute();
     const result = presenter.getOutputData()
  
     if (!result) {

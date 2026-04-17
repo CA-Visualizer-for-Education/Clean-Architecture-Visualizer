@@ -1,9 +1,10 @@
+import { describe, it, expect, afterEach } from '@jest/globals';
 import { GraphVerificationInteractor } from "../../../src/use_case/graphVerification/graphVerificationInteractor.js";
 import { FileAccess } from "../../../src/data_access/fileAccess.js";
 import { CleanArchAccess } from "../../../src/data_access/cleanArchInfoAccess.js";
 import { SessionDBAccess } from "../../../src/data_access/sessionDBAccess.js";
 
-import { useCaseGraph } from "../../../src/entities/useCaseGraph.js";
+import { useCaseGraph } from "../../../src/entity/useCaseGraph.js";
 
 const genericFileAccess = new FileAccess();
 const genericNeighbourAccess = new CleanArchAccess();
@@ -21,7 +22,7 @@ describe("Ensures that resolveLayer correctly identifies layers from their file 
         ["frameworksAndDrivers",    "/src/views/test/testView.ts"],
         ["interfaceAdapters",       "/src/views/test/testViewModel.ts"],
         ["frameworksAndDrivers",    "/src/database/test/testDatabase.ts"],
-        ["enterpriseBusinessRules", "/src/entities/test/testEntities.ts"],
+        ["enterpriseBusinessRules", "/src/entity/test/testEntities.ts"],
         ["applicationBusinessRules","/src/data_access/test/testAccessInterface.ts"],
         ["frameworksAndDrivers",    "/src/data_access/test/testAccess.ts"],
         ["interfaceAdapters",       "/src/interface_adapters/test/testController.ts"],

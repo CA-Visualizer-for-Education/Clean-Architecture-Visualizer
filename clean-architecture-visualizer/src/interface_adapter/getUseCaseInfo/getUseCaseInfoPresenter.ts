@@ -4,8 +4,8 @@ import type { GetUseCaseInfoOutputData } from "../../use_case/getUseCaseInfo/get
 export class GetUseCaseInfoPresenter implements GetUseCaseInfoOutputBoundary {
     
     constructor(private readonly outputData: GetUseCaseInfoOutputData) {}
-    getOutputData(): string {
-        return JSON.stringify(this.outputData.getOutputData(), null, 2);
+    getOutputData(): object {
+        return this.outputData.getOutputData();
     }
     
 }

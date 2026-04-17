@@ -29,6 +29,9 @@ export type CAEdgeType = (typeof EDGE_TYPES)[number];
 export const EDGE_STATUSES = ['VALID', 'VIOLATION', 'INCORRECT_DEPENDENCY'] as const;
 export type CAEdgeStatus = (typeof EDGE_STATUSES)[number];
 
+export const ARROW_HEAD_TYPES = ['filledTriangle', 'hollowTriangle', 'none'] as const;
+export type ArrowHeadType = (typeof ARROW_HEAD_TYPES)[number];
+
 // UI metadata for mapping architecture layers to palette groups and display labels.
 interface LayerMetadata {
   paletteKey: CALayerKey;
@@ -78,7 +81,7 @@ export interface InteractionDetail {
   edges: CAEdge[];
 }
 
-// Violation payloads attached to analysis and code navigation views.
+// --- Violation Types ---
 export interface Violation {
   id: string;
   type: string;

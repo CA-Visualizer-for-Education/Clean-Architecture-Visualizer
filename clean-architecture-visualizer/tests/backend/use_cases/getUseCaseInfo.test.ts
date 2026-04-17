@@ -43,7 +43,7 @@ describe("GetUseCaseInfoInteractor", () => {
             id: "node-1",
             name: "User",
             type: "entities",
-            layer: "Enterprise",
+            layer: "enterpriseBusinessRules",
             filePath: filePath,
             status: "VALID"
         });
@@ -75,7 +75,7 @@ describe("GetUseCaseInfoInteractor", () => {
         genericDBAccess.upsertNode({
             id: "missing-controller",
             type: "controller",
-            layer: "Interface",
+            layer: "interfaceAdapters",
             status: "MISSING"
         });
 

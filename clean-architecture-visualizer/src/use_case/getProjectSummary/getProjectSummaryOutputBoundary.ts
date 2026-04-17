@@ -1,3 +1,3 @@
 export interface GetProjectSummaryOutputBoundary {
-    getOutputData(): string;
+    getOutputData(): object;
 }

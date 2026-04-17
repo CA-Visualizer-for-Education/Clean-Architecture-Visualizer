@@ -1,0 +1,8 @@
+{
+  "dependency": "Dependency",
+  "implements": "Implements",
+  "incorrectDependency": "Incorrect Dependency",
+  "component": "Component",
+  "missingComponent": "Missing Component",
+  "errorInComponent": "Error in Component"
+}

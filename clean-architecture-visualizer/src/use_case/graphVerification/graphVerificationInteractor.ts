@@ -3,9 +3,10 @@ import type { CleanArchInfoAccessInterface } from "../../data_access/cleanArchIn
 import type { SessionDBAccessInterface } from "../../data_access/sessionDBAccessInterface.js";
 import type { GraphVerificationInputBoundary } from "./graphVerificationInputBoundary.js";
 import type { cleanNode } from "../../types/cleanNode.js";
-import { useCaseGraph } from "../../entities/useCaseGraph.js";
+import { useCaseGraph } from "../../entity/useCaseGraph.js";
 import type { EdgeStorage, FileStorage, NodeStorage } from "../../types/sessionData.js";
 import type { cleanLayer } from "../../types/cleanLayer.js";
+import { GraphVerificationOutputData } from "./graphVerificationOutputData.js";
 
 export class GraphVerificationInteractor implements GraphVerificationInputBoundary{
     private readonly internalDirectories = [
@@ -13,7 +14,7 @@ export class GraphVerificationInteractor implements GraphVerificationInputBounda
         "interface_adapter",
     ];
     private readonly externalDirectories = [
-        "entities",
+        "entity",
         "views",
         "data_access",
         "database",
@@ -26,19 +27,32 @@ export class GraphVerificationInteractor implements GraphVerificationInputBounda
     // The node of files <File Name, Node>
     private readonly externalNodes : Record<string, cleanNode> = {};
 
+    private toCommandLine: boolean = false;
+    private outputData: GraphVerificationOutputData;
+
     constructor(
         private readonly fileAccess: FileAccessInterface,
         private readonly cleanArchInfoAccess: CleanArchInfoAccessInterface,
         private readonly db: SessionDBAccessInterface,
-        private readonly useCaseGraphList: useCaseGraph[] = []
-    ) {}
+        private readonly useCaseGraphList: useCaseGraph[] = [],
+        outputData: GraphVerificationOutputData = new GraphVerificationOutputData(),
+    ) {
+        this.outputData = outputData;
+    }
 
     async execute(): Promise<void> {
+        // restart db
+        this.db.resetDB();
+
+        // main use case logic
         await this.buildFilePaths();
         await this.buildUseCaseGraphs();
         await this.developOutNeighbours();
         await this.verifyOutNeighbours();
         await this.populateDatabase();
+        if (this.toCommandLine) {
+            this.prepareOutput();
+        }
     }
 
     /**
@@ -130,7 +144,7 @@ export class GraphVerificationInteractor implements GraphVerificationInputBounda
         if (importPath.includes("viewmodel")) return "viewModel"; // must be verified before 'view'
         if (importPath.includes("view")) return "view";
         if (importPath.includes("database")) return "database";
-        if (importPath.includes("entities")) return "entities";
+        if (importPath.includes("entity")) return "entities";
         if (importPath.includes("accessinterface")) return "dataAccessInterface"; // must be verified before 'dataAccess'
         if (importPath.includes("access")) return "dataAccess";
         if (importPath.includes("controller")) return "controller";
@@ -371,5 +385,31 @@ export class GraphVerificationInteractor implements GraphVerificationInputBounda
         this.db.setNodes(nodes);
         this.db.setEdges(edges);
         this.db.setProjectName(await this.fileAccess.getProjectName());
+    }
+
+    private prepareOutput(): void {
+        const lines: string[] = [];
+        const lineColours: boolean[] = [];
+
+        for (const graph of this.useCaseGraphList) {
+            const violations = graph.getViolationEdges();
+            const hasViolations = violations.length > 0;
+            const prefix = hasViolations ? "✗" : "✓";
+
+            lines.push(`${prefix} ${graph.getName()}`);
+            lineColours.push(!hasViolations);
+
+            if (hasViolations) {
+                for (const [from, to] of violations) {
+                    lines.push(`    ${from} → ${to}`);
+                    lineColours.push(false);
+                }
+            }
+        }
+        this.outputData.setOutputData(lines, lineColours);
+    }
+
+    toggleCommandLine(): void {
+        this.toCommandLine = !this.toCommandLine;
     }
 }

@@ -12,7 +12,7 @@ export class FileAccess implements FileAccessInterface {
     async getUseCases(): Promise<string[]> {
         const currPath = process.cwd();
 
-        const srcPath = await this.bfsFindSrc(currPath);
+        const srcPath = await this.bfsFindDir(currPath, "src");
         if (!srcPath) return [];
         const useCasePath = await this.findDirectory(srcPath, "use_case");
         if (!useCasePath) return [];
@@ -31,7 +31,7 @@ export class FileAccess implements FileAccessInterface {
      */
     async getFilePaths(node: string, paths: Map<string, string>): Promise<void> {
         const currPath = process.cwd();
-        const srcPath = await this.bfsFindSrc(currPath);
+        const srcPath = await this.bfsFindDir(currPath, "src");
 
         if (!srcPath) {
             return;
@@ -61,7 +61,7 @@ export class FileAccess implements FileAccessInterface {
         });
 
         for (const entry of files) {
-            const fullPath = dir + "/" + entry.name;
+            const fullPath = path.join(dir, entry.name);
 
             if (entry.isFile()) {
                 paths.set(entry.name, fullPath);
@@ -72,11 +72,11 @@ export class FileAccess implements FileAccessInterface {
     }
 
     /**
-     * Find the highest src file starting from the current directory.
+     * Find the highest target directory starting from the current directory.
      * @param curr is your current working directory path.
      * @returns the path to highest in depth src directory.
      */
-    async bfsFindSrc(curr: string): Promise<string | null> {
+    async bfsFindDir(curr: string, target: string): Promise<string | null> {
         const queue: string[] = [curr];
         const visited = new Set<string>();
 
@@ -93,7 +93,7 @@ export class FileAccess implements FileAccessInterface {
 
                 const fullPath = path.join(currentPath, entry.name);
 
-                if (entry.name === 'src') {
+                if (entry.name === target) {
                     return fullPath;
                 }
 
@@ -136,13 +136,13 @@ export class FileAccess implements FileAccessInterface {
 
     /**
      * Read the imports of the file that path points to and return a list of module names.
-     * @param path is a path to a valid file.
+     * @param filePath is a path to a valid file.
      */
-    async getFileImports(path: string): Promise<string[]> {
+    async getFileImports(filePath: string): Promise<string[]> {
         let result: string[] = [];
 
         try {
-            const fileContent: string = await fs.readFile(path, { encoding: 'utf-8' });
+            const fileContent: string = await fs.readFile(filePath, { encoding: 'utf-8' });
             const fileLines = fileContent.split("\n");
             fileLines.forEach(line => {
                 if (line.startsWith("import ")) {
@@ -153,7 +153,7 @@ export class FileAccess implements FileAccessInterface {
             });
         }
         catch {
-            console.log("The file: " + path + " could not be found");
+            console.log("The file: " + filePath + " could not be found");
             return [];
         }
 
@@ -167,26 +167,26 @@ export class FileAccess implements FileAccessInterface {
      * @returns a string representing the project name.
      */
     async getProjectName(): Promise<string> {
-        const currPath = process.cwd().split("/");
-        // returns the index of src if in currPath, else returns -1
-        const srcIndex = currPath.indexOf("src");
-        if (srcIndex == -1) return currPath[srcIndex];
-        return currPath[srcIndex - 1];
+        const currPath = process.cwd();
+        const parts = currPath.split(path.sep);
+        const srcIndex = parts.indexOf("src");
+        if (srcIndex === -1) return parts[parts.length - 1]; // current dir
+        return parts[srcIndex - 1];
     }
 
     /**
      * Get the file content of path as a single string.
-     * @param path is a path to a valid file
+     * @param filePath is a path to a valid file
      * @returns 
      */
-    async getFileContent(path: string): Promise<string> {
+    async getFileContent(filePath: string): Promise<string> {
         
         try {
-            const fileContent: string = await fs.readFile(path, { encoding: 'utf-8' });
+            const fileContent: string = await fs.readFile(filePath, { encoding: 'utf-8' });
             return fileContent;
         }
         catch {
-            console.log("The file: " + path + " could not be found");
+            console.log("The file: " + filePath + " could not be found");
             return "";
         }
     }
@@ -238,5 +238,37 @@ export class FileAccess implements FileAccessInterface {
         }
  
         return undefined;
+    }
+
+    /**
+     * Create a directory and all nested parent directories if they don't exist.
+     * @param dirPath the path of the directory (and any nested dirs) to create.
+     */
+    async createDirectory(dirPath: string): Promise<void> {
+        try {
+            await fs.mkdir(dirPath, { recursive: true });
+        } catch (err) {
+            console.log(`Failed to create directory at ${dirPath}: ${err}`);
+        }
+    }
+
+    /**
+     * Create a file.
+     * @param dirPath the path of the directory (and any nested dirs) to create.
+     */
+    async createFile(filePath: string, content: string = ""): Promise<void> {
+        try {
+            await fs.writeFile(filePath, content, { encoding: "utf-8", flag: "wx" });
+        } catch (err) {
+            console.log(`Failed to create file at ${filePath}: ${err}`);
+        }
+    }
+
+    /**
+     * Get the current working directory path.
+     * @returns a string representing the current working directory path.
+     */
+    async getCurrentPath(): Promise<string> {
+        return process.cwd();
     }
 }

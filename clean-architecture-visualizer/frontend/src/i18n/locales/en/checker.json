@@ -3,5 +3,6 @@
   "useCasesDetected": "Use Cases Detected: {{count}}",
   "violationsPresent": "Violations Present: {{count}}",
   "searchPlaceholder": "Search for a use case or interaction",
-  "noInteractions": "No interactions"
+  "noInteractions": "No interactions",
+  "errorLoading": "Error loading data!"
 }

@@ -27,9 +27,9 @@ jobs:
           working-directory: ./clean-architecture-visualizer
 
       - name: Run jest
-        run: npm test
+        run: npm test --runInBand
     
-  frontend-typecheck:
+  frontend-validation:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -45,4 +45,8 @@ jobs:
         
       - name: Run type check
         run: npm run type-check
+        working-directory: ./clean-architecture-visualizer/frontend
+      
+      - name: Run unit tests
+        run: npm run test:unit
         working-directory: ./clean-architecture-visualizer/frontend

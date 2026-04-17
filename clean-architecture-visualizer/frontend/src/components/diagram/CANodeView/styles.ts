@@ -15,15 +15,22 @@ export const NodePaper = styled(Paper, {
   const canInteract = isInteractive ?? status !== 'MISSING';
 
   return ({
-  margin: theme.spacing(0.5, 1),
+  boxSizing: 'border-box',
+  width: 'clamp(88px, 12vw, 152px)',
+  minWidth: 'clamp(88px, 12vw, 152px)',
+  maxWidth: 'clamp(88px, 12vw, 152px)',
+  marginTop: theme.spacing(0.3),
+  marginBottom: theme.spacing(0.3),
+  marginLeft: 'auto',
+  marginRight: 'auto',
   backgroundColor: theme.palette[layerColor].main,
   border: '2px solid',
   borderColor: theme.palette[layerColor].contrastText,
   color: theme.palette[layerColor].contrastText,
-  paddingLeft: theme.spacing(2),
-  paddingRight: theme.spacing(2),
-  paddingTop: theme.spacing(1),
-  paddingBottom: theme.spacing(1),
+  paddingLeft: theme.spacing(1.25),
+  paddingRight: theme.spacing(1.25),
+  paddingTop: theme.spacing(0.55),
+  paddingBottom: theme.spacing(0.55),
   ...(status === 'MISSING' && {
     borderStyle: 'dashed',
     opacity: 0.6,
