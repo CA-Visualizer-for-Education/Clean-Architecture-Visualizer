@@ -4,5 +4,7 @@
   "incorrectDependency": "Incorrect Dependency",
   "component": "Component",
   "missingComponent": "Missing Component",
-  "errorInComponent": "Error in Component"
+  "errorInComponent": "Error in Component",
+  "layerBreach": "Layer Breach",
+  "mutableViewState": "Mutable View State"
 }

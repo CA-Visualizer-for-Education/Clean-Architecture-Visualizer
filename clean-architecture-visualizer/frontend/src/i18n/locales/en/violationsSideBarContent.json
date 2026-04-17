@@ -12,6 +12,9 @@
   },
   "types": {
     "INCORRECT_DEPENDENCY": "Incorrect Dependency",
+    "MISSING_COMPONENT": "Missing Component",
+    "LAYER_BREACH": "Layer Breach",
+    "MUTABLE_VIEW_STATE": "Mutable View State",
     "VALID": "Valid",
     "MISSING": "Missing",
     "VIOLATION": "Violation"
