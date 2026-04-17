@@ -6,6 +6,6 @@ export class CreateUseCaseController {
         ) {}
     
     async execute(): Promise<void> {
-        this.inputBoundary.execute();
+        await this.inputBoundary.execute();
     }
 }

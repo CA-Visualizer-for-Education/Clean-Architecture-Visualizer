@@ -14,6 +14,9 @@ export const NodeContainer = styled('div', {
 })<NodeContainerProps>(({ isActive, depth, theme }) => ({
   display: 'flex',
   alignItems: 'center',
+  width: '100%',
+  boxSizing: 'border-box',
+  minWidth: 0,
   paddingTop: 6,
   paddingBottom: 6,
   paddingLeft: depth * 16 + 12,
@@ -41,6 +44,8 @@ export const NodeLabel = styled('span')({
   display: 'flex',
   alignItems: 'center',
   gap: 8,
+  flex: 1,
+  minWidth: 0,
 });
 
 export const NodeText = styled(Typography, {
@@ -48,6 +53,11 @@ export const NodeText = styled(Typography, {
 })<{ isActive?: boolean }>(({ theme, isActive }) => ({
   fontSize: '0.85rem',
   color: isActive ? theme.palette.primary.dark : theme.palette.text.primary,
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
+  minWidth: 0,
+  flex: 1,
 }));
 
 export const StyledFolderIcon = styled(FolderIcon)(({ theme }) => ({

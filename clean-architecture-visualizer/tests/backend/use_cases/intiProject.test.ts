@@ -36,14 +36,14 @@ describe("InitProjectInteractor", () => {
 
         // Assert
         const expectedDirs = [
-            `${ROOT_PATH}/main/java`,
-            `${ROOT_PATH}/test/java`,
-            `${ROOT_PATH}/main/java/app`,
-            `${ROOT_PATH}/main/java/use_case`,
-            `${ROOT_PATH}/main/java/entity`,
-            `${ROOT_PATH}/main/java/interface_adapter`,
-            `${ROOT_PATH}/main/java/data_access`,
-            `${ROOT_PATH}/main/java/view`
+            `${ROOT_PATH}/src/main/java`,
+            `${ROOT_PATH}/src/test/java`,
+            `${ROOT_PATH}/src/main/java/app`,
+            `${ROOT_PATH}/src/main/java/use_case`,
+            `${ROOT_PATH}/src/main/java/entity`,
+            `${ROOT_PATH}/src/main/java/interface_adapter`,
+            `${ROOT_PATH}/src/main/java/data_access`,
+            `${ROOT_PATH}/src/main/java/view`
         ];
 
         // Check that each directory was called

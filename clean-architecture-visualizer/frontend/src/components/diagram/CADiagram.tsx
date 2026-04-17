@@ -65,6 +65,7 @@ export function CADiagram({ onNodeClick }: { onNodeClick?: (info: NodeClickInfo)
     } = useInteraction(interactionId ?? '');
 
     const isLearningMode = interactionId === undefined && pathname.endsWith('/learning');
+    const areNodesInteractive = isLearningMode || !!onNodeClick;
 
     if (isLearningMode) {
         controller = {
@@ -333,7 +334,7 @@ export function CADiagram({ onNodeClick }: { onNodeClick?: (info: NodeClickInfo)
             dataAccess={dataAccess}
             database={database}
             edges={edges}
-            areNodesInteractive={isLearningMode}
+            areNodesInteractive={areNodesInteractive}
             onNodeClick={onNodeClick}
         />
     )

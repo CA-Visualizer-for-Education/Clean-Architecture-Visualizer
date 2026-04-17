@@ -8,6 +8,7 @@ export type NodeClickInfo = {
   type: CANode['type'];
   layer: CANode['layer'];
   status?: CANode['status'];
+  filePath?: string;
 };
 
 type CANodeViewProps = CANode & {
@@ -27,6 +28,7 @@ export function CANodeView({ isInteractive, onNodeClick, ...nodeObject }: CANode
         type: nodeObject.type,
         layer: nodeObject.layer,
         status: nodeObject.status,
+        filePath: nodeObject.file_path,
       });
     }
   };

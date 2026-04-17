@@ -14,13 +14,13 @@ const router = Router();
 
 const fileAccess = new FileAccess();
 
-router.post("/template/generate",  (_req, res) => {
+router.post("/template/generate",  async(_req, res) => {
     const outputData = new InitProjectOutputData();
     const interactor = new InitProjectInteractor(fileAccess, outputData);
     const controller = new InitProjectContoller(interactor);
     const presenter = new InitProjectPresetner(outputData);
 
-    controller.execute();
+    await controller.execute();
     const result = presenter.getOutputData();
 
     if (!result) {
@@ -38,7 +38,7 @@ router.post("/template/add/:useCaseName", async (req, res) => {
     const controller = new CreateUseCaseController(interactor);
     const presenter = new CreateUseCasePresenter(outputData);
 
-    controller.execute();
+    await controller.execute();
     const result = presenter.getOutputData();
  
     if (!result) {

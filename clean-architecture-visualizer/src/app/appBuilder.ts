@@ -1,10 +1,21 @@
+import chalk from "chalk";
+
 import type { FileAccess } from "../data_access/fileAccess.js";
 import type { CleanArchAccess } from "../data_access/cleanArchInfoAccess.js";
 import type { SessionDBAccess } from "../data_access/sessionDBAccess.js";
 
-import type { GraphVerificationController } from "../interface_adapter/graphVerification/graphVerificationController.js";
+import { GraphVerificationController } from "../interface_adapter/graphVerification/graphVerificationController.js";
 import type { GraphVerificationInputBoundary } from "../use_case/graphVerification/graphVerificationInputBoundary.js";
-
+import { GraphVerificationOutputData } from "../use_case/graphVerification/graphVerificationOutputData.js";
+import { GraphVerificationPresenter } from "../interface_adapter/graphVerification/graphVerificationPresenter.js";
+import type { useCaseGraph } from "../entity/useCaseGraph.js";
+import type { InitProjectInputBoundary } from "../use_case/initProject/initProjectInputBoundary.js";
+import type { InitProjectContoller } from "../interface_adapter/intiProject/initProjectContoller.js";
+import type { CreateUseCaseInputBoundary } from "../use_case/createUseCase/createUseCaseInputBoundary.js";
+import type { CreateUseCaseController } from "../interface_adapter/createUseCase/createUseCaseController.js";
+import { CreateUseCaseInputData } from "../use_case/createUseCase/createUseCaseInputData.js";
+import { CreateUseCaseOutputData } from "../use_case/createUseCase/createUseCaseOutputData.js";
+import { InitProjectOutputData } from "../use_case/initProject/initProjectOutputData.js";
 
 export class AppBuilder {
     private fileAccess?: FileAccess;
@@ -12,6 +23,11 @@ export class AppBuilder {
     private db?: SessionDBAccess;
     private graphVerificationInteractor?: GraphVerificationInputBoundary;
     private graphVerificationController?: GraphVerificationController;
+    private graphVerificationOutputData?: GraphVerificationOutputData;
+    private initProjectInteractor?: InitProjectInputBoundary;
+    private initProjectController?: InitProjectContoller;
+    private createUseCaseInteractor?: CreateUseCaseInputBoundary;
+    private createUseCaseController?: CreateUseCaseController; 
 
     // Data Access Layer
     withFileAccess(fileAccess: FileAccess): this {
@@ -34,18 +50,50 @@ export class AppBuilder {
         InteractorClass: new (
             fileAccess: FileAccess,
             cleanArchAccess: CleanArchAccess,
-            db: SessionDBAccess
+            db: SessionDBAccess,
+            useCaseGraphList: useCaseGraph[],
+            outputData: GraphVerificationOutputData
         ) => GraphVerificationInputBoundary
         ): this {
         if (!this.fileAccess || !this.cleanArchAccess || !this.db) {
             throw new Error("FileAccess, CleanArchAccess, and SessionDBAccess must be set before building interactor");
         }
+        this.graphVerificationOutputData = new GraphVerificationOutputData();
 
         this.graphVerificationInteractor = new InteractorClass(
             this.fileAccess,
             this.cleanArchAccess,
-            this.db
+            this.db,
+            [],
+            this.graphVerificationOutputData
             );
+        return this;
+    }
+
+    buildCreateUseCaseInteractor(
+        InteractorClass: new (
+            fileAccess: FileAccess,
+            inputData?: CreateUseCaseInputData,
+            outputData?: CreateUseCaseOutputData
+        ) => CreateUseCaseInputBoundary
+    ): this {
+        if (!this.fileAccess) {
+            throw new Error("FileAccess must be set before building CreateUseCaseInteractor");
+        }
+        this.createUseCaseInteractor = new InteractorClass(this.fileAccess);
+        return this;
+    }
+
+    buildInitProjectInteractor(
+        InteractorClass: new (
+            fileAccess: FileAccess,
+            outputData?: InitProjectOutputData
+        ) => InitProjectInputBoundary
+    ): this {
+        if (!this.fileAccess) {
+            throw new Error("FileAccess must be set before building InitProjectInteractor");
+        }
+        this.initProjectInteractor = new InteractorClass(this.fileAccess);
         return this;
     }
 
@@ -63,16 +111,78 @@ export class AppBuilder {
         return this;
     }
 
+    buildInitProjectController(
+        ControllerClass: new (interactor: InitProjectInputBoundary) => InitProjectContoller
+        ): this {
+        if (!this.initProjectInteractor) {
+            throw new Error("InitProjectInteractor must be built before controller");
+        }
+        
+        this.initProjectController = new ControllerClass(
+            this.initProjectInteractor
+            );
+        return this;
+    }
+
+    buildCreateUseCaseController(
+        ControllerClass: new (interactor: CreateUseCaseInputBoundary) => CreateUseCaseController
+        ): this {
+        if (!this.createUseCaseInteractor) {
+            throw new Error("CreateUseCaseInteractor must be built before controller");
+        }
+        
+        this.createUseCaseController = new ControllerClass(
+            this.createUseCaseInteractor
+            );
+        return this;
+    }
+
     build() {
         return {
             fileAccess: this.fileAccess!,
             validOutNeighbourAccess: this.cleanArchAccess!,
             graphVerificationInteractor: this.graphVerificationInteractor!,
+            initProjectInteractor: this.initProjectInteractor!,
+            createUseCaseInteractor: this.createUseCaseInteractor!,
+            createUseCaseController: this.createUseCaseController!,
             graphVerificationController: this.graphVerificationController!,
+            initProjectController: this.initProjectController!,
+
         };
     }
 
     runGraphVerification() {
         this.graphVerificationController?.execute();
+    }
+
+    async runCLIGraphVerification() {
+        if (!this.graphVerificationOutputData) {
+            throw new Error("GraphVerificationOutputData must be built before presenter");
+        }
+        this.graphVerificationInteractor?.toggleCommandLine();
+        const presenter = new GraphVerificationPresenter(this.graphVerificationOutputData);
+        await this.graphVerificationController?.execute();
+        this.graphVerificationInteractor?.toggleCommandLine(); // set back to not printing to CL
+        const data = presenter.getOutputData();
+        const lineContent = data[0];
+        const lineColour = data[1];
+        for (let line = 0; line < lineContent.length; line++) {
+            if (lineColour[line]) {
+                console.log(chalk.green(lineContent[line]));
+            } else {
+                console.log(chalk.red(lineContent[line]));
+            }
+        }
+    }
+
+    runInitProject() {
+        this.initProjectController?.execute();
+        console.log(chalk.green("Your project has been initialized."));
+    }
+
+    runCreateUseCase(name: string) {
+        this.createUseCaseInteractor?.newUseCase(name);
+        this.createUseCaseController?.execute();
+        console.log(chalk.green("Usecase " + name + " has been created."));
     }
 }
