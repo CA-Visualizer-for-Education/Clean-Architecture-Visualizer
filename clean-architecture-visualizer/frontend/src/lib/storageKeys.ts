@@ -1,0 +1,1 @@
+export const USE_CASE_SIDEBAR_OPEN_STORAGE_KEY = 'useCaseSidebarOpen';

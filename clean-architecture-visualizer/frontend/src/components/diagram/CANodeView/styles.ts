@@ -12,7 +12,7 @@ export const NodePaper = styled(Paper, {
   status,
   isInteractive,
 }) => {
-  const canInteract = isInteractive ?? status !== 'MISSING';
+  const canInteract = status !== 'MISSING' && (isInteractive ?? true);
 
   return ({
   boxSizing: 'border-box',
