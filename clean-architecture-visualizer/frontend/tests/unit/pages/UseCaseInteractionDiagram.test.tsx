@@ -9,6 +9,7 @@ import { USE_CASE_SIDEBAR_OPEN_STORAGE_KEY } from '@/lib/storageKeys';
 const mockNavigate = vi.fn();
 const mockUseParams = vi.fn();
 const mockUseInteractionViolations = vi.fn();
+let mockDiagramNodeData: any = null;
 
 vi.mock('react-router-dom', async () => {
     const actual = await vi.importActual<typeof import('react-router-dom')>('react-router-dom');
@@ -32,13 +33,15 @@ vi.mock('../../../src/components/diagram/CADiagram.tsx', () => ({
         <button
             data-testid="mock-diagram"
             onClick={() =>
-                onNodeClick?.({
+                onNodeClick?.(
+                  mockDiagramNodeData ?? {
                     id: 'controller-learning',
                     title: 'Controller',
                     type: 'Controller',
                     layer: 'InterfaceAdapters',
-                  filePath: 'src/main/java/app/Controller.java',
-                })
+                    filePath: 'src/main/java/app/Controller.java',
+                  }
+                )
             }
         >
             mock diagram
@@ -53,6 +56,7 @@ vi.mock('../../../src/components/diagram/Legend/index.tsx', () => ({
 describe('UseCaseInteractionDiagram page', () => {
   beforeEach(() => {
     mockNavigate.mockClear();
+    mockDiagramNodeData = null;
     window.localStorage.removeItem(USE_CASE_SIDEBAR_OPEN_STORAGE_KEY);
     mockUseInteractionViolations.mockReset();
     mockUseInteractionViolations.mockReturnValue({
@@ -204,5 +208,19 @@ describe('UseCaseInteractionDiagram page', () => {
 
     expect(screen.queryByLabelText('Collapse sidebar')).not.toBeInTheDocument();
     expect(screen.getByLabelText('Expand sidebar')).toBeInTheDocument();
+  });
+
+  it('does not navigate when a node is clicked without a filePath', () => {
+    mockDiagramNodeData = {
+      id: 'entity-node',
+      title: 'Some Entity',
+      type: 'Entity',
+      layer: 'EnterpriseBusinessRules',
+    };
+
+    renderWithTheme();
+
+    fireEvent.click(screen.getByTestId('mock-diagram'));
+    expect(mockNavigate).not.toHaveBeenCalled();
   });
 });
