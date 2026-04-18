@@ -4,12 +4,13 @@ import { ThemeProvider } from '@mui/material/styles';
 import UseCaseInteractionDiagram from '@/pages/UseCaseInteractionDiagram';
 import { lightTheme } from '@/lib';
 import type { Violation } from '@/lib/types';
+import type { NodeClickInfo } from '@/components/diagram';
 import { USE_CASE_SIDEBAR_OPEN_STORAGE_KEY } from '@/lib/storageKeys';
 
 const mockNavigate = vi.fn();
 const mockUseParams = vi.fn();
 const mockUseInteractionViolations = vi.fn();
-let mockDiagramNodeData: any = null;
+let mockDiagramNodeData: Partial<NodeClickInfo> | null = null;
 
 vi.mock('react-router-dom', async () => {
     const actual = await vi.importActual<typeof import('react-router-dom')>('react-router-dom');
@@ -29,7 +30,7 @@ vi.mock('../../../src/actions/useAnalysis.ts', async () => {
 });
 
 vi.mock('../../../src/components/diagram/CADiagram.tsx', () => ({
-    CADiagram: ({ onNodeClick }: { onNodeClick?: (info: any) => void }) => (
+    CADiagram: ({ onNodeClick }: { onNodeClick?: (info: NodeClickInfo) => void }) => (
         <button
             data-testid="mock-diagram"
             onClick={() =>
