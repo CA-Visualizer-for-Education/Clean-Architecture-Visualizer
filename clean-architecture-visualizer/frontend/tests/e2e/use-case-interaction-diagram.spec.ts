@@ -38,7 +38,7 @@ test.describe('Use Case Interaction Diagram E2E', () => {
 		await expect(page.getByLabel('Collapse sidebar')).toBeVisible();
 		await expect(page.getByText('selectFile')).toBeVisible();
 
-        await page.getByLabel('Collapse sidebar').click();
+		await page.getByLabel('Collapse sidebar').click();
 		await expect(page.getByLabel('Expand sidebar')).toBeVisible();
 
 		await page.getByRole('button', { name: 'actions.backToDiagram' }).click();

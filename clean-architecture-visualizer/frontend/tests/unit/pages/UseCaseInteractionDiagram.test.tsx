@@ -79,7 +79,7 @@ describe('UseCaseInteractionDiagram page', () => {
     renderWithTheme();
 
     expect(screen.getByRole('link', { name: 'branding.name' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /navigation\.pages\./ })).toBeInTheDocument();
+    expect(screen.getByText('navigation.pages.home')).toBeInTheDocument();
     expect(screen.getByTestId('mock-diagram')).toBeInTheDocument();
     expect(screen.getByTestId('mock-legend')).toBeInTheDocument();
     expect(screen.getByLabelText('Collapse sidebar')).toBeInTheDocument();

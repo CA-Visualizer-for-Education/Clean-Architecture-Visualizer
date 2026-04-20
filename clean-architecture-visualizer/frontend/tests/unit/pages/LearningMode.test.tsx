@@ -3,9 +3,10 @@ import { fireEvent, render, screen } from '../../test-utils';
 import { ThemeProvider } from '@mui/material/styles';
 import LearningMode from '@/pages/LearningMode';
 import { lightTheme } from '@/lib';
+import type { NodeClickInfo } from '@/components/diagram/CANodeView';
 
 vi.mock('../../../src/components/diagram/CADiagram.tsx', () => ({
-  CADiagram: ({ onNodeClick }: { onNodeClick?: (info: { id: string; title: string; type: 'Controller'; layer: 'InterfaceAdapters' }) => void }) => (
+  CADiagram: ({ onNodeClick }: { onNodeClick?: (info: NodeClickInfo) => void }) => (
     <button
       data-testid="mock-diagram"
       onClick={() =>
@@ -38,7 +39,7 @@ describe('LearningMode page', () => {
     renderWithTheme();
 
     expect(screen.getByRole('link', { name: 'branding.name' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /navigation\.pages\./ })).toBeInTheDocument();
+    expect(screen.getByText('navigation.pages.home')).toBeInTheDocument();
     expect(screen.getByTestId('mock-diagram')).toBeInTheDocument();
     expect(screen.getByTestId('mock-legend')).toBeInTheDocument();
     expect(screen.getByLabelText('Expand sidebar')).toBeInTheDocument();
