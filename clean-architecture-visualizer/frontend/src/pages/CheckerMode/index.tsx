@@ -11,7 +11,6 @@ import HomeIcon from '@mui/icons-material/Home';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
-import '../../i18n/config'; 
 import { useAnalysisSummary } from '../../actions/useAnalysis';
 import { UseCase, Interaction } from '../../lib/types';
 import { styles } from './styles';

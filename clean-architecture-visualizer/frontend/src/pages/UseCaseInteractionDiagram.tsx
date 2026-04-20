@@ -1,6 +1,5 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import '../i18n/config';
 import Header from '../components/common/Header';
 import { CADiagram, Legend, SideBar, type NodeClickInfo } from '../components/diagram';
 import { MainViewContainer, PageContainer, Workspace } from '../components/diagram/CADiagramPageLayout';

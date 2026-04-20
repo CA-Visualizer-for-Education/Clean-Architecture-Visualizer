@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Box, Divider, IconButton, Snackbar, Alert } from '@mui/material';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import { Link } from 'react-router-dom';
-import '../../i18n/config';
 import { useTranslation } from 'react-i18next';
 import { useGenerateProject, useCreateUseCase } from '../../actions/useTemplate';
 import {
