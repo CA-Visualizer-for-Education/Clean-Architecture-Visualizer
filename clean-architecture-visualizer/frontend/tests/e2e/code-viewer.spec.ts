@@ -94,6 +94,7 @@ test.describe('Code Viewer E2E', () => {
     await expect(backToPreviousButton).toBeEnabled();
 
     await backToPreviousButton.click();
+    await waitForCodeViewerToSettle(page);
     await expect(page.getByText('UserSignOutController.java')).toHaveCount(2);
     await expect(backToPreviousButton).toBeDisabled();
   });
