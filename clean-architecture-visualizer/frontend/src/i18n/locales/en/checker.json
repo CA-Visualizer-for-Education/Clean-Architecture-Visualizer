@@ -1,8 +1,0 @@
-{
-  "title": "Clean Architecture Checker",
-  "useCasesDetected": "Use Cases Detected: {{count}}",
-  "violationsPresent": "Violations Present: {{count}}",
-  "searchPlaceholder": "Search for a use case or interaction",
-  "noInteractions": "No interactions",
-  "errorLoading": "Error loading data!"
-}

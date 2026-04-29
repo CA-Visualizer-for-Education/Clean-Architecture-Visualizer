@@ -1,6 +1,0 @@
-{
-    "selectFile": "Select a file to view content.",
-    "loading": "Loading code...",
-    "errorLoading": "Error loading file: {{path}}",
-    "layerLabel": "Layer: {{label}}"
-  }
