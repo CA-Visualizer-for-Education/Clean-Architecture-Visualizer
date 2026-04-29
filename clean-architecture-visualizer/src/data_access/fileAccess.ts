@@ -14,7 +14,7 @@ export class FileAccess implements FileAccessInterface {
 
         const srcPath = await this.bfsFindDir(currPath, "src");
         if (!srcPath) return [];
-        const useCasePath = await this.findDirectory(srcPath, "use_case");
+        const useCasePath = await this.bfsFindDir(srcPath, "use_case");
         if (!useCasePath) return [];
 
         const useCases = await fs.readdir(useCasePath, {
@@ -37,16 +37,13 @@ export class FileAccess implements FileAccessInterface {
             return;
         }
 
-        const target = path.join(srcPath, node);
-        
-        try {
-            const stat = await fs.stat(target);
-            if (stat.isDirectory()) {
-                await this.collectFiles(target, paths);
-            }
-        } catch {
+        const target = await this.bfsFindDir(srcPath, node); // was path.join + stat
+        if (!target) {
             console.log(`Directory ${node} not found`);
+            return;
         }
+
+        await this.collectFiles(target, paths);
     }
 
     /**
