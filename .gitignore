@@ -8,4 +8,5 @@ dist/
 clean-architecture-visualizer/frontend/public/
 
 # Secrets
+.DS_Store
 .env

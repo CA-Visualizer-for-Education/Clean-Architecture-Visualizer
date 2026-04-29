@@ -10,11 +10,11 @@ const config: Config = {
     v4: true,
   },
 
-  url: 'https://your-docusaurus-site.example.com',
-  baseUrl: '/',
-
-  organizationName: 'CSC207',
-  projectName: 'clean-architecture-visualizer',
+  url: 'https://CA-Visualizer-for-Education.github.io',
+  baseUrl: '/Clean-Architecture-Visualizer/',
+  organizationName: 'CA-Visualizer-for-Education',
+  projectName: 'Clean-Architecture-Visualizer',
+  deploymentBranch: 'gh-pages',
 
   onBrokenLinks: 'throw',
 
@@ -28,9 +28,9 @@ const config: Config = {
       'classic',
       {
         docs: {
-          path: 'students',
-          routeBasePath: 'students',
-          sidebarPath: './sidebarsStudents.ts',
+          path: 'users',
+          routeBasePath: 'users',
+          sidebarPath: './sidebarsUsers.ts',
         },
         blog: false,
         theme: {
@@ -67,9 +67,9 @@ const config: Config = {
       items: [
         {
           type: 'docSidebar',
-          sidebarId: 'studentsSidebar',
+          sidebarId: 'usersSidebar',
           position: 'left',
-          label: 'Students',
+          label: 'Users',
         },
         {
           type: 'docSidebar',
@@ -88,7 +88,7 @@ const config: Config = {
           items: [
             {
               label: 'GitHub',
-              href: 'https://github.com/paulgries/Clean-Architecture-Visualizer',
+              href: 'https://github.com/CA-Visualizer-for-Education/Clean-Architecture-Visualizer',
             },
           ],
         },
