@@ -22,9 +22,12 @@ jobs:
         working-directory: docs
 
       - name: Deploy to GitHub Pages
-        run: GIT_USER="git" yarn deploy
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          yarn deploy
         working-directory: docs
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GIT_USER: git
+          GIT_USER: ${{ secrets.GITHUB_TOKEN }}
           USE_SSH: false
