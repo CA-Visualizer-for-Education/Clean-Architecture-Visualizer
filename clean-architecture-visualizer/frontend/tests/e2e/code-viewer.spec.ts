@@ -11,7 +11,23 @@ test.describe('Code Viewer E2E', () => {
 
   const waitForCodeViewerToSettle = async (page: Page) => {
     const main = page.getByRole('main');
-    await expect(main.getByText(loadingText)).not.toBeVisible({ timeout: 20000 });
+    const loadingElement = main.getByText(loadingText);
+    const errorElement = main.getByText(errorLoadingText);
+    
+    const startTime = Date.now();
+    const timeout = 20000;
+    
+    while (Date.now() - startTime < timeout) {
+      if (await errorElement.isVisible().catch(() => false)) {
+        throw new Error('File loading failed with error');
+      }
+      if (!(await loadingElement.isVisible().catch(() => false))) {
+        return;
+      }
+      await page.waitForTimeout(500);
+    }
+    
+    throw new Error('Timeout waiting for code viewer to settle');
   };
 
   test('should expand folders, open a file, and render in Monaco', async ({ page }) => {
@@ -65,9 +81,11 @@ test.describe('Code Viewer E2E', () => {
     const backToPreviousButton = page.getByText('actions.backToPrevious');
 
     await controllerFile.click();
+    await waitForCodeViewerToSettle(page);
     await expect(page).toHaveURL(/file=src%2Finterface_adapters%2FUserSignOutController.java/);
 
     await presenterFile.click();
+    await waitForCodeViewerToSettle(page);
     await expect(page).toHaveURL(/file=src%2Finterface_adapters%2FUserSignOutPresenter.java/);
 
     await backToPreviousButton.click();
