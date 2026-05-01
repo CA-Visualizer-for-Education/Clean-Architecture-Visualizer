@@ -20,7 +20,7 @@ The `SessionDB` class is a generic key-value store that reads and writes this fi
 Always call `.load()` before any read operation — the in-memory state is not automatically synced from disk. Whenever an instance of the `SessionDBAccess` is created `.load()` is run.
 :::
 
-## SessionData Shape
+## SessionData Structure
 
 This is the top-level type stored in the session file:
 
