@@ -20,6 +20,9 @@ export function CANodeView({ isInteractive, onNodeClick, ...nodeObject }: CANode
   const title = nodeObject.name ?? nodeObject.id;
   const layerColor: LayerColor = LAYER_METADATA[nodeObject.layer].paletteKey;
 
+  // TODO(accessibility): expose semantic keyboard/ARIA support for interactive nodes
+  // (e.g., role="button", tabIndex=0, aria-label, and keyboard activation handlers).
+
   const handleClick = () => {
     if (isInteractive && onNodeClick) {
       onNodeClick({

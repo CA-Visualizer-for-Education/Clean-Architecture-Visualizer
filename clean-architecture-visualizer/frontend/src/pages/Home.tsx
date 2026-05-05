@@ -1,5 +1,4 @@
 import React from 'react';
-import '../i18n/config';
 import { useTranslation, Trans } from 'react-i18next';
 import { Box, Typography, Container, IconButton } from '@mui/material';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';

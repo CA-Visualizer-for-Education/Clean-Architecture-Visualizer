@@ -1,6 +1,5 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import '../../../i18n/config';
 import { CANodeView } from '../CANodeView';
 import { Edge } from '../Edge';
 import type { ArrowHeadType, CANode, CAEdge } from '../../../lib/types';
