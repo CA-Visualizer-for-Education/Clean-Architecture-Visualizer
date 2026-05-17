@@ -1,13 +1,8 @@
 import { http, HttpResponse } from 'msw';
-import { mockLearningMode } from './data/learning';
 import { mockAnalysisSummary, mockInteractionDetails, mockViolations } from './data/analysis';
 import { mockFileTree, mockFiles, mockFileRelationsByPath } from './data/codebase';
 
 export const handlers = [
-    http.get('/api/learning-mode/', () => {
-    return HttpResponse.json(mockLearningMode);
-  }),
-
   http.get('/api/analysis/summary', () => HttpResponse.json(mockAnalysisSummary)),
   http.get('/api/analysis/interaction/:id', () => HttpResponse.json(mockInteractionDetails)),
   http.get('/api/analysis/violations/:interactionId', () => HttpResponse.json(mockViolations)),
