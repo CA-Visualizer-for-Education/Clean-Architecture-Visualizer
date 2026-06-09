@@ -47,15 +47,12 @@ router.get("/analysis/interaction/:id", async (req, res) => {
 
     controller.execute();
     const result = presenter.getOutputData();
- 
     if (!result) {
         res.status(404).json({ error: `Interaction '${req.params.id}' not found.` });
         return;
     }
- 
     res.json(result);
 });
- 
 router.get("/analysis/violations/:interactionId", async (req, res) => {
     const inputData = new GetViolationsInputData(req.params.interactionId);
     const outputData = new GetViolationsOutputData();
@@ -65,12 +62,10 @@ router.get("/analysis/violations/:interactionId", async (req, res) => {
 
     controller.execute();
     const result = presenter.getOutputData();
- 
     if (!result) {
         res.status(404).json({ error: `Interaction '${req.params.interactionId}' not found.` });
         return;
     }
- 
     res.json(result);
 });
 
