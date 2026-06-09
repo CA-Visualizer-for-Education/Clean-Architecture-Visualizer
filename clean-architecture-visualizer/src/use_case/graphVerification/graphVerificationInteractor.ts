@@ -136,9 +136,10 @@ export class GraphVerificationInteractor implements GraphVerificationInputBounda
             // Find all graphs that own any (.some functionality) of this file's imports
             const owningGraphs = this.useCaseGraphList.filter(graph =>
                 imports.some(importPath =>
-                    [...graph.getFiles().keys()].some(targetFileName =>
-                        importPath.toLowerCase().includes(targetFileName.toLowerCase())
-                    )
+                    [...graph.getFiles().keys()].some(targetFileName => {
+                        const base = targetFileName.toLowerCase().replace(/\.[^.]+$/, "");
+                        return importPath.toLowerCase().includes(base);
+                    })
                 )
             );
 
