@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach} from '@jest/globals';
 
 import { GetFileTreeInteractor } from "../../../src/use_case/getFileTree/getFileTreeInteractor.js";
 import { SessionDBAccess } from "../../../src/data_access/sessionDBAccess.js";
-import { GetFileTreeOutputData } from "../../../src/use_case/getFileTree/getFileTreeOuptutData.js";
+import { GetFileTreeOutputData } from "../../../src/use_case/getFileTree/getFileTreeOutputData.js";
 import type { FileStorage } from "../../../src/types/sessionData.js";
 import type { FileTreeNode } from "../../../src/types/fileTreeNode.js";
 
@@ -75,7 +75,7 @@ describe("GetFileTreeInteractor", () => {
                 layer: "enterpriseBusinessRules",
                 node: "entities",
             };
-            
+
             genericDBAccess.upsertFile(file1);
             genericDBAccess.upsertFile(file2);
 
@@ -105,14 +105,14 @@ describe("GetFileTreeInteractor", () => {
                 layer: "enterpriseBusinessRules",
                 node: "entities",
             };
-            
+
             const mockUseCase = {
                 violationEdges: [["entities", "presenter"]]
             };
 
             // Assuming your DBAccess allows adding use cases
             genericDBAccess.upsertFile(mockFile);
-            (genericDBAccess as any).upsertUseCase?.(mockUseCase); 
+            (genericDBAccess as any).upsertUseCase?.(mockUseCase);
 
             const outputData = makeOutputData();
             const interactor = new GetFileTreeInteractor(genericDBAccess, outputData);

@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { SessionDBAccess } from "../../data_access/sessionDBAccess.js";
 import { FileAccess } from "../../data_access/fileAccess.js";
-import { GetFileTreeOutputData } from "../../use_case/getFileTree/getFileTreeOuptutData.js";
+import { GetFileTreeOutputData } from "../../use_case/getFileTree/getFileTreeOutputData.js";
 import { GetFileTreeInteractor } from "../../use_case/getFileTree/getFileTreeInteractor.js";
 import { GetFileTreeController } from "../../interface_adapter/getFileTree/getFileTreeController.js";
 import { GetFileTreePresenter } from "../../interface_adapter/getFileTree/getFileTreePresenter.js";
@@ -38,10 +38,10 @@ router.get("/codebase/file-tree", async (_req, res) => {
 
     res.json(outputData.getOutputData());
 });
- 
+
 router.get("/codebase/interactions/:interactionId/files/:filepath", async (req, res) => {
     const { interactionId, filepath } = req.params;
-    
+
     const inputData = new GetFileContentInputData(interactionId, filepath);
     const outputData = new GetFileContentOutputData();
     const interactor = new GetFileContentInteractor(dbAccess, fileAccess, inputData, outputData);
@@ -50,18 +50,18 @@ router.get("/codebase/interactions/:interactionId/files/:filepath", async (req, 
 
     await controller.execute();
     const result = presenter.getOutputData();
- 
+
     if (!result) {
         res.status(404).json({ error: `File '${filepath}' not found for interaction '${interactionId}'.` });
         return;
     }
- 
+
     res.json(result);
 });
- 
+
 router.get("/codebase/interactions/:interactionId/files/:filepath/relations", async (req, res) => {
     const { interactionId, filepath } = req.params;
- 
+
     const inputData = new GetRelationsInputData(interactionId, filepath);
     const outputData = new GetRelationsOutputData();
     const interactor = new GetRelationsInteractor(dbAccess, fileAccess, inputData, outputData);
@@ -70,12 +70,12 @@ router.get("/codebase/interactions/:interactionId/files/:filepath/relations", as
 
     await controller.execute();
     const result = presenter.getOutputData()
- 
+
     if (!result) {
         res.status(404).json({ error: `File '${filepath}' not found for interaction '${interactionId}'.` });
         return;
     }
- 
+
     res.json(result);
 });
 
