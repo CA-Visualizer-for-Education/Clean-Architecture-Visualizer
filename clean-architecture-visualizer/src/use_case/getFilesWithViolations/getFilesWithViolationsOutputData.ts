@@ -1,9 +1,9 @@
 export class GetFilesWithViolationsOutputData {
     
-    private filesWithViolationsOutputData?: { [key: string]: any }[];
+    private filesWithViolationsOutputData?: { [key: string]: any };
 
     // called by interactor to store result
-    setOutputData(OutputData: {[key: string]: any }[]) {
+    setOutputData(OutputData: {[key: string]: any }) {
         this.filesWithViolationsOutputData = OutputData;
     }
 
