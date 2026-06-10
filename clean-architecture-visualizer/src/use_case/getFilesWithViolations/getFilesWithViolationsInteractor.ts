@@ -2,7 +2,7 @@ import type { GetFilesWithViolationsInputBoundary} from "./getFilesWithViolation
 import type { SessionDBAccessInterface } from "../../data_access/sessionDBAccessInterface.js";
 import type { GetFilesWithViolationsOutputData } from "./getFilesWithViolationsOutputData.js";
 
-export class GetFileswithViolationInteractor implements GetFilesWithViolationsInputBoundary {
+export class GetFilesWithViolationInteractor implements GetFilesWithViolationsInputBoundary {
     
     // new per session. construcing REQUIRES input of BOTH DBA and Output data (blank)
     constructor (
