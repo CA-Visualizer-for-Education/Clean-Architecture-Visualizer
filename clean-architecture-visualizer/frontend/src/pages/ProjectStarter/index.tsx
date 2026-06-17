@@ -80,17 +80,6 @@ const ProjectStarter = () => {
 
     return (
         <PageWrapper maxWidth="md">
-            <Box sx={{ mb: 4 }}>
-                 <IconButton
-                     component={Link}
-                     to="/"
-                     aria-label={t('homeButtonAriaLabel', { defaultValue: 'Go to home' })}
-                     sx={{ color: 'text.primary', p: 0 }}
-                 >
-                    <HomeOutlinedIcon sx={{ fontSize: 48 }} />
-                </IconButton>
-            </Box>
-
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4, alignItems: 'center' }}>
                 <Section sx={{ textAlign: 'center'}}>
                     <Title variant="h4">{t('startNew.title')}</Title>
