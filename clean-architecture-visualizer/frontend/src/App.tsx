@@ -8,6 +8,7 @@ import UseCaseInteractionDiagram from './pages/UseCaseInteractionDiagram';
 import UseCaseInteractionCode from './pages/UseCaseInteractionCode';
 import { ThemeProvider } from '@mui/material/styles';
 import { lightTheme } from './lib';
+import Navbar from './components/layout/Navbar';
 
 
 export default function App() {
@@ -16,15 +17,16 @@ export default function App() {
         <ThemeProvider theme={lightTheme}>
             <AppGlobalStyles />
         <Router>
-                <Routes>
-                    <Route path='/' element={<Home />} />
-                    <Route path='/learning' element={<LearningMode />} />
-                    <Route path='/checker' element={<CheckerMode />} />
-                    <Route path='/project-starter' element={<ProjectStarter />} />
-                    <Route path='/use-case/:useCaseId/interaction/:interactionId/diagram' element={<UseCaseInteractionDiagram />} />
-                    <Route path='/use-case/:useCaseId/interaction/:interactionId/code' element={<UseCaseInteractionCode />} />
-                </Routes>
-            </Router>
+            <Navbar />
+            <Routes>
+                <Route path='/' element={<Home />} />
+                <Route path='/learning' element={<LearningMode />} />
+                <Route path='/checker' element={<CheckerMode />} />
+                <Route path='/project-starter' element={<ProjectStarter />} />
+                <Route path='/use-case/:useCaseId/interaction/:interactionId/diagram' element={<UseCaseInteractionDiagram />} />
+                <Route path='/use-case/:useCaseId/interaction/:interactionId/code' element={<UseCaseInteractionCode />} />
+            </Routes>
+        </Router>
         </ThemeProvider>
   );
 }
