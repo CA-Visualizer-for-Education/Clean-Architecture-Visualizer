@@ -65,6 +65,7 @@ export class GetUseCaseInfoInteractor implements GetUseCaseInfoInputBoundary {
         edge.source !== edge.target &&
         allNodes.find((node) => node.id === edge.target)?.type ===
           'useCaseInteractor'
+      // edge.target === 'useCaseInteractor' replace "allNodes.find ... 'useCaseInteractor' with this"
     );
 
     if (hasSubCase) {

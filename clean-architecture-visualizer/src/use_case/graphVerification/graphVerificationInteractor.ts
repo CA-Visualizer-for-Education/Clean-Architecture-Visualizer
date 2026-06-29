@@ -55,6 +55,8 @@ export class GraphVerificationInteractor implements GraphVerificationInputBounda
     await this.developOutNeighbours();
     await this.verifyOutNeighbours();
     await this.populateDatabase();
+
+    // Paths are defined as <File Name, File Path>
     if (formatForCLI) {
       this.prepareOutput();
       this.presenter.prepareSuccessView(this.outputData);
@@ -66,14 +68,25 @@ export class GraphVerificationInteractor implements GraphVerificationInputBounda
    * values being their respective file paths.
    */
   private async buildFilePaths(): Promise<void> {
-    await Promise.all([
-      ...this.internalDirectories.map((dir) =>
-        this.fileAccess.getFilePaths(dir, this.internalFilePaths)
-      ),
-      ...this.externalDirectories.map((dir) =>
-        this.fileAccess.getFilePaths(dir, this.externalFilePaths)
-      ),
-    ]);
+    // Must now account for packaging by module -- if features exists, packaging by module
+    const currPath = process.cwd();
+    if (await this.fileAccess.bfsFindDir(currPath, 'features')) {
+      await Promise.all([
+        this.fileAccess.getFilePaths('features', this.internalFilePaths),
+        ...this.externalDirectories.map((dir) =>
+          this.fileAccess.getFilePaths(dir, this.externalFilePaths)
+        ),
+      ]);
+    } else {
+      await Promise.all([
+        ...this.internalDirectories.map((dir) =>
+          this.fileAccess.getFilePaths(dir, this.internalFilePaths)
+        ),
+        ...this.externalDirectories.map((dir) =>
+          this.fileAccess.getFilePaths(dir, this.externalFilePaths)
+        ),
+      ]);
+    }
   }
 
   /**
@@ -113,6 +126,7 @@ export class GraphVerificationInteractor implements GraphVerificationInputBounda
         const fromNode = this.resolveNode(filePath);
         if (!fromNode) continue;
         this.externalNodes[fileName] = fromNode;
+        // Stores the names of the files imported (does not store the actual path)
         const imports = await this.fileAccess.getFileImports(filePath);
         for (const importPath of imports) {
           const toNode =
@@ -130,6 +144,16 @@ export class GraphVerificationInteractor implements GraphVerificationInputBounda
               this.crossUseCaseEdges[useCaseIndex].push([fromNode, toNode]);
             } else {
               graph.setNodeNeighbour(fromNode, toNode);
+              const modifiedImportPath =
+                importPath.length > 0 && importPath.at(-1) === ';'
+                  ? importPath.slice(0, -1)
+                  : importPath;
+              if (this.externalFilePaths.has(modifiedImportPath)) {
+                graph.addFile(
+                  modifiedImportPath,
+                  this.externalFilePaths.get(modifiedImportPath) as string
+                );
+              }
             }
           }
         }
@@ -142,7 +166,6 @@ export class GraphVerificationInteractor implements GraphVerificationInputBounda
       if (!fromNode) continue;
       this.externalNodes[fileName] = fromNode;
       const imports = await this.fileAccess.getFileImports(filePath);
-
       // Find all graphs that own any (.some functionality) of this file's imports
       const owningGraphs = this.useCaseGraphList.filter((graph) =>
         imports.some((importPath) =>
@@ -202,7 +225,9 @@ export class GraphVerificationInteractor implements GraphVerificationInputBounda
     if (importPath.includes('viewmodel')) return 'interfaceAdapters'; // must be verified before 'view'
     if (importPath.includes('view')) return 'frameworksAndDrivers';
     if (importPath.includes('database')) return 'frameworksAndDrivers';
-    if (importPath.includes('entities')) return 'enterpriseBusinessRules';
+    // if (importPath.includes('entities')) return 'enterpriseBusinessRules';
+    if (importPath.includes('entity') || importPath.includes('entities'))
+      return 'enterpriseBusinessRules';
     if (importPath.includes('accessinterface'))
       return 'applicationBusinessRules'; // must be verified before 'dataAccess'
     if (importPath.includes('access')) return 'frameworksAndDrivers';
@@ -434,7 +459,6 @@ export class GraphVerificationInteractor implements GraphVerificationInputBounda
       ...this.buildFileStorageList(this.internalFilePaths),
       ...this.buildFileStorageList(this.externalFilePaths),
     ];
-
     const nodes: NodeStorage[] = this.buildNodeStorageList(files);
     const edges: EdgeStorage[] = this.buildEdgeStorageList();
 

@@ -144,3 +144,48 @@ describe('GetViolationsInteractor', () => {
     });
   });
 });
+
+describe('execute — Violation Mapping for differently formatted file path.', () => {
+  const fromNode = 'controller';
+  const toNode = 'entities';
+  const filePath = 'src/interface_adapters/UserController.java';
+
+  beforeEach(() => {
+    genericDBAccess.upsertNode({
+      // node id's are file paths since they are unique
+      id: 'src/interface_adapters/UserController.java',
+      name: 'UserController',
+      type: fromNode,
+      layer: 'interfaceAdapters',
+      filePath: filePath,
+      status: 'VALID',
+    });
+
+    // Setup the use case with a violation edge
+    const mockUseCase = {
+      id: 'uc-1',
+      name: 'Process User',
+      fileKeys: ['UserController.java'],
+      violationEdges: [[fromNode, toNode]] as [string, string][],
+    };
+    (genericDBAccess as any).upsertUseCase(mockUseCase);
+  });
+
+  it('correctly resolves related node IDs where fileKeys stores names of files', async () => {
+    const outputData = makeOutputData();
+    const interactor = new GetViolationsInteractor(
+      genericDBAccess,
+      genericFileAccess,
+      makeInputData('uc-1'),
+      outputData
+    );
+
+    await interactor.execute();
+
+    const violation = outputData.result[0];
+    expect(violation.related_node_ids).toContain(
+      'src/interface_adapters/UserController.java'
+    );
+    expect(violation.related_edge_id).toBe(`${fromNode}->${toNode}`);
+  });
+});

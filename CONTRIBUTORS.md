@@ -4,6 +4,7 @@ Annie Wang,
 Cindy Yang,
 Ethan Diep,
 Eric Xu,
+Jayden Ong
 Matthew Dahlgren,
 Olivier Denis,
 Raymond Wu,

@@ -1,4 +1,11 @@
-import { describe, it, expect, afterEach } from '@jest/globals';
+import {
+  describe,
+  it,
+  expect,
+  afterEach,
+  jest,
+  beforeEach,
+} from '@jest/globals';
 import { GraphVerificationInteractor } from '../../../src/use_case/graphVerification/graphVerificationInteractor.js';
 import { GraphVerificationPresenter } from '../../../src/interface_adapter/graphVerification/graphVerificationPresenter.js';
 import { FileAccess } from '../../../src/data_access/fileAccess.js';
@@ -536,5 +543,158 @@ describe('Imports across use cases are caught and seperate from normal violation
     await (interactor as any).developOutNeighbours();
     const crossUseCaseEdges = interactor.getCrossUseCaseEdges();
     expect(crossUseCaseEdges).toEqual(expectedViolations);
+  });
+});
+
+function buildFiles(files: string[], paths: Map<string, string>): void {
+  for (const file of files) {
+    paths.set(file.split('/').at(-1) as string, file);
+  }
+}
+
+describe('Ensures buildFilePaths returns all files in correct maps.', () => {
+  let mockFileAccess: jest.Mocked<FileAccessInterface>;
+  beforeEach(() => {
+    mockFileAccess = {
+      getCurrentPath: jest.fn<any>(),
+      bfsFindDir: jest.fn<any>(),
+      exists: jest.fn<any>(),
+      createDirectory: jest.fn<any>(),
+      createFile: jest.fn<any>(),
+      getFilePaths: jest.fn<any>(),
+    } as any;
+  });
+  it('Collects all files when packaged by module.', async () => {
+    mockFileAccess.bfsFindDir.mockResolvedValueOnce('root/src/features');
+    mockFileAccess.getFilePaths
+      .mockImplementationOnce(async (_, map) =>
+        buildFiles(
+          [
+            'root/src/features/feature1/usecase1/use_case/usecase1InputData.java',
+            'root/src/features/feature1/usecase1/interface_adapter/usecase1Controller.java',
+          ],
+          map
+        )
+      )
+      .mockImplementationOnce(async (_, map) =>
+        buildFiles(['root/src/entity/entity.java'], map)
+      )
+      .mockImplementationOnce(async (_, map) => buildFiles([], map))
+      .mockImplementationOnce(async (_, map) =>
+        buildFiles(['root/src/data_access/data_access.java'], map)
+      )
+      .mockImplementationOnce(async (_, map) => buildFiles([], map));
+    let expectedInternalMap = new Map<string, string>();
+    expectedInternalMap.set(
+      'usecase1Controller.java',
+      'root/src/features/feature1/usecase1/interface_adapter/usecase1Controller.java'
+    );
+    expectedInternalMap.set(
+      'usecase1InputData.java',
+      'root/src/features/feature1/usecase1/use_case/usecase1InputData.java'
+    );
+
+    let expectedExternalMap = new Map<string, string>();
+    expectedExternalMap.set('entity.java', 'root/src/entity/entity.java');
+    expectedExternalMap.set(
+      'data_access.java',
+      'root/src/data_access/data_access.java'
+    );
+
+    let interactor = new GraphVerificationInteractor(
+      mockFileAccess,
+      genericNeighbourAccess,
+      genericDBAccess,
+      presenter
+    );
+    await (interactor as any).buildFilePaths();
+    expect((interactor as any).internalFilePaths).toEqual(expectedInternalMap);
+    expect((interactor as any).externalFilePaths).toEqual(expectedExternalMap);
+  });
+
+  it('Collects all files when packaged by layer.', async () => {
+    mockFileAccess.bfsFindDir.mockResolvedValueOnce(null);
+    mockFileAccess.getFilePaths
+      .mockImplementationOnce(async (_, map) =>
+        buildFiles(
+          [
+            'root/src/use_case/usecase1/usecase1InputData.java',
+            'root/src/use_case/usecase2/usecase2InputData.java',
+            'root/src/use_case/usecase2/usecase2OutputBoundary.java',
+            'root/src/use_case/usecase2/usecase2OutputData.java',
+            'root/src/use_case/usecase2/usecase2Interactor.java',
+          ],
+          map
+        )
+      )
+      .mockImplementationOnce(async (_, map) =>
+        buildFiles(
+          [
+            'root/src/interface_adapter/usecase1/usecase1Controller.java',
+            'root/src/interface_adapter/usecase2/usecase2Presenter.java',
+          ],
+          map
+        )
+      )
+      .mockImplementationOnce(async (_, map) =>
+        buildFiles(['root/src/entity/entity.java'], map)
+      )
+      .mockImplementationOnce(async (_, map) =>
+        buildFiles(['root/src/views/view.java'], map)
+      )
+      .mockImplementationOnce(async (_, map) =>
+        buildFiles(['root/src/data_access/data_access.java'], map)
+      )
+      .mockImplementationOnce(async (_, map) =>
+        buildFiles(['root/src/database.java'], map)
+      );
+    let expectedInternalMap = new Map<string, string>();
+    expectedInternalMap.set(
+      'usecase1InputData.java',
+      'root/src/use_case/usecase1/usecase1InputData.java'
+    );
+    expectedInternalMap.set(
+      'usecase2InputData.java',
+      'root/src/use_case/usecase2/usecase2InputData.java'
+    );
+    expectedInternalMap.set(
+      'usecase2OutputBoundary.java',
+      'root/src/use_case/usecase2/usecase2OutputBoundary.java'
+    );
+    expectedInternalMap.set(
+      'usecase2OutputData.java',
+      'root/src/use_case/usecase2/usecase2OutputData.java'
+    );
+    expectedInternalMap.set(
+      'usecase2Interactor.java',
+      'root/src/use_case/usecase2/usecase2Interactor.java'
+    );
+    expectedInternalMap.set(
+      'usecase1Controller.java',
+      'root/src/interface_adapter/usecase1/usecase1Controller.java'
+    );
+    expectedInternalMap.set(
+      'usecase2Presenter.java',
+      'root/src/interface_adapter/usecase2/usecase2Presenter.java'
+    );
+
+    let expectedExternalMap = new Map<string, string>();
+    expectedExternalMap.set('entity.java', 'root/src/entity/entity.java');
+    expectedExternalMap.set(
+      'data_access.java',
+      'root/src/data_access/data_access.java'
+    );
+    expectedExternalMap.set('database.java', 'root/src/database.java');
+    expectedExternalMap.set('view.java', 'root/src/views/view.java');
+
+    let interactor = new GraphVerificationInteractor(
+      mockFileAccess,
+      genericNeighbourAccess,
+      genericDBAccess,
+      presenter
+    );
+    await (interactor as any).buildFilePaths();
+    expect((interactor as any).internalFilePaths).toEqual(expectedInternalMap);
+    expect((interactor as any).externalFilePaths).toEqual(expectedExternalMap);
   });
 });

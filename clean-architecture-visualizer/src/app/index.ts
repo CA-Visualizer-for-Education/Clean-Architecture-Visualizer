@@ -17,8 +17,12 @@ import { GraphVerificationController } from '../interface_adapter/graphVerificat
 import { GraphVerificationInteractor } from '../use_case/graphVerification/graphVerificationInteractor.js';
 import { startCommand } from '../server/startCommand.js';
 import { InitProjectInteractor } from '../use_case/initProject/initProjectInteractor.js';
+import { InitModuleProjectInteractor } from '../use_case/initModuleProject/initModuleProjectInteractor.js';
 import { CreateUseCaseController } from '../interface_adapter/createUseCase/createUseCaseController.js';
 import { InitProjectController } from '../interface_adapter/initProject/initProjectController.js';
+import { InitModuleProjectController } from '../interface_adapter/initModuleProject/initModuleProjectController.js';
+import { CreateFeatureController } from '../interface_adapter/createFeature/createFeatureController.js';
+import { CreateModuleUseCaseController } from '../interface_adapter/CreateModuleUseCase/createModuleUseCaseController.js';
 
 const program = new Command();
 
@@ -28,10 +32,16 @@ const app = new AppBuilder()
   .withSessionDBAccess(new SessionDBAccess())
   .buildGraphVerificationInteractor(GraphVerificationInteractor)
   .buildCreateUseCaseInteractor()
+  .buildCreateFeatureInteractor()
+  .buildCreateModuleUseCaseInteractor()
   .buildInitProjectInteractor(InitProjectInteractor)
+  .buildInitModuleProjectInteractor(InitModuleProjectInteractor)
   .buildGraphVerificationController(GraphVerificationController)
   .buildCreateUseCaseController(CreateUseCaseController)
-  .buildInitProjectController(InitProjectController);
+  .buildCreateFeatureController(CreateFeatureController)
+  .buildInitProjectController(InitProjectController)
+  .buildInitModuleProjectController(InitModuleProjectController)
+  .buildCreateModuleUseCaseController(CreateModuleUseCaseController);
 
 program.version(packageJson.version);
 
@@ -61,10 +71,33 @@ program
   });
 
 program
+  .command('module_init')
+  .description(
+    'Create the template for a new CSC207 project, packaged by module.'
+  )
+  .action(async () => {
+    app.runInitModuleProject();
+  });
+
+program
   .command('usecase <name>')
   .description('Create the template for a new use case')
   .action(async (name: string) => {
     app.runCreateUseCase(name);
+  });
+
+program
+  .command('module_usecase <feature> <usecase>')
+  .description('Add a new use case to a specified feature.')
+  .action(async (feature: string, usecase: string) => {
+    app.runCreateModuleUseCase(feature, usecase);
+  });
+
+program
+  .command('feature <feature>')
+  .description('Add a new feature to the directory of features.')
+  .action(async (feature: string) => {
+    app.runCreateFeature(feature);
   });
 
 program

@@ -6,6 +6,8 @@ import type { FileAccessInterface } from './fileAccessInterface.js';
 export class FileAccess implements FileAccessInterface {
   /**
    * Find the use case folder and collect the name of each use case.
+   *  We first check if we are packaging by module by trying to find the features directory.
+   *  If it exists, we assume we are packaging by module. Otherwise, we are packaging by layer.
    * @returns A list of the names of each use case.
    */
   async getUseCases(): Promise<string[]> {
@@ -13,6 +15,29 @@ export class FileAccess implements FileAccessInterface {
 
     const srcPath = await this.bfsFindDir(currPath, 'src');
     if (!srcPath) return [];
+
+    const featuresPath = await this.bfsFindDir(currPath, 'features');
+    if (featuresPath) {
+      // Extract all of the features in the features directory
+      const allFeatures = await fs.readdir(featuresPath, {
+        withFileTypes: true,
+      });
+      const allFeaturePaths = allFeatures
+        .filter((e) => e.isDirectory())
+        .map((e) => e.name)
+        .map((featureName) => path.join(featuresPath, featureName));
+      const allFeatureContents = await Promise.all(
+        allFeaturePaths.map(
+          async (featurePath) =>
+            await fs.readdir(featurePath, { withFileTypes: true })
+        )
+      );
+      return allFeatureContents
+        .flat()
+        .filter((e) => e.isDirectory())
+        .map((e) => e.name);
+    }
+
     const useCasePath = await this.bfsFindDir(srcPath, 'use_case');
     if (!useCasePath) return [];
 
