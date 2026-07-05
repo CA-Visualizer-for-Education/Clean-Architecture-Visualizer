@@ -20,7 +20,7 @@ export default function App() {
             <Navbar />
             <Routes>
                 <Route path='/' element={<Home />} />
-                <Route path='/learning' element={<LearningMode />} />
+                <Route path='/learn' element={<LearningMode />} />
                 <Route path='/checker' element={<CheckerMode />} />
                 <Route path='/project-starter' element={<ProjectStarter />} />
                 <Route path='/use-case/:useCaseId/interaction/:interactionId/diagram' element={<UseCaseInteractionDiagram />} />

@@ -21,7 +21,7 @@ export default function Header({ actions }: HeaderProps) {
     const isCodeView = location.pathname.includes('/code');
 
     const navigationOptions: DropdownOption[] = [
-        ...(isCodeView ? [] : [{ key: 'learning-mode', label: t('navigation.pages.learningMode'), to: '/learning' }]),
+        ...(isCodeView ? [] : [{ key: 'learning-mode', label: t('navigation.pages.learningMode'), to: '/learn' }]),
         ...(isLoading
             ? [{ key: 'loading-interactions', label: t('navigation.status.loadingInteractions'), to: '', disabled: true }]
             : []),

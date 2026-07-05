@@ -64,7 +64,7 @@ export function CADiagram({ onNodeClick }: { onNodeClick?: (info: NodeClickInfo)
         error,
     } = useInteraction(interactionId ?? '');
 
-    const isLearningMode = interactionId === undefined && pathname.endsWith('/learning');
+    const isLearningMode = interactionId === undefined && pathname.endsWith('/learn');
     const areNodesInteractive = isLearningMode || !!onNodeClick;
 
     if (isLearningMode) {

@@ -11,7 +11,7 @@ export const NAV_BAR_HEIGHT = 64
 const NAV_ITEMS = [
   { href: '/', label: 'Home', exact: true as const },
   { href: '/checker', label: 'Checker', matchDiagram: true as const },
-  { href: '/learning', label: 'Learn' },
+  { href: '/learn', label: 'Learn' },
   { href: '/project-starter', label: 'Project Starter' },
 ] as const
 

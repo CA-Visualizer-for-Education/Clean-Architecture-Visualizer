@@ -26,7 +26,7 @@ const Home = () => {
         {
             title: t('cards.learn.title'),
             description: t('cards.learn.description'),
-            to: "/learning",
+            to: "/learn",
             icon: <MenuBookIcon />,
             bgColor: "drivers.main"
         },
