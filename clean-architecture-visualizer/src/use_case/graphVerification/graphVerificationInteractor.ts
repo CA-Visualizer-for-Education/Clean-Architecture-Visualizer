@@ -31,6 +31,7 @@ export class GraphVerificationInteractor implements GraphVerificationInputBounda
   private readonly externalNodes: Record<string, cleanNode> = {};
 
   private crossUseCaseEdges: Array<[cleanNode, cleanNode]>[] = [];
+  private crossUseCaseFiles = new Set<string>();
   private outputData: GraphVerificationOutputData;
 
   constructor(
@@ -114,6 +115,19 @@ export class GraphVerificationInteractor implements GraphVerificationInputBounda
       (name) => name.split('.').at(0) ?? ''
     );
 
+    // Maps external files to the names of the use case graphs they belong to
+    let externalFilesToUseCaseGraphs = new Map<string, Set<string>>();
+    // Map external file paths to their representative (default is themselves)
+    let externalFileRepresentative = new Map<string, string>();
+    [...this.externalFilePaths.values()].map((filePath) => {
+      externalFileRepresentative.set(filePath, filePath);
+      externalFilesToUseCaseGraphs.set(filePath, new Set<string>());
+    });
+    // allEdges will store all of the edges in the form of (fromNodePath, toNodePath)
+    let allEdges: string[][] = [];
+    // map use case graph names to graphs
+    let useCaseGraphNamesToGraph = new Map<string, useCaseGraph>();
+
     let useCaseIndex = 0;
     for (const graph of this.useCaseGraphList) {
       this.crossUseCaseEdges.push([]);
@@ -121,8 +135,10 @@ export class GraphVerificationInteractor implements GraphVerificationInputBounda
       const useCaseFiles = [...graph.getFiles().keys()].map(
         (name) => name.split('.').at(0) ?? ''
       );
-
-      for (const [fileName, filePath] of graph.getFiles()) {
+      // We use a shallow copy to prevent looking at external files that import external files
+      // We only want to look at internal files that import external files
+      // Consider removing this if it doesn't affect the overall outcome
+      for (const [fileName, filePath] of [...graph.getFiles()]) {
         const fromNode = this.resolveNode(filePath);
         if (!fromNode) continue;
         this.externalNodes[fileName] = fromNode;
@@ -136,23 +152,30 @@ export class GraphVerificationInteractor implements GraphVerificationInputBounda
             let importFileName = importPath.split('/').at(-1) ?? '';
             importFileName = importFileName.split('.').at(0) ?? '';
 
+            const modifiedImportPath =
+              importPath.length > 0 && importPath.at(-1) === ';'
+                ? importPath.slice(0, -1)
+                : importPath;
             //Check if the imported file is an external file path
             if (
               !useCaseFiles.includes(importFileName) &&
               !externalFileNames.includes(importFileName)
             ) {
               this.crossUseCaseEdges[useCaseIndex].push([fromNode, toNode]);
+              this.crossUseCaseFiles.add(filePath);
             } else {
               graph.setNodeNeighbour(fromNode, toNode);
-              const modifiedImportPath =
-                importPath.length > 0 && importPath.at(-1) === ';'
-                  ? importPath.slice(0, -1)
-                  : importPath;
               if (this.externalFilePaths.has(modifiedImportPath)) {
                 graph.addFile(
                   modifiedImportPath,
                   this.externalFilePaths.get(modifiedImportPath) as string
                 );
+                // Gets the external file path from the modified import path and adds the use case graph name
+                // to the set of use case graphs that the external file belongs to
+                // Nothing to optimize.
+                externalFilesToUseCaseGraphs
+                  .get(this.externalFilePaths.get(modifiedImportPath) as string)
+                  ?.add(graph.getName());
               }
             }
           }
@@ -166,29 +189,160 @@ export class GraphVerificationInteractor implements GraphVerificationInputBounda
       if (!fromNode) continue;
       this.externalNodes[fileName] = fromNode;
       const imports = await this.fileAccess.getFileImports(filePath);
-      // Find all graphs that own any (.some functionality) of this file's imports
-      const owningGraphs = this.useCaseGraphList.filter((graph) =>
-        imports.some((importPath) =>
-          [...graph.getFiles().keys()].some((targetFileName) => {
+
+      // Get all use case graphs that import this file, add them to externalFilePathToUseCaseGraphs
+      // We only set neighbour if it is an internal file and both paths resolve to clean nodes
+      // There is probably room to optimize since we iterate #graphs * #imports * #internal_files
+      this.useCaseGraphList.map((graph) => {
+        useCaseGraphNamesToGraph.set(graph.getName(), graph);
+        imports.map((importPath) =>
+          [...graph.getFiles().keys()].map((targetFileName) => {
             const base = targetFileName.toLowerCase().replace(/\.[^.]+$/, '');
-            return importPath.toLowerCase().includes(base);
+            const res = importPath.toLowerCase().includes(base);
+            if (res) {
+              const modifiedImportPath =
+                importPath.length > 0 && importPath.at(-1) === ';'
+                  ? importPath.slice(0, -1)
+                  : importPath;
+              if (
+                this.resolveNode(importPath) &&
+                this.internalFilePaths.has(modifiedImportPath)
+              ) {
+                // We need to set node neighbour and add file now
+                // When we do dsu, we only look at external->external edges
+                graph.setNodeNeighbour(
+                  fromNode,
+                  this.resolveNode(importPath) as cleanNode
+                );
+                graph.addFile(fileName, filePath);
+                externalFilesToUseCaseGraphs
+                  .get(filePath)
+                  ?.add(graph.getName());
+              }
+            }
           })
-        )
+        );
+      });
+
+      // Add all edges to allEdges as long as it resolves to a node and the import is not an
+      // internal file in CA and unite them.
+      imports.map((importPath) => {
+        const modifiedImportPath =
+          importPath.length > 0 && importPath.at(-1) === ';'
+            ? importPath.slice(0, -1)
+            : importPath;
+        if (
+          this.resolveNode(importPath) &&
+          !this.internalFilePaths.has(modifiedImportPath)
+        ) {
+          allEdges.push([
+            filePath,
+            this.externalFilePaths.get(modifiedImportPath) as string,
+          ]);
+          /**
+           * Add a check before this executes that checks if both filePath and its rep are in the map
+           * If not, it means there is an import that doesn't exist.
+           */
+          this.unite(
+            filePath,
+            this.externalFilePaths.get(modifiedImportPath) as string,
+            externalFileRepresentative,
+            externalFilesToUseCaseGraphs
+          );
+        }
+      });
+    }
+
+    allEdges.map(([fromNodePath, toNodePath]) => {
+      if (this.internalFilePaths.has(toNodePath.split('/').at(-1) ?? '')) {
+      }
+      const fromNodePathRep = this.findRep(
+        fromNodePath,
+        externalFileRepresentative,
+        externalFilesToUseCaseGraphs
       );
 
-      if (owningGraphs.length === 0) continue;
+      const fromNode = this.resolveNode(fromNodePath);
+      const toNode = this.resolveNode(toNodePath);
+      [
+        ...(externalFilesToUseCaseGraphs.get(fromNodePathRep) as Set<string>),
+      ].map((useCaseGraphName) => {
+        const currGraph = useCaseGraphNamesToGraph.get(useCaseGraphName);
+        currGraph?.addFile(fromNodePath.split('/').at(-1) ?? '', fromNodePath);
+        currGraph?.addFile(toNodePath.split('/').at(-1) ?? '', toNodePath);
+        currGraph?.setNodeNeighbour(fromNode as cleanNode, toNode as cleanNode);
+      });
+    });
+  }
 
-      // Add ALL imports to every owning graph
-      for (const graph of owningGraphs) {
-        for (const importPath of imports) {
-          const toNode = this.resolveNode(importPath);
-          if (toNode) {
-            const fileName = filePath.split('/').at(-1) ?? '';
-            graph.setNodeNeighbour(fromNode, toNode);
-            graph.addFile(fileName, importPath);
-          }
-        }
-      }
+  /**
+   * Given an external file path, find the xternal file path that represents it
+   * @param externalFilePath The external file path we are trying to get the rep of
+   * @param externalFilePathRepresentatives The map of external file paths to their reps
+   * @param externalFilePathToUseCaseGraphs The map of external file paths to the set of use cases they belong to.
+   * @returns The representative (string)
+   */
+  private findRep(
+    externalFilePath: string,
+    externalFilePathRepresentatives: Map<string, string>,
+    externalFilePathToUseCaseGraphs: Map<string, Set<string>>
+  ): string {
+    if (
+      externalFilePath == externalFilePathRepresentatives.get(externalFilePath)
+    ) {
+      return externalFilePath;
+    }
+    const externalFilePathRep: string = externalFilePathRepresentatives.get(
+      externalFilePath
+    ) as string;
+    externalFilePathToUseCaseGraphs.set(
+      externalFilePathRep,
+      (
+        externalFilePathToUseCaseGraphs.get(externalFilePathRep) as Set<string>
+      ).union(
+        externalFilePathToUseCaseGraphs.get(externalFilePath) as Set<string>
+      )
+    );
+    return this.findRep(
+      externalFilePathRep,
+      externalFilePathRepresentatives,
+      externalFilePathToUseCaseGraphs
+    );
+  }
+
+  /**
+   * Given two external file paths, the map of reps and map of external files to their use case graphs, unite
+   * them to have the same rep and unite all of the sets of use case graphs.
+   * @param externalFilePath1 The first external file path to unite.
+   * @param externalFilePath2 The other external file path to unite.
+   * @param externalFilePathRepresentatives The map of external files to their reps.
+   * @param externalFilePathsToUseCaseGraphs The map of external files to the use case graphs they belong to.
+   * @returns void
+   */
+  private unite(
+    externalFilePath1: string,
+    externalFilePath2: string,
+    externalFilePathRepresentatives: Map<string, string>,
+    externalFilePathsToUseCaseGraphs: Map<string, Set<string>>
+  ): void {
+    const rep1 = this.findRep(
+      externalFilePath1,
+      externalFilePathRepresentatives,
+      externalFilePathsToUseCaseGraphs
+    );
+    const rep2 = this.findRep(
+      externalFilePath2,
+      externalFilePathRepresentatives,
+      externalFilePathsToUseCaseGraphs
+    );
+    if (rep1 != rep2) {
+      externalFilePathRepresentatives.set(rep1, rep2);
+      externalFilePathsToUseCaseGraphs.set(
+        rep2,
+        (externalFilePathsToUseCaseGraphs.get(rep1) as Set<string>).union(
+          externalFilePathsToUseCaseGraphs.get(rep2) as Set<string>
+        )
+      );
     }
   }
 
@@ -327,17 +481,61 @@ export class GraphVerificationInteractor implements GraphVerificationInputBounda
     const result: NodeStorage[] = [];
     const seenIds = new Set<string>();
 
-    const violationNodes = new Set<cleanNode>(
-      this.useCaseGraphList.flatMap((uc) =>
-        uc.getViolationEdges().flatMap(([from, to]) => [from, to])
-      )
-    );
+    // Go over every use case graph and every one of its files
+    // Add it to the list of nodes
+    this.useCaseGraphList.map((uc) => {
+      // Get all violation nodes
+      // There shouldn't be any violation nodes missing since violation nodes are
+      // derived from violation edges and violation edges come from edges between
+      // nodes that exist in and belong to the graph
+      const violationNodes = new Set<cleanNode>();
+      uc.getViolationEdges().map(([from, to]) => {
+        violationNodes.add(from);
+        violationNodes.add(to);
+      });
+      const nodeTypesSeen = new Set<cleanNode>();
+      [...uc.getFiles().values()].map((filePath) => {
+        const nodeType = this.resolveNode(filePath);
+        nodeTypesSeen.add(nodeType as cleanNode);
+        seenIds.add(filePath);
+        // We get the file name and if it is an external file, we add it to list of files to add later
+        // If it doesn't have the external file yet, set it and move on
+        // If it does, we only change it if it doesn't have a violation yet
+        // If an external file is a violation in at least one use case, we will make it a violation everywhere
+        result.push({
+          id: `${filePath}-${uc.getName()}`,
+          filePath: filePath,
+          type: nodeType as cleanNode,
+          layer: this.resolveLayerFromNode(nodeType as cleanNode),
+          status:
+            violationNodes.has(nodeType as cleanNode) ||
+            this.crossUseCaseFiles.has(filePath)
+              ? 'VIOLATION'
+              : 'VALID',
+        });
+      });
 
-    const missingNodes = new Set<cleanNode>(
-      this.useCaseGraphList.flatMap((uc) => uc.getMissingNodes())
-    );
+      // Make a node storage for all missing nodes
+      // Missing nodes aren't imported and don't import anything
+      // Is it missing if the file exists?
+      // In this case, a missing node is one that just doesn't appear at all.
+      // If a file has no imports/is not imported, it will appear, just have no edges
+      // Consider the idea that if a node has no imports/is not imported, mark it as a violation
+      uc.getMissingNodes().map((missingNode) => {
+        if (!nodeTypesSeen.has(missingNode)) {
+          result.push({
+            id: `missing-${missingNode}-${uc.getName()}`,
+            type: missingNode,
+            layer: this.resolveLayerFromNode(missingNode),
+            status: 'MISSING',
+          });
+        }
+      });
+    });
 
-    // One NodeStorage per unique file
+    // This is what happens if a file exists, but is not linked to a use case
+    // seenIds contain the file paths. If we have seen a filePath, it must belong
+    // to a use case. If not, then it goes in this loop.
     for (const file of files) {
       const id = file.filePath;
       if (seenIds.has(id)) continue;
@@ -348,34 +546,7 @@ export class GraphVerificationInteractor implements GraphVerificationInputBounda
         filePath: file.filePath,
         type: file.node,
         layer: file.layer,
-        status: violationNodes.has(file.node) ? 'VIOLATION' : 'VALID',
-      });
-    }
-
-    // Ensure violation node types always get a NodeStorage entry,
-    // even when no FileStorage exists for that node type
-    for (const violationNode of violationNodes) {
-      if (result.some((n) => n.type === violationNode)) continue;
-
-      result.push({
-        id: `violation-${violationNode}`,
-        type: violationNode,
-        layer: this.resolveLayerFromNode(violationNode),
-        status: 'VIOLATION',
-      });
-    }
-
-    // One NodeStorage per missing node type (no file path available)
-    for (const missingNode of missingNodes) {
-      if (result.some((n) => n.type === missingNode)) continue;
-
-      const matchingFile = files.find((f) => f.node === missingNode);
-
-      result.push({
-        id: `missing-${missingNode}`,
-        type: missingNode,
-        layer: matchingFile?.layer ?? this.resolveLayerFromNode(missingNode),
-        status: 'MISSING',
+        status: 'VALID',
       });
     }
 

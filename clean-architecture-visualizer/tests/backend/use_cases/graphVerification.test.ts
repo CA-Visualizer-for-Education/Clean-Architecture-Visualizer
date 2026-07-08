@@ -38,6 +38,9 @@ function makeUseCaseGraphs(types: string[]): useCaseGraph[] {
         break;
       case 'single':
         const singleViolation = new useCaseGraph('single');
+        singleViolation.addFile('view', 'root/src/views/view.java');
+        singleViolation.addFile('viewModel', 'root/src/views/viewModel.java');
+        singleViolation.addFile('entity', 'root/src/entity/entity.java');
         singleViolation.setNodeNeighbour('view', 'viewModel');
         singleViolation.setNodeNeighbour('view', 'entities');
         useCaseGraphs.push(singleViolation);
@@ -696,5 +699,994 @@ describe('Ensures buildFilePaths returns all files in correct maps.', () => {
     await (interactor as any).buildFilePaths();
     expect((interactor as any).internalFilePaths).toEqual(expectedInternalMap);
     expect((interactor as any).externalFilePaths).toEqual(expectedExternalMap);
+  });
+});
+
+describe('Ensures developOutNeighbours maps the files to all of the use cases they belong to.', () => {
+  let mockFileAccess: jest.Mocked<FileAccessInterface>;
+  beforeEach(() => {
+    mockFileAccess = {
+      getCurrentPath: jest.fn<any>(),
+      bfsFindDir: jest.fn<any>(),
+      exists: jest.fn<any>(),
+      createDirectory: jest.fn<any>(),
+      createFile: jest.fn<any>(),
+      getFilePaths: jest.fn<any>(),
+      getFileImports: jest.fn<any>(),
+    } as any;
+  });
+
+  it('Assigns imports of external use case files to the correct use case when packaging by layer.', async () => {
+    let interactor = new GraphVerificationInteractor(
+      mockFileAccess,
+      genericNeighbourAccess,
+      genericDBAccess,
+      presenter
+    );
+
+    const fileMap = new Map<string, string>();
+    fileMap.set('dataAccess1.java', 'root/src/data_access/dataAccess1.java');
+    fileMap.set('entity1.java', 'root/src/entity/entity1.java');
+    fileMap.set(
+      'dataAccessInterface1.java',
+      'root/src/data_access/dataAccessInterface1.java'
+    );
+    fileMap.set('view1.java', 'root/src/views/view1.java');
+    fileMap.set('viewModel1.java', 'root/src/views/viewModel1.java');
+    fileMap.set('database1.java', 'root/src/database/database1.java');
+    for (const [fileName, filePath] of fileMap) {
+      (interactor as any).externalFilePaths.set(fileName, filePath);
+    }
+    fileMap.set(
+      'usecase1InputData.java',
+      'root/src/use_case/usecase1/usecase1InputData.java'
+    );
+
+    (interactor as any).internalFilePaths.set(
+      'usecase1InputData.java',
+      'root/src/use_case/usecase1/usecase1InputData.java'
+    );
+    (interactor as any).useCaseGraphList.push(new useCaseGraph('usecase1'));
+    (interactor as any).useCaseGraphList[0].addFile(
+      'usecase1InputData.java',
+      'root/src/use_case/usecase1/usecase1InputData.java'
+    );
+
+    mockFileAccess.getFileImports
+      .mockImplementationOnce(async (_) => [])
+      .mockImplementationOnce(async (_) => ['entity1.java;'])
+      .mockImplementationOnce(async (_) => ['usecase1InputData.java;'])
+      .mockImplementationOnce(async (_) => ['dataAccess1.java;'])
+      .mockImplementationOnce(async (_) => ['dataAccessInterface1.java;'])
+      .mockImplementationOnce(async (_) => ['view1.java;'])
+      .mockImplementationOnce(async (_) => ['viewModel1.java;']);
+
+    await (interactor as any).developOutNeighbours();
+    const expectedFiles = [
+      'entity1.java',
+      'usecase1InputData.java',
+      'dataAccess1.java',
+      'dataAccessInterface1.java',
+      'view1.java',
+      'viewModel1.java',
+    ];
+    for (const fileName of expectedFiles) {
+      expect((interactor as any).useCaseGraphList[0].getFiles().has(fileName));
+    }
+    expect(
+      (interactor as any).useCaseGraphList[0]
+        .getFiles()
+        .has('usecase1InputData.java')
+    );
+    await (interactor as any).verifyOutNeighbours();
+    const expectedNeighbours = [
+      ['entities', 'inputData'],
+      ['dataAccess', 'entities'],
+      ['dataAccessInterface', 'dataAccess'],
+      ['view', 'dataAccessInterface'],
+      ['viewModel', 'view'],
+      ['database', 'viewModel'],
+    ];
+    for (const [from, to] of expectedNeighbours) {
+      expect(
+        (interactor as any).useCaseGraphList[0]
+          .getNodeNeighbours(from)
+          .includes(to)
+      );
+    }
+
+    const fileStorage = (interactor as any).buildFileStorageList(fileMap);
+    const nodeStorage = (interactor as any).buildNodeStorageList(fileStorage);
+
+    for (const [_, filePath] of fileMap) {
+      expect(nodeStorage).toContainEqual({
+        id: `${filePath}-usecase1`,
+        filePath: filePath,
+        type: (interactor as any).resolveNode(filePath),
+        layer: (interactor as any).resolveLayer(filePath),
+        status: 'VIOLATION',
+      });
+    }
+    const missingNodes = [
+      'controller',
+      'presenter',
+      'inputBoundary',
+      'outputBoundary',
+      'outputData',
+      'useCaseInteractor',
+    ];
+    for (const node of missingNodes) {
+      expect(
+        (interactor as any).useCaseGraphList[0].getMissingNodes().includes(node)
+      );
+    }
+  });
+
+  it('Assigns imports of external use case files to the correct use case when packaging by component.', async () => {
+    let interactor = new GraphVerificationInteractor(
+      mockFileAccess,
+      genericNeighbourAccess,
+      genericDBAccess,
+      presenter
+    );
+
+    const fileMap = new Map<string, string>();
+    fileMap.set('dataAccess1.java', 'root/src/data_access/dataAccess1.java');
+    fileMap.set('entity1.java', 'root/src/entity/entity1.java');
+    fileMap.set(
+      'dataAccessInterface1.java',
+      'root/src/data_access/dataAccessInterface1.java'
+    );
+    fileMap.set('view1.java', 'root/src/views/view1.java');
+    fileMap.set('viewModel1.java', 'root/src/views/viewModel1.java');
+    fileMap.set('database1.java', 'root/src/database/database1.java');
+    for (const [fileName, filePath] of fileMap) {
+      (interactor as any).externalFilePaths.set(fileName, filePath);
+    }
+    fileMap.set(
+      'usecase1InputData.java',
+      'root/src/features/feature1/usecase1/usecase/usecase1InputData.java'
+    );
+
+    (interactor as any).internalFilePaths.set(
+      'usecase1InputData.java',
+      'root/src/features/feature1/usecase1/usecase/usecase1InputData.java'
+    );
+    (interactor as any).useCaseGraphList.push(new useCaseGraph('usecase1'));
+    (interactor as any).useCaseGraphList[0].addFile(
+      'usecase1InputData.java',
+      'root/src/features/feature1/usecase1/usecase/usecase1InputData.java'
+    );
+
+    mockFileAccess.getFileImports
+      .mockImplementationOnce(async (_) => [])
+      .mockImplementationOnce(async (_) => ['entity1.java;'])
+      .mockImplementationOnce(async (_) => ['usecase1InputData.java;'])
+      .mockImplementationOnce(async (_) => ['dataAccess1.java;'])
+      .mockImplementationOnce(async (_) => ['dataAccessInterface1.java;'])
+      .mockImplementationOnce(async (_) => ['view1.java;'])
+      .mockImplementationOnce(async (_) => ['viewModel1.java;']);
+
+    await (interactor as any).developOutNeighbours();
+    const expectedFiles = [
+      'entity1.java',
+      'usecase1InputData.java',
+      'dataAccess1.java',
+      'dataAccessInterface1.java',
+      'view1.java',
+      'viewModel1.java',
+    ];
+    for (const fileName of expectedFiles) {
+      expect((interactor as any).useCaseGraphList[0].getFiles().has(fileName));
+    }
+    expect(
+      (interactor as any).useCaseGraphList[0]
+        .getFiles()
+        .has('usecase1InputData.java')
+    );
+    await (interactor as any).verifyOutNeighbours();
+    const expectedNeighbours = [
+      ['entities', 'inputData'],
+      ['dataAccess', 'entities'],
+      ['dataAccessInterface', 'dataAccess'],
+      ['view', 'dataAccessInterface'],
+      ['viewModel', 'view'],
+      ['database', 'viewModel'],
+    ];
+    for (const [from, to] of expectedNeighbours) {
+      expect(
+        (interactor as any).useCaseGraphList[0]
+          .getNodeNeighbours(from)
+          .includes(to)
+      );
+    }
+
+    const fileStorage = (interactor as any).buildFileStorageList(fileMap);
+    const nodeStorage = (interactor as any).buildNodeStorageList(fileStorage);
+
+    for (const [_, filePath] of fileMap) {
+      expect(nodeStorage).toContainEqual({
+        id: `${filePath}-usecase1`,
+        filePath: filePath,
+        type: (interactor as any).resolveNode(filePath),
+        layer: (interactor as any).resolveLayer(filePath),
+        status: 'VIOLATION',
+      });
+    }
+    const missingNodes = [
+      'controller',
+      'presenter',
+      'inputBoundary',
+      'outputBoundary',
+      'outputData',
+      'useCaseInteractor',
+    ];
+    for (const node of missingNodes) {
+      expect(
+        (interactor as any).useCaseGraphList[0].getMissingNodes().includes(node)
+      );
+    }
+  });
+
+  it('Assigns the origin of cross use case edge as violation, but not the imported file when packaging by layer.', async () => {
+    let interactor = new GraphVerificationInteractor(
+      mockFileAccess,
+      genericNeighbourAccess,
+      genericDBAccess,
+      presenter
+    );
+
+    (interactor as any).internalFilePaths.set(
+      'usecase1InputData.java',
+      'root/src/use_case/usecase1/usecase1InputData.java'
+    );
+    (interactor as any).internalFilePaths.set(
+      'usecase2Controller.java',
+      'root/src/interface_adapter/usecase2/usecase2Controller.java'
+    );
+    (interactor as any).useCaseGraphList.push(new useCaseGraph('usecase1'));
+    (interactor as any).useCaseGraphList.push(new useCaseGraph('usecase2'));
+    (interactor as any).useCaseGraphList[0].addFile(
+      'usecase1InputData.java',
+      'root/src/use_case/usecase1/usecase1InputData.java'
+    );
+    (interactor as any).useCaseGraphList[1].addFile(
+      'usecase2Controller.java',
+      'root/src/interface_adapter/usecase2/usecase2Controller.java'
+    );
+
+    mockFileAccess.getFileImports
+      .mockImplementationOnce(async (_) => [])
+      .mockImplementationOnce(async (_) => ['usecase1InputData.java']);
+
+    await (interactor as any).developOutNeighbours();
+    expect(
+      (interactor as any).useCaseGraphList[0]
+        .getFiles()
+        .has('usecase1InputData.java')
+    );
+    expect(
+      (interactor as any).useCaseGraphList[1]
+        .getFiles()
+        .has('usecase2Controller.java')
+    );
+
+    await (interactor as any).verifyOutNeighbours();
+    expect((interactor as any).crossUseCaseEdges).toContainEqual([
+      ['controller', 'inputData'],
+    ]);
+    expect((interactor as any).crossUseCaseFiles).toContainEqual(
+      'root/src/interface_adapter/usecase2/usecase2Controller.java'
+    );
+    expect((interactor as any).crossUseCaseFiles).not.toContainEqual(
+      'root/src/use_case/usecase1/usecase1InputData.java'
+    );
+
+    const fileMap = new Map<string, string>();
+    fileMap.set(
+      'usecase1InputData.java',
+      'root/src/use_case/usecase1/usecase1InputData.java'
+    );
+    fileMap.set(
+      'usecase2Controller.java',
+      'root/src/interface_adapter/usecase2/usecase2Controller.java'
+    );
+    const fileStorage = (interactor as any).buildFileStorageList(fileMap);
+    const nodeStorage = (interactor as any).buildNodeStorageList(fileStorage);
+
+    for (const [_, filePath] of fileMap) {
+      expect(nodeStorage).toContainEqual({
+        id: `${filePath}-${filePath.includes('Controller') ? 'usecase2' : 'usecase1'}`,
+        filePath: filePath,
+        type: (interactor as any).resolveNode(filePath),
+        layer: (interactor as any).resolveLayer(filePath),
+        status: filePath.includes('Controller') ? 'VIOLATION' : 'VALID',
+      });
+    }
+    const missingNodes1 = [
+      'controller',
+      'presenter',
+      'inputBoundary',
+      'outputBoundary',
+      'outputData',
+      'useCaseInteractor',
+      'view',
+      'dataAccess',
+      'dataAccessInterface',
+      'database',
+      'entities',
+      'viewModel',
+    ];
+    const missingNodes2 = [
+      'presenter',
+      'inputData',
+      'inputBoundary',
+      'outputBoundary',
+      'outputData',
+      'useCaseInteractor',
+      'view',
+      'dataAccess',
+      'dataAccessInterface',
+      'database',
+      'entities',
+      'viewModel',
+    ];
+    for (const node of missingNodes1) {
+      expect(
+        (interactor as any).useCaseGraphList[0].getMissingNodes().includes(node)
+      );
+    }
+    for (const node of missingNodes2) {
+      expect(
+        (interactor as any).useCaseGraphList[0].getMissingNodes().includes(node)
+      );
+    }
+  });
+
+  it('Assigns the origin of cross use case edge as violation, but not the imported file when packaging by component.', async () => {
+    let interactor = new GraphVerificationInteractor(
+      mockFileAccess,
+      genericNeighbourAccess,
+      genericDBAccess,
+      presenter
+    );
+
+    (interactor as any).internalFilePaths.set(
+      'usecase1InputData.java',
+      'root/src/features/feature1/usecase1/use_case/usecase1InputData.java'
+    );
+    (interactor as any).internalFilePaths.set(
+      'usecase2Controller.java',
+      'root/src/features/feature2/usecase2/interface_adapter/usecase2Controller.java'
+    );
+    (interactor as any).useCaseGraphList.push(new useCaseGraph('usecase1'));
+    (interactor as any).useCaseGraphList.push(new useCaseGraph('usecase2'));
+    (interactor as any).useCaseGraphList[0].addFile(
+      'usecase1InputData.java',
+      'root/src/features/feature1/usecase1/use_case/usecase1InputData.java'
+    );
+    (interactor as any).useCaseGraphList[1].addFile(
+      'usecase2Controller.java',
+      'root/src/features/feature2/usecase2/interface_adapter/usecase2Controller.java'
+    );
+
+    mockFileAccess.getFileImports
+      .mockImplementationOnce(async (_) => [])
+      .mockImplementationOnce(async (_) => ['usecase1InputData.java']);
+
+    await (interactor as any).developOutNeighbours();
+    expect(
+      (interactor as any).useCaseGraphList[0]
+        .getFiles()
+        .has('usecase1InputData.java')
+    );
+    expect(
+      (interactor as any).useCaseGraphList[1]
+        .getFiles()
+        .has('usecase2Controller.java')
+    );
+
+    await (interactor as any).verifyOutNeighbours();
+    expect((interactor as any).crossUseCaseEdges).toContainEqual([
+      ['controller', 'inputData'],
+    ]);
+    expect((interactor as any).crossUseCaseFiles).toContainEqual(
+      'root/src/features/feature2/usecase2/interface_adapter/usecase2Controller.java'
+    );
+    expect((interactor as any).crossUseCaseFiles).not.toContainEqual(
+      'root/src/features/feature1/usecase1/use_case/usecase1InputData.java'
+    );
+
+    const fileMap = new Map<string, string>();
+    fileMap.set(
+      'usecase1InputData.java',
+      'root/src/features/feature1/usecase1/use_case/usecase1InputData.java'
+    );
+    fileMap.set(
+      'usecase2Controller.java',
+      'root/src/features/feature2/usecase2/interface_adapter/usecase2Controller.java'
+    );
+    const fileStorage = (interactor as any).buildFileStorageList(fileMap);
+    const nodeStorage = (interactor as any).buildNodeStorageList(fileStorage);
+
+    for (const [_, filePath] of fileMap) {
+      expect(nodeStorage).toContainEqual({
+        id: `${filePath}-${filePath.includes('Controller') ? 'usecase2' : 'usecase1'}`,
+        filePath: filePath,
+        type: (interactor as any).resolveNode(filePath),
+        layer: (interactor as any).resolveLayer(filePath),
+        status: filePath.includes('Controller') ? 'VIOLATION' : 'VALID',
+      });
+    }
+    const missingNodes1 = [
+      'controller',
+      'presenter',
+      'inputBoundary',
+      'outputBoundary',
+      'outputData',
+      'useCaseInteractor',
+      'view',
+      'dataAccess',
+      'dataAccessInterface',
+      'database',
+      'entities',
+      'viewModel',
+    ];
+    const missingNodes2 = [
+      'presenter',
+      'inputData',
+      'inputBoundary',
+      'outputBoundary',
+      'outputData',
+      'useCaseInteractor',
+      'view',
+      'dataAccess',
+      'dataAccessInterface',
+      'database',
+      'entities',
+      'viewModel',
+    ];
+    for (const node of missingNodes1) {
+      expect(
+        (interactor as any).useCaseGraphList[0].getMissingNodes().includes(node)
+      );
+    }
+    for (const node of missingNodes2) {
+      expect(
+        (interactor as any).useCaseGraphList[0].getMissingNodes().includes(node)
+      );
+    }
+  });
+
+  it('Assigns internal files that import external ones to the correct use case (along with the external files) when packaging by layer.', async () => {
+    let interactor = new GraphVerificationInteractor(
+      mockFileAccess,
+      genericNeighbourAccess,
+      genericDBAccess,
+      presenter
+    );
+
+    const fileMap = new Map<string, string>();
+    fileMap.set('dataAccess1.java', 'root/src/data_access/dataAccess1.java');
+    fileMap.set('entity1.java', 'root/src/entity/entity1.java');
+    fileMap.set(
+      'dataAccessInterface1.java',
+      'root/src/data_access/dataAccessInterface1.java'
+    );
+    fileMap.set('view1.java', 'root/src/views/view1.java');
+    fileMap.set('viewModel1.java', 'root/src/views/viewModel1.java');
+    fileMap.set('database1.java', 'root/src/database/database1.java');
+    for (const [fileName, filePath] of fileMap) {
+      (interactor as any).externalFilePaths.set(fileName, filePath);
+    }
+    fileMap.set(
+      'usecase1InputData.java',
+      'root/src/use_case/usecase1/usecase1InputData.java'
+    );
+
+    (interactor as any).internalFilePaths.set(
+      'usecase1InputData.java',
+      'root/src/use_case/usecase1/usecase1InputData.java'
+    );
+    (interactor as any).useCaseGraphList.push(new useCaseGraph('usecase1'));
+    (interactor as any).useCaseGraphList[0].addFile(
+      'usecase1InputData.java',
+      'root/src/use_case/usecase1/usecase1InputData.java'
+    );
+
+    mockFileAccess.getFileImports
+      .mockImplementationOnce(async (_) => ['entity1.java'])
+      .mockImplementationOnce(async (_) => ['entity1.java;'])
+      .mockImplementationOnce(async (_) => [])
+      .mockImplementationOnce(async (_) => ['dataAccess1.java;'])
+      .mockImplementationOnce(async (_) => ['dataAccessInterface1.java;'])
+      .mockImplementationOnce(async (_) => ['view1.java;'])
+      .mockImplementationOnce(async (_) => ['viewModel1.java;']);
+
+    await (interactor as any).developOutNeighbours();
+    const expectedFiles = [
+      'entity1.java',
+      'usecase1InputData.java',
+      'dataAccess1.java',
+      'dataAccessInterface1.java',
+      'view1.java',
+      'import viewModel1.java',
+    ];
+    for (const fileName of expectedFiles) {
+      expect((interactor as any).useCaseGraphList[0].getFiles().has(fileName));
+    }
+    expect(
+      (interactor as any).useCaseGraphList[0]
+        .getFiles()
+        .has('usecase1InputData.java')
+    );
+    await (interactor as any).verifyOutNeighbours();
+    const expectedNeighbours = [
+      ['inputData', 'entities'],
+      ['dataAccess', 'entities'],
+      ['dataAccessInterface', 'dataAccess'],
+      ['view', 'dataAccessInterface'],
+      ['viewModel', 'view'],
+      ['database', 'viewModel'],
+    ];
+    for (const [from, to] of expectedNeighbours) {
+      expect(
+        (interactor as any).useCaseGraphList[0]
+          .getNodeNeighbours(from)
+          .includes(to)
+      );
+    }
+
+    const fileStorage = (interactor as any).buildFileStorageList(fileMap);
+    const nodeStorage = (interactor as any).buildNodeStorageList(fileStorage);
+
+    for (const [_, filePath] of fileMap) {
+      expect(nodeStorage).toContainEqual({
+        id: `${filePath}-usecase1`,
+        filePath: filePath,
+        type: (interactor as any).resolveNode(filePath),
+        layer: (interactor as any).resolveLayer(filePath),
+        status: 'VIOLATION',
+      });
+    }
+    const missingNodes = [
+      'controller',
+      'presenter',
+      'inputBoundary',
+      'outputBoundary',
+      'outputData',
+      'useCaseInteractor',
+    ];
+    for (const node of missingNodes) {
+      expect(
+        (interactor as any).useCaseGraphList[0].getMissingNodes().includes(node)
+      );
+    }
+  });
+
+  it('Assigns internal files that import external ones to the correct use case (along with the external files) when packaging by component.', async () => {
+    let interactor = new GraphVerificationInteractor(
+      mockFileAccess,
+      genericNeighbourAccess,
+      genericDBAccess,
+      presenter
+    );
+
+    const fileMap = new Map<string, string>();
+    fileMap.set('dataAccess1.java', 'root/src/data_access/dataAccess1.java');
+    fileMap.set('entity1.java', 'root/src/entity/entity1.java');
+    fileMap.set(
+      'dataAccessInterface1.java',
+      'root/src/data_access/dataAccessInterface1.java'
+    );
+    fileMap.set('view1.java', 'root/src/views/view1.java');
+    fileMap.set('viewModel1.java', 'root/src/views/viewModel1.java');
+    fileMap.set('database1.java', 'root/src/database/database1.java');
+    for (const [fileName, filePath] of fileMap) {
+      (interactor as any).externalFilePaths.set(fileName, filePath);
+    }
+    fileMap.set(
+      'usecase1InputData.java',
+      'root/src/features/feature1/usecase1/use_case/usecase1InputData.java'
+    );
+
+    (interactor as any).internalFilePaths.set(
+      'usecase1InputData.java',
+      'root/src/features/feature1/usecase1/use_case/usecase1InputData.java'
+    );
+    (interactor as any).useCaseGraphList.push(new useCaseGraph('usecase1'));
+    (interactor as any).useCaseGraphList[0].addFile(
+      'usecase1InputData.java',
+      'root/src/features/feature1/usecase1/use_case/usecase1InputData.java'
+    );
+
+    mockFileAccess.getFileImports
+      .mockImplementationOnce(async (_) => ['entity1.java'])
+      .mockImplementationOnce(async (_) => ['entity1.java;'])
+      .mockImplementationOnce(async (_) => [])
+      .mockImplementationOnce(async (_) => ['dataAccess1.java;'])
+      .mockImplementationOnce(async (_) => ['dataAccessInterface1.java;'])
+      .mockImplementationOnce(async (_) => ['view1.java;'])
+      .mockImplementationOnce(async (_) => ['viewModel1.java;']);
+
+    await (interactor as any).developOutNeighbours();
+    const expectedFiles = [
+      'entity1.java',
+      'usecase1InputData.java',
+      'dataAccess1.java',
+      'dataAccessInterface1.java',
+      'view1.java',
+      'import viewModel1.java',
+    ];
+    for (const fileName of expectedFiles) {
+      expect((interactor as any).useCaseGraphList[0].getFiles().has(fileName));
+    }
+    expect(
+      (interactor as any).useCaseGraphList[0]
+        .getFiles()
+        .has('usecase1InputData.java')
+    );
+    await (interactor as any).verifyOutNeighbours();
+    const expectedNeighbours = [
+      ['inputData', 'entities'],
+      ['dataAccess', 'entities'],
+      ['dataAccessInterface', 'dataAccess'],
+      ['view', 'dataAccessInterface'],
+      ['viewModel', 'view'],
+      ['database', 'viewModel'],
+    ];
+    for (const [from, to] of expectedNeighbours) {
+      expect(
+        (interactor as any).useCaseGraphList[0]
+          .getNodeNeighbours(from)
+          .includes(to)
+      );
+    }
+
+    const fileStorage = (interactor as any).buildFileStorageList(fileMap);
+    const nodeStorage = (interactor as any).buildNodeStorageList(fileStorage);
+
+    for (const [_, filePath] of fileMap) {
+      expect(nodeStorage).toContainEqual({
+        id: `${filePath}-usecase1`,
+        filePath: filePath,
+        type: (interactor as any).resolveNode(filePath),
+        layer: (interactor as any).resolveLayer(filePath),
+        status: 'VIOLATION',
+      });
+    }
+    const missingNodes = [
+      'controller',
+      'presenter',
+      'inputBoundary',
+      'outputBoundary',
+      'outputData',
+      'useCaseInteractor',
+    ];
+    for (const node of missingNodes) {
+      expect(
+        (interactor as any).useCaseGraphList[0].getMissingNodes().includes(node)
+      );
+    }
+  });
+
+  it('Assigns nodes to the correct status when packaging by layer.', async () => {
+    let interactor = new GraphVerificationInteractor(
+      mockFileAccess,
+      genericNeighbourAccess,
+      genericDBAccess,
+      presenter
+    );
+
+    const fileMap1 = new Map<string, string>();
+    fileMap1.set('dataAccess1.java', 'root/src/data_access/dataAccess1.java');
+    fileMap1.set('entity1.java', 'root/src/entity/entity1.java');
+    fileMap1.set(
+      'dataAccessInterface1.java',
+      'root/src/data_access/dataAccessInterface1.java'
+    );
+    fileMap1.set('view1.java', 'root/src/views/view1.java');
+    fileMap1.set('viewModel1.java', 'root/src/views/viewModel1.java');
+    fileMap1.set('database1.java', 'root/src/database/database1.java');
+    for (const [fileName, filePath] of fileMap1) {
+      (interactor as any).externalFilePaths.set(fileName, filePath);
+    }
+
+    (interactor as any).useCaseGraphList.push(new useCaseGraph('usecase1'));
+
+    const fileMap2 = new Map<string, string>();
+    fileMap2.set(
+      'usecase1Controller.java',
+      'root/src/interface_adapter/usecase1/usecase1Controller.java'
+    );
+    fileMap2.set(
+      'usecase1Presenter.java',
+      'root/src/interface_adapter/usecase1/usecase1Presenter.java'
+    );
+    fileMap2.set(
+      'usecase1InputBoundary.java',
+      'root/src/use_case/usecase1/usecase1InputBoundary.java'
+    );
+    fileMap2.set(
+      'usecase1InputData.java',
+      'root/src/use_case/usecase1/usecase1InputData.java'
+    );
+    fileMap2.set(
+      'usecase1OutputBoundary.java',
+      'root/src/use_case/usecase1/usecase1OutputBoundary.java'
+    );
+    fileMap2.set(
+      'usecase1OutputData.java',
+      'root/src/use_case/usecase1/usecase1OutputData.java'
+    );
+    fileMap2.set(
+      'usecase1Interactor.java',
+      'root/src/use_case/usecase1/usecase1Interactor.java'
+    );
+    for (const [fileName, filePath] of fileMap2) {
+      (interactor as any).internalFilePaths.set(fileName, filePath);
+      (interactor as any).useCaseGraphList[0].addFile(fileName, filePath);
+    }
+
+    const fileMap = new Map<string, string>([...fileMap1, ...fileMap2]);
+
+    mockFileAccess.getFileImports
+      .mockImplementationOnce(async (_) => [
+        'usecase1InputBoundary.java;',
+        'usecase1InputData.java;',
+      ])
+      .mockImplementationOnce(async (_) => [
+        'usecase1OutputBoundary.java;',
+        'usecase1OutputData.java;',
+        'viewModel1.java;',
+      ])
+      .mockImplementationOnce(async (_) => [])
+      .mockImplementationOnce(async (_) => [])
+      .mockImplementationOnce(async (_) => [])
+      .mockImplementationOnce(async (_) => [])
+      .mockImplementationOnce(async (_) => [
+        'usecase1InputBoundary.java;',
+        'usecase1InputData.java;',
+        'usecase1OutputBoundary.java;',
+        'usecase1OutputData.java;',
+        'dataAccessInterface1.java;',
+        'entity1.java;',
+      ])
+      .mockImplementationOnce(async (_) => [
+        'dataAccessInterface1.java',
+        'database1.java',
+        'entity1.java;',
+      ])
+      .mockImplementationOnce(async (_) => [])
+      .mockImplementationOnce(async (_) => [])
+      .mockImplementationOnce(async (_) => [
+        'viewModel1.java',
+        'usecase1Controller.java',
+      ])
+      .mockImplementationOnce(async (_) => [])
+      .mockImplementationOnce(async (_) => []);
+
+    await (interactor as any).developOutNeighbours();
+    const expectedFiles = [
+      'usecase1Presenter.java',
+      'usecase1Controller.java',
+      'usecase1Interactor.java',
+      'entity1.java',
+      'usecase1InputData.java',
+      'dataAccess1.java',
+      'dataAccessInterface1.java',
+      'view1.java',
+      'viewModel1.java',
+      'usecase1InputBoundary.java',
+      'usecase1InputData.java',
+      'usecase1OutputBoundary.java',
+      'usecase1OutputData.java',
+    ];
+    for (const fileName of expectedFiles) {
+      expect((interactor as any).useCaseGraphList[0].getFiles().has(fileName));
+    }
+
+    await (interactor as any).verifyOutNeighbours();
+    const expectedNeighbours = [
+      ['controller', 'inputData'],
+      ['controller', 'inputBoundary'],
+      ['presenter', 'outputBoundary'],
+      ['presenter', 'outputData'],
+      ['presenter', 'viewModel'],
+      ['useCaseInteractor', 'inputBoundary'],
+      ['useCaseInteractor', 'inputData'],
+      ['useCaseInteractor', 'outputBoundary'],
+      ['useCaseInteractor', 'outputData'],
+      ['useCaseInteractor', 'dataAccessInterface'],
+      ['useCaseInteractor', 'entities'],
+      ['dataAccess', 'dataAccessInterface'],
+      ['dataAccess', 'entities'],
+      ['dataAccess', 'database'],
+      ['view', 'viewModel'],
+      ['view', 'controller'],
+    ];
+    for (const [from, to] of expectedNeighbours) {
+      expect(
+        (interactor as any).useCaseGraphList[0]
+          .getNodeNeighbours(from)
+          .includes(to)
+      );
+    }
+
+    const fileStorage = (interactor as any).buildFileStorageList(fileMap);
+    const nodeStorage = (interactor as any).buildNodeStorageList(fileStorage);
+
+    for (const [_, filePath] of fileMap) {
+      expect(nodeStorage).toContainEqual({
+        id: `${filePath}-usecase1`,
+        filePath: filePath,
+        type: (interactor as any).resolveNode(filePath),
+        layer: (interactor as any).resolveLayer(filePath),
+        status: 'VALID',
+      });
+    }
+    expect(
+      (interactor as any).useCaseGraphList[0].getMissingNodes().length === 0
+    );
+  });
+
+  it('Assigns nodes to the correct status when packaging by component.', async () => {
+    let interactor = new GraphVerificationInteractor(
+      mockFileAccess,
+      genericNeighbourAccess,
+      genericDBAccess,
+      presenter
+    );
+
+    const fileMap1 = new Map<string, string>();
+    fileMap1.set('dataAccess1.java', 'root/src/data_access/dataAccess1.java');
+    fileMap1.set('entity1.java', 'root/src/entity/entity1.java');
+    fileMap1.set(
+      'dataAccessInterface1.java',
+      'root/src/data_access/dataAccessInterface1.java'
+    );
+    fileMap1.set('view1.java', 'root/src/views/view1.java');
+    fileMap1.set('viewModel1.java', 'root/src/views/viewModel1.java');
+    fileMap1.set('database1.java', 'root/src/database/database1.java');
+    for (const [fileName, filePath] of fileMap1) {
+      (interactor as any).externalFilePaths.set(fileName, filePath);
+    }
+
+    (interactor as any).useCaseGraphList.push(new useCaseGraph('usecase1'));
+
+    const fileMap2 = new Map<string, string>();
+    fileMap2.set(
+      'usecase1Controller.java',
+      'root/src/features/feature1/usecase1/interface_adapter/usecase1Controller.java'
+    );
+    fileMap2.set(
+      'usecase1Presenter.java',
+      'root/src/features/feature1/usecase1/interface_adapter/usecase1Presenter.java'
+    );
+    fileMap2.set(
+      'usecase1InputBoundary.java',
+      'root/src/features/feature1/usecase1/use_case/usecase1InputBoundary.java'
+    );
+    fileMap2.set(
+      'usecase1InputData.java',
+      'root/src/features/feature1/usecase1/use_case/usecase1InputData.java'
+    );
+    fileMap2.set(
+      'usecase1OutputBoundary.java',
+      'root/src/features/feature1/usecase1/use_case/usecase1OutputBoundary.java'
+    );
+    fileMap2.set(
+      'usecase1OutputData.java',
+      'root/src/features/feature1/usecase1/use_case/usecase1OutputData.java'
+    );
+    fileMap2.set(
+      'usecase1Interactor.java',
+      'root/src/features/feature1/usecase1/use_case/usecase1Interactor.java'
+    );
+    for (const [fileName, filePath] of fileMap2) {
+      (interactor as any).internalFilePaths.set(fileName, filePath);
+      (interactor as any).useCaseGraphList[0].addFile(fileName, filePath);
+    }
+
+    const fileMap = new Map<string, string>([...fileMap1, ...fileMap2]);
+
+    mockFileAccess.getFileImports
+      .mockImplementationOnce(async (_) => [
+        'usecase1InputBoundary.java;',
+        'usecase1InputData.java;',
+      ])
+      .mockImplementationOnce(async (_) => [
+        'usecase1OutputBoundary.java;',
+        'usecase1OutputData.java;',
+        'viewModel1.java;',
+      ])
+      .mockImplementationOnce(async (_) => [])
+      .mockImplementationOnce(async (_) => [])
+      .mockImplementationOnce(async (_) => [])
+      .mockImplementationOnce(async (_) => [])
+      .mockImplementationOnce(async (_) => [
+        'usecase1InputBoundary.java;',
+        'usecase1InputData.java;',
+        'usecase1OutputBoundary.java;',
+        'usecase1OutputData.java;',
+        'dataAccessInterface1.java;',
+        'entity1.java;',
+      ])
+      .mockImplementationOnce(async (_) => [
+        'dataAccessInterface1.java',
+        'database1.java',
+        'entity1.java;',
+      ])
+      .mockImplementationOnce(async (_) => [])
+      .mockImplementationOnce(async (_) => [])
+      .mockImplementationOnce(async (_) => [
+        'viewModel1.java',
+        'usecase1Controller.java',
+      ])
+      .mockImplementationOnce(async (_) => [])
+      .mockImplementationOnce(async (_) => []);
+
+    await (interactor as any).developOutNeighbours();
+    const expectedFiles = [
+      'usecase1Presenter.java',
+      'usecase1Controller.java',
+      'usecase1Interactor.java',
+      'entity1.java',
+      'usecase1InputData.java',
+      'dataAccess1.java',
+      'dataAccessInterface1.java',
+      'view1.java',
+      'viewModel1.java',
+      'usecase1InputBoundary.java',
+      'usecase1InputData.java',
+      'usecase1OutputBoundary.java',
+      'usecase1OutputData.java',
+    ];
+    for (const fileName of expectedFiles) {
+      expect((interactor as any).useCaseGraphList[0].getFiles().has(fileName));
+    }
+
+    await (interactor as any).verifyOutNeighbours();
+    const expectedNeighbours = [
+      ['controller', 'inputData'],
+      ['controller', 'inputBoundary'],
+      ['presenter', 'outputBoundary'],
+      ['presenter', 'outputData'],
+      ['presenter', 'viewModel'],
+      ['useCaseInteractor', 'inputBoundary'],
+      ['useCaseInteractor', 'inputData'],
+      ['useCaseInteractor', 'outputBoundary'],
+      ['useCaseInteractor', 'outputData'],
+      ['useCaseInteractor', 'dataAccessInterface'],
+      ['useCaseInteractor', 'entities'],
+      ['dataAccess', 'dataAccessInterface'],
+      ['dataAccess', 'entities'],
+      ['dataAccess', 'database'],
+      ['view', 'viewModel'],
+      ['view', 'controller'],
+    ];
+    for (const [from, to] of expectedNeighbours) {
+      expect(
+        (interactor as any).useCaseGraphList[0]
+          .getNodeNeighbours(from)
+          .includes(to)
+      );
+    }
+
+    const fileStorage = (interactor as any).buildFileStorageList(fileMap);
+    const nodeStorage = (interactor as any).buildNodeStorageList(fileStorage);
+
+    for (const [_, filePath] of fileMap) {
+      expect(nodeStorage).toContainEqual({
+        id: `${filePath}-usecase1`,
+        filePath: filePath,
+        type: (interactor as any).resolveNode(filePath),
+        layer: (interactor as any).resolveLayer(filePath),
+        status: 'VALID',
+      });
+    }
+    expect(
+      (interactor as any).useCaseGraphList[0].getMissingNodes().length === 0
+    );
   });
 });
