@@ -1,12 +1,11 @@
 export class GetFileContentOutputData {
+  private fileConentOutputData?: { [key: string]: any };
 
-    private fileConentOutputData?: { [key: string]: any }
+  setOutputData(outputData: { [key: string]: any }) {
+    this.fileConentOutputData = outputData;
+  }
 
-    setOutputData(outputData: { [key: string]: any }) {
-        this.fileConentOutputData = outputData;
-    }
-    
-    getOutputData(): object {
-        return this.fileConentOutputData ?? {};
-    }
+  getOutputData(): object {
+    return this.fileConentOutputData ?? {};
+  }
 }

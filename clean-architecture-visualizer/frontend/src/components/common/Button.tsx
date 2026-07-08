@@ -5,7 +5,7 @@ export const CtaButton = styled(Button)(({ theme }) => ({
   borderRadius: '24px',
   textTransform: 'none',
   padding: '4px 12px',
-  fontSize: '0.8125rem', 
+  fontSize: '0.8125rem',
   fontWeight: 600,
   borderWidth: '1.5px',
   borderColor: theme.palette.divider,

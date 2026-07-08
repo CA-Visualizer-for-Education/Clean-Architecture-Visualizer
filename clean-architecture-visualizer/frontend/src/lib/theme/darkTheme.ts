@@ -3,7 +3,6 @@ import { createTheme } from '@mui/material/styles';
 /* For simplicity, the dark theme is currently just the default MUI dark mode. 
     Customization can be added later if desired. */
 
-
 export const darkTheme = createTheme({
   palette: {
     mode: 'dark',
@@ -31,5 +30,5 @@ export const darkTheme = createTheme({
       dark: '#8ad0f7',
       contrastText: '#f5f5f5',
     },
-  }
+  },
 });

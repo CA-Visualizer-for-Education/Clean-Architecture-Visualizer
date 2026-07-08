@@ -1,15 +1,14 @@
 export class GetRelationsInputData {
-    
-    constructor(
-        private readonly interactionId: string,
-        private readonly filePath: string
-    ) {}
+  constructor(
+    private readonly interactionId: string,
+    private readonly filePath: string
+  ) {}
 
-    getInteractionId(): string {
-        return this.interactionId;
-    }
+  getInteractionId(): string {
+    return this.interactionId;
+  }
 
-    getFilePath(): string {
-        return this.filePath;
-    }
+  getFilePath(): string {
+    return this.filePath;
+  }
 }

@@ -8,14 +8,21 @@ type FileExplorerProps = {
   activeFilePath: string | null;
 };
 
-const normalizeFolderPath = (path: string): string => 
+const normalizeFolderPath = (path: string): string =>
   path && !path.endsWith('/') ? `${path}/` : path;
 
-export const FileExplorer = ({ onSelect, activeFilePath }: FileExplorerProps) => {
+export const FileExplorer = ({
+  onSelect,
+  activeFilePath,
+}: FileExplorerProps) => {
   const { data: fileTree, isLoading, isFetching } = useFileTree();
-  const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set());
-  
-  const [lastAutoExpandedPath, setLastAutoExpandedPath] = useState<string | null>(null);
+  const [expandedFolders, setExpandedFolders] = useState<Set<string>>(
+    new Set()
+  );
+
+  const [lastAutoExpandedPath, setLastAutoExpandedPath] = useState<
+    string | null
+  >(null);
 
   if (activeFilePath && activeFilePath !== lastAutoExpandedPath) {
     const parts = activeFilePath.split('/');

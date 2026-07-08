@@ -1,3 +1,3 @@
 export interface GetFileTreeInputBoundary {
-    getFileTree(): Promise<void>;
+  getFileTree(): Promise<void>;
 }

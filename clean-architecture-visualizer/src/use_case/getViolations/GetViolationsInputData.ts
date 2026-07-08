@@ -1,10 +1,7 @@
 export class GetViolationsInputData {
-    
-    constructor(
-        private readonly interactionId: string
-    ) {}
+  constructor(private readonly interactionId: string) {}
 
-    getInteractionId(): string {
-        return this.interactionId;
-    }
+  getInteractionId(): string {
+    return this.interactionId;
+  }
 }

@@ -1,3 +1,3 @@
 export interface GetProjectSummaryInputBoundary {
-    getProjectSummary(): Promise<void>;
+  getProjectSummary(): Promise<void>;
 }

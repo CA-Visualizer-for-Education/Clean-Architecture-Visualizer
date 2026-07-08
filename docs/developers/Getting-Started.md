@@ -33,21 +33,25 @@ git remote -v
 Always create a new branch for your changes — never commit directly to `main`.
 
 **Create and switch to a new branch:**
+
 ```bash
 git checkout -b my-feature-branch
 ```
 
 **Push your branch to your fork:**
+
 ```bash
 git push origin my-feature-branch
 ```
 
 **Pull the latest changes from the main repo:**
+
 ```bash
 git pull upstream main
 ```
 
 **Keep your fork's main branch up to date:**
+
 ```bash
 git checkout main
 git pull upstream main

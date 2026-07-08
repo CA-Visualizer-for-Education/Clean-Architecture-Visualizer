@@ -1,10 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import { http, HttpResponse } from 'msw';
 import { server } from '@/mocks/server';
-import { 
-  getFileTree, 
-  getFileContent, 
-  getFileRelations 
+import {
+  getFileTree,
+  getFileContent,
+  getFileRelations,
 } from '@/api/codebase.api';
 
 describe('Codebase API', () => {
@@ -22,11 +22,14 @@ describe('Codebase API', () => {
     const interactionId = 'flow-1';
     const filePath = 'src/entities/User.java';
     const encodedPath = encodeURIComponent(filePath);
-    
+
     server.use(
-      http.get(`*/api/codebase/interactions/${interactionId}/files/${encodedPath}`, () => {
-        return HttpResponse.json({ content: 'class User {}' });
-      })
+      http.get(
+        `*/api/codebase/interactions/${interactionId}/files/${encodedPath}`,
+        () => {
+          return HttpResponse.json({ content: 'class User {}' });
+        }
+      )
     );
 
     const result = await getFileContent(interactionId, filePath);
@@ -39,9 +42,12 @@ describe('Codebase API', () => {
     const encodedPath = encodeURIComponent(filePath);
 
     server.use(
-      http.get(`*/api/codebase/interactions/${interactionId}/files/${encodedPath}/relations`, () => {
-        return HttpResponse.json({ dependencies: ['Service.ts'] });
-      })
+      http.get(
+        `*/api/codebase/interactions/${interactionId}/files/${encodedPath}/relations`,
+        () => {
+          return HttpResponse.json({ dependencies: ['Service.ts'] });
+        }
+      )
     );
 
     const result = await getFileRelations(interactionId, filePath);
@@ -50,7 +56,10 @@ describe('Codebase API', () => {
 
   it('throws an error when the API returns a 404', async () => {
     server.use(
-      http.get('*/api/codebase/file-tree', () => new HttpResponse(null, { status: 404 }))
+      http.get(
+        '*/api/codebase/file-tree',
+        () => new HttpResponse(null, { status: 404 })
+      )
     );
 
     // Axios helper: should reject when status is not 2xx

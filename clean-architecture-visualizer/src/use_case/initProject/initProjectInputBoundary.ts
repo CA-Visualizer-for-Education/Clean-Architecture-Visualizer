@@ -1,3 +1,3 @@
 export interface InitProjectInputBoundary {
-    execute(): Promise<void>;
+  execute(): Promise<void>;
 }

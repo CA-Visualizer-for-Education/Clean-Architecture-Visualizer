@@ -1,3 +1,3 @@
 export interface GetFileTreeOutputBoundary {
-    getOutputData(): string;
+  getOutputData(): string;
 }

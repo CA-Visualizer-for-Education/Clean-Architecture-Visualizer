@@ -1,64 +1,50 @@
 {
-    "nodes": {
-        "controller": {
-            "outNeighbours": [
-                "inputData",
-                "inputBoundary"
-            ]
-        },
-        "presenter": {
-            "outNeighbours": [
-                "viewModel",
-                "outputBoundary",
-                "outputData"
-            ]
-        },
-        "viewModel": {
-            "outNeighbours": []
-        },
-        "view": {
-            "outNeighbours": [
-                "viewModel",
-                "controller"
-            ]
-        },
-        "dataAccess": {
-            "outNeighbours": [
-                "dataAccessInterface",
-                "database",
-                "entities"
-            ]
-        },
-        "database": {
-            "outNeighbours": []
-        },
-        "entities": {
-            "outNeighbours": []
-        },
-        "inputData": {
-            "outNeighbours": []
-        },
-        "inputBoundary": {
-            "outNeighbours": []
-        },
-        "outputData": {
-            "outNeighbours": []
-        },
-        "outputBoundary": {
-            "outNeighbours": []
-        },
-        "dataAccessInterface": {
-            "outNeighbours": []
-        },
-        "useCaseInteractor": {
-            "outNeighbours": [
-                "inputData",
-                "inputBoundary",
-                "outputBoundary",
-                "outputData",
-                "dataAccessInterface",
-                "entities"
-            ]
-        }
+  "nodes": {
+    "controller": {
+      "outNeighbours": ["inputData", "inputBoundary"]
+    },
+    "presenter": {
+      "outNeighbours": ["viewModel", "outputBoundary", "outputData"]
+    },
+    "viewModel": {
+      "outNeighbours": []
+    },
+    "view": {
+      "outNeighbours": ["viewModel", "controller"]
+    },
+    "dataAccess": {
+      "outNeighbours": ["dataAccessInterface", "database", "entities"]
+    },
+    "database": {
+      "outNeighbours": []
+    },
+    "entities": {
+      "outNeighbours": []
+    },
+    "inputData": {
+      "outNeighbours": []
+    },
+    "inputBoundary": {
+      "outNeighbours": []
+    },
+    "outputData": {
+      "outNeighbours": []
+    },
+    "outputBoundary": {
+      "outNeighbours": []
+    },
+    "dataAccessInterface": {
+      "outNeighbours": []
+    },
+    "useCaseInteractor": {
+      "outNeighbours": [
+        "inputData",
+        "inputBoundary",
+        "outputBoundary",
+        "outputData",
+        "dataAccessInterface",
+        "entities"
+      ]
     }
+  }
 }

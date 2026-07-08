@@ -6,7 +6,11 @@
     "build": "tsc --project clean-architecture-visualizer/tsconfig.json && node -e \"require('fs').copyFileSync('clean-architecture-visualizer/package.json', 'clean-architecture-visualizer/dist/package.json')\" && npm run build_frontend",
     "build_frontend": "npm install --prefix clean-architecture-visualizer/frontend && npm run build --prefix clean-architecture-visualizer/frontend",
     "start": "node ./clean-architecture-visualizer/dist/src/app/index.js",
-    "test":  "node --experimental-vm-modules node_modules/.bin/jest"
+    "test": "node --experimental-vm-modules node_modules/.bin/jest",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "license": "MIT",
   "bugs": {
@@ -16,10 +20,14 @@
     "cave": "clean-architecture-visualizer/dist/src/app/index.js"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/express": "^5.0.6",
     "@types/jest": "^30.0.0",
     "@types/node": "^25.0.10",
+    "eslint": "^10.4.1",
     "jest": "^30.2.0",
+    "jiti": "^2.7.0",
+    "prettier": "^3.8.4",
     "ts-jest": "^29.4.6",
     "typescript": "^5.9.3"
   },

@@ -1,3 +1,3 @@
 export interface GetRelationsInputBoundary {
-    execute(): Promise<void>;
+  execute(): Promise<void>;
 }

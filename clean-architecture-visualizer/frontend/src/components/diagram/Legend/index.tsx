@@ -88,7 +88,11 @@ function LegendEdgeItem({ label, arrowHeadType, status }: LegendEdgeItemProps) {
             status={status}
             arrowHeadType={arrowHeadType}
             containerRef={containerRef}
-            routeHint={{ mode: 'straight', startSide: 'right', endSide: 'left' }}
+            routeHint={{
+              mode: 'straight',
+              startSide: 'right',
+              endSide: 'left',
+            }}
             layoutVersion={layoutVersion}
           />
         </EdgePreview>
@@ -120,9 +124,21 @@ export function Legend() {
   return (
     <LegendRoot elevation={0}>
       <LegendItems>
-        <LegendEdgeItem label={t('dependency')} arrowHeadType="filledTriangle" status="VALID" />
-        <LegendEdgeItem label={t('implements')} arrowHeadType="hollowTriangle" status="VALID" />
-        <LegendEdgeItem label={t('incorrectDependency')} arrowHeadType="filledTriangle" status="INCORRECT_DEPENDENCY" />
+        <LegendEdgeItem
+          label={t('dependency')}
+          arrowHeadType="filledTriangle"
+          status="VALID"
+        />
+        <LegendEdgeItem
+          label={t('implements')}
+          arrowHeadType="hollowTriangle"
+          status="VALID"
+        />
+        <LegendEdgeItem
+          label={t('incorrectDependency')}
+          arrowHeadType="filledTriangle"
+          status="INCORRECT_DEPENDENCY"
+        />
 
         <LegendNodeItem
           label={t('component')}

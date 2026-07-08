@@ -5,6 +5,7 @@
     "build": "tsc && node -e \"require('fs').copyFileSync('package.json', 'dist/package.json')\" && npm run build_frontend",
     "build_frontend": "npm install --prefix frontend && npm run build --prefix frontend",
     "start": "cross-env NODE_ENV=production node ./dist/src/app/index.js",
+    "dev": "npm run build && cross-env NODE_ENV=development node ./dist/src/app/index.js start",
     "test": "cross-env NODE_OPTIONS='--experimental-vm-modules' jest --no-cache"
   },
   "license": "MIT",
@@ -21,7 +22,8 @@
     "cross-env": "^10.1.0",
     "jest": "^30.2.0",
     "ts-jest": "^29.4.6",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vite": "^8.0.16"
   },
   "dependencies": {
     "chalk": "^5.6.2",
@@ -29,5 +31,9 @@
     "express": "^5.2.1",
     "http-proxy-middleware": "^3.0.5"
   },
-  "type": "module"
+  "type": "module",
+  "files": [
+    "dist/",
+    "frontend/dist/"
+  ]
 }

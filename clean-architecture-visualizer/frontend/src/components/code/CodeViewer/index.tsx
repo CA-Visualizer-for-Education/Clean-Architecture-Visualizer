@@ -3,13 +3,27 @@ import Editor, { OnMount } from '@monaco-editor/react';
 import { useTheme, Theme } from '@mui/material/styles';
 import type * as Monaco from 'monaco-editor';
 import { useFileViewer, useFileRelations } from '../../../actions/useCodebase';
-import { LAYER_METADATA, CALayer, FileRelation, FileContent } from '../../../lib';
+import {
+  LAYER_METADATA,
+  CALayer,
+  FileRelation,
+  FileContent,
+} from '../../../lib';
 import { Breadcrumbs } from '@mui/material';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
-import { ViewerContainer, HeaderContainer, EditorCard, LayerChip, StatusContainer, BreadcrumbPath } from './styles';
+import {
+  ViewerContainer,
+  HeaderContainer,
+  EditorCard,
+  LayerChip,
+  StatusContainer,
+  BreadcrumbPath,
+} from './styles';
 import { useTranslation } from 'react-i18next';
 
-const getMonacoThemeConfig = (theme: Theme): Monaco.editor.IStandaloneThemeData => ({
+const getMonacoThemeConfig = (
+  theme: Theme
+): Monaco.editor.IStandaloneThemeData => ({
   base: 'vs',
   inherit: true,
   rules: [],
@@ -28,7 +42,11 @@ type CodeViewerProps = {
   onFileChange: (newPath: string) => void;
 };
 
-export const CodeViewer = ({ interactionId, filePath, onFileChange }: CodeViewerProps) => {
+export const CodeViewer = ({
+  interactionId,
+  filePath,
+  onFileChange,
+}: CodeViewerProps) => {
   const muiTheme = useTheme();
   const { t } = useTranslation('codeViewer');
   const editorRef = useRef<Monaco.editor.IStandaloneCodeEditor | null>(null);
@@ -37,12 +55,23 @@ export const CodeViewer = ({ interactionId, filePath, onFileChange }: CodeViewer
   const linkProviderRef = useRef<Monaco.IDisposable | null>(null);
   const relationsRef = useRef<FileRelation[]>([]);
 
-  const { data, isLoading, isError } = useFileViewer(interactionId, filePath) as { data?: FileContent; isLoading: boolean; isError: boolean };
-  const { data: relationsData } = useFileRelations(interactionId, filePath) as { data?: FileRelation[] | { relations: FileRelation[] } };
+  const { data, isLoading, isError } = useFileViewer(
+    interactionId,
+    filePath
+  ) as {
+    data?: FileContent;
+    isLoading: boolean;
+    isError: boolean;
+  };
+  const { data: relationsData } = useFileRelations(interactionId, filePath) as {
+    data?: FileRelation[] | { relations: FileRelation[] };
+  };
 
   const relations = useMemo(() => {
     if (!relationsData) return [];
-    return Array.isArray(relationsData) ? relationsData : relationsData.relations ?? [];
+    return Array.isArray(relationsData)
+      ? relationsData
+      : (relationsData.relations ?? []);
   }, [relationsData]);
 
   useEffect(() => {
@@ -51,25 +80,34 @@ export const CodeViewer = ({ interactionId, filePath, onFileChange }: CodeViewer
 
   const layer = data?.layer;
 
-const layerInfo = useMemo(() => 
-  layer ? LAYER_METADATA[layer as CALayer] : null
-, [layer]);
+  const layerInfo = useMemo(
+    () => (layer ? LAYER_METADATA[layer as CALayer] : null),
+    [layer]
+  );
 
   // Link Provider & Decoration logic remains same to preserve "Cmd+Click" functionality
   useEffect(() => {
     if (!monacoRef.current || !data?.language || !editorRef.current) return;
     linkProviderRef.current?.dispose();
-    linkProviderRef.current = monacoRef.current.languages.registerLinkProvider(data.language, {
-      provideLinks: (model) => {
-        const links = relations
-          .filter((rel) => rel.line && rel.target_file)
-          .map((rel) => ({
-            range: new monacoRef.current!.Range(rel.line, 1, rel.line, model.getLineMaxColumn(rel.line)),
-            url: `file://${rel.target_file}`, 
-          }));
-        return { links };
-      },
-    });
+    linkProviderRef.current = monacoRef.current.languages.registerLinkProvider(
+      data.language,
+      {
+        provideLinks: (model) => {
+          const links = relations
+            .filter((rel) => rel.line && rel.target_file)
+            .map((rel) => ({
+              range: new monacoRef.current!.Range(
+                rel.line,
+                1,
+                rel.line,
+                model.getLineMaxColumn(rel.line)
+              ),
+              url: `file://${rel.target_file}`,
+            }));
+          return { links };
+        },
+      }
+    );
     return () => linkProviderRef.current?.dispose();
   }, [data?.language, relations]);
 
@@ -98,7 +136,10 @@ const layerInfo = useMemo(() =>
         },
       });
     });
-    decorationIds.current = editorRef.current.deltaDecorations(decorationIds.current, newDecorations);
+    decorationIds.current = editorRef.current.deltaDecorations(
+      decorationIds.current,
+      newDecorations
+    );
   }, [data, relations, t]);
 
   const handleEditorDidMount: OnMount = (editor, monaco) => {
@@ -117,8 +158,14 @@ const layerInfo = useMemo(() =>
     });
   };
 
-  useEffect(() => { applyDecorations(); }, [data, relations, applyDecorations]);
-  useEffect(() => { return () => { linkProviderRef.current?.dispose(); }; }, []);
+  useEffect(() => {
+    applyDecorations();
+  }, [data, relations, applyDecorations]);
+  useEffect(() => {
+    return () => {
+      linkProviderRef.current?.dispose();
+    };
+  }, []);
 
   if (!filePath) return <StatusContainer>{t('selectFile')}</StatusContainer>;
   if (isLoading) return <StatusContainer>{t('loading')}</StatusContainer>;
@@ -137,10 +184,7 @@ const layerInfo = useMemo(() =>
           {filePath.split('/').map((part, index, arr) => {
             const isLast = index === arr.length - 1;
             return (
-              <BreadcrumbPath 
-                key={`${part}-${index}`} 
-                isLast={isLast}
-              >
+              <BreadcrumbPath key={`${part}-${index}`} isLast={isLast}>
                 {part}
               </BreadcrumbPath>
             );
@@ -148,10 +192,10 @@ const layerInfo = useMemo(() =>
         </Breadcrumbs>
 
         {layerInfo && (
-          <LayerChip 
+          <LayerChip
             label={layerInfo.label}
             size="small"
-            layerkey={layerInfo.paletteKey} 
+            layerkey={layerInfo.paletteKey}
           />
         )}
       </HeaderContainer>
@@ -163,7 +207,12 @@ const layerInfo = useMemo(() =>
           language={data.language}
           value={data.content}
           onMount={handleEditorDidMount}
-          options={{ readOnly: true, automaticLayout: true, glyphMargin: true, scrollBeyondLastLine: false, }}
+          options={{
+            readOnly: true,
+            automaticLayout: true,
+            glyphMargin: true,
+            scrollBeyondLastLine: false,
+          }}
         />
       </EditorCard>
     </ViewerContainer>

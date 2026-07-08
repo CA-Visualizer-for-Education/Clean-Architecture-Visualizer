@@ -1,38 +1,38 @@
-import fs from "fs";
-import os from "os";
-import path from "path";
+import fs from 'fs';
+import os from 'os';
+import path from 'path';
 
 export const SESSION_FILE = path.join(
-    os.tmpdir(),
-    `clean-arch-cli-session${process.env.JEST_WORKER_ID ? `-${process.env.JEST_WORKER_ID}` : ""}.json`
+  os.tmpdir(),
+  `clean-arch-cli-session${process.env.JEST_WORKER_ID ? `-${process.env.JEST_WORKER_ID}` : ''}.json`
 );
 
 export class SessionDB<T extends object> {
-    private data: Partial<T> = {};
+  private data: Partial<T> = {};
 
-    set<K extends keyof T>(key: K, value: T[K]): void {
-        this.data[key] = value;
-        fs.writeFileSync(SESSION_FILE, JSON.stringify(this.data, null, 2));
-    }
+  set<K extends keyof T>(key: K, value: T[K]): void {
+    this.data[key] = value;
+    fs.writeFileSync(SESSION_FILE, JSON.stringify(this.data, null, 2));
+  }
 
-    get<K extends keyof T>(key: K): T[K] | undefined {
-        return this.data[key];
-    }
+  get<K extends keyof T>(key: K): T[K] | undefined {
+    return this.data[key];
+  }
 
-    // call before call that requires a database call.
-    load(): void {
-        if (!fs.existsSync(SESSION_FILE)) return;
-        const raw = fs.readFileSync(SESSION_FILE, "utf-8");
-        if (!raw.trim()) return;
-        this.data = JSON.parse(raw) as Partial<T>;
-    }
+  // call before call that requires a database call.
+  load(): void {
+    if (!fs.existsSync(SESSION_FILE)) return;
+    const raw = fs.readFileSync(SESSION_FILE, 'utf-8');
+    if (!raw.trim()) return;
+    this.data = JSON.parse(raw) as Partial<T>;
+  }
 
-    exists(): boolean {
-        return fs.existsSync(SESSION_FILE);
-    }
+  exists(): boolean {
+    return fs.existsSync(SESSION_FILE);
+  }
 
-    clear(): void {
-        this.data = {};
-        if (this.exists()) fs.unlinkSync(SESSION_FILE);
-    }
+  clear(): void {
+    this.data = {};
+    if (this.exists()) fs.unlinkSync(SESSION_FILE);
+  }
 }
