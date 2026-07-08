@@ -297,12 +297,7 @@ export class GraphVerificationInteractor implements GraphVerificationInputBounda
     ) as string;
     externalFilePathToUseCaseGraphs.set(
       externalFilePathRep,
-      (
-        externalFilePathToUseCaseGraphs.get(externalFilePathRep) as Set<string>
-      ).union(
-        externalFilePathToUseCaseGraphs.get(externalFilePath) as Set<string>
-      )
-    );
+      new Set([...(externalFilePathToUseCaseGraphs.get(externalFilePathRep) as Set<string>), ...(externalFilePathToUseCaseGraphs.get(externalFilePath) as Set<string>)]));
     return this.findRep(
       externalFilePathRep,
       externalFilePathRepresentatives,
@@ -339,9 +334,7 @@ export class GraphVerificationInteractor implements GraphVerificationInputBounda
       externalFilePathRepresentatives.set(rep1, rep2);
       externalFilePathsToUseCaseGraphs.set(
         rep2,
-        (externalFilePathsToUseCaseGraphs.get(rep1) as Set<string>).union(
-          externalFilePathsToUseCaseGraphs.get(rep2) as Set<string>
-        )
+        new Set([...(externalFilePathsToUseCaseGraphs.get(rep1) as Set<string>), ...(externalFilePathsToUseCaseGraphs.get(rep2) as Set<string>)])
       );
     }
   }
