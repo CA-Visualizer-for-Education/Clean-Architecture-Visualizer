@@ -53,7 +53,7 @@ export class GetUseCaseInfoInteractor implements GetUseCaseInfoInputBoundary {
       decoupling: false,
     };
 
-    const allNodes = this.db.getAllNodes();
+    // const allNodes = this.db.getAllNodes();
 
     /**
      * Checking for sub use case.
@@ -62,10 +62,7 @@ export class GetUseCaseInfoInteractor implements GetUseCaseInfoInputBoundary {
 
     const hasSubCase = edges.some(
       (edge) =>
-        edge.source !== edge.target &&
-        allNodes.find((node) => node.id === edge.target)?.type ===
-          'useCaseInteractor'
-      // edge.target === 'useCaseInteractor' replace "allNodes.find ... 'useCaseInteractor' with this"
+        edge.source !== edge.target && edge.target === 'useCaseInteractor'
     );
 
     if (hasSubCase) {

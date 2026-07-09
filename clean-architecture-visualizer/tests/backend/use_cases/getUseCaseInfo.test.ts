@@ -79,6 +79,7 @@ describe('GetUseCaseInfoInteractor', () => {
     // Check if node was found via fileKey
     expect(outputData.result.nodes).toHaveLength(1);
     expect(outputData.result.nodes[0].file_path).toBe(filePath);
+    expect(outputData.result.decoupling).toBe(false);
   });
 
   it('includes missing nodes based on the use case missingNodes list', async () => {
@@ -113,11 +114,52 @@ describe('GetUseCaseInfoInteractor', () => {
     );
     expect(missingNode).toBeDefined();
     expect(missingNode.type).toBe('controller');
+    expect(outputData.result.decoupling).toBe(false);
   });
 
-  it('assembles edges from the outNeighbours map', async () => {
-    const sourceId = 'controller-node';
-    const targetId = 'interactor-node';
+  it('assembles edges from the outNeighbours map and checks for decoupling when edge depends on interactor', async () => {
+    const sourceId = 'controller';
+    const targetId = 'useCaseInteractor';
+    const edgeId = `${sourceId}->${targetId}`;
+
+    // Setup the edge in the DB
+    (genericDBAccess as any).upsertEdge({
+      id: edgeId,
+      source: sourceId,
+      target: targetId,
+      type: 'DEPENDENCY',
+      status: 'INVALID',
+    });
+
+    const mockUseCase = {
+      id: 'uc-edge',
+      name: 'Edge Test',
+      fileKeys: [],
+      missingNodes: [],
+      outNeighbours: {
+        [sourceId]: [targetId],
+      },
+    };
+    (genericDBAccess as any).upsertUseCase(mockUseCase);
+
+    const outputData = makeOutputData();
+    const interactor = new GetUseCaseInfoInteractor(
+      genericDBAccess,
+      makeInputData('uc-edge'),
+      outputData
+    );
+
+    await interactor.execute();
+
+    expect(outputData.result.edges).toHaveLength(1);
+    expect(outputData.result.edges[0].id).toBe(edgeId);
+    expect(outputData.result.edges[0].status).toBe('INVALID');
+    expect(outputData.result.decoupling).toBe(true);
+  });
+
+  it('ensures decoupling is false when there is no dependency on interactor', async () => {
+    const sourceId = 'controller';
+    const targetId = 'inputBoundary';
     const edgeId = `${sourceId}->${targetId}`;
 
     // Setup the edge in the DB
@@ -152,5 +194,6 @@ describe('GetUseCaseInfoInteractor', () => {
     expect(outputData.result.edges).toHaveLength(1);
     expect(outputData.result.edges[0].id).toBe(edgeId);
     expect(outputData.result.edges[0].status).toBe('VALID');
+    expect(outputData.result.decoupling).toBe(false);
   });
 });
