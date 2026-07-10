@@ -200,13 +200,9 @@ export class GraphVerificationInteractor implements GraphVerificationInputBounda
             const base = targetFileName.toLowerCase().replace(/\.[^.]+$/, '');
             const res = importPath.toLowerCase().includes(base);
             if (res) {
-              const modifiedImportPath =
-                importPath.length > 0 && importPath.at(-1) === ';'
-                  ? importPath.slice(0, -1)
-                  : importPath;
               if (
                 this.resolveNode(importPath) &&
-                this.internalFilePaths.has(modifiedImportPath)
+                this.internalFilePaths.has(targetFileName)
               ) {
                 // We need to set node neighbour and add file now
                 // When we do dsu, we only look at external->external edges
@@ -227,34 +223,32 @@ export class GraphVerificationInteractor implements GraphVerificationInputBounda
       // Add all edges to allEdges as long as it resolves to a node and the import is not an
       // internal file in CA and unite them.
       imports.map((importPath) => {
-        const modifiedImportPath =
-          importPath.length > 0 && importPath.at(-1) === ';'
-            ? importPath.slice(0, -1)
-            : importPath;
-        if (
-          this.resolveNode(importPath) &&
-          !this.internalFilePaths.has(modifiedImportPath)
-        ) {
-          allEdges.push([
-            filePath,
-            this.externalFilePaths.get(modifiedImportPath) as string,
-          ]);
-          /**
-           * Add a check before this executes that checks if both filePath and its rep are in the map
-           * If not, it means there is an import that doesn't exist.
-           */
-          this.unite(
-            filePath,
-            this.externalFilePaths.get(modifiedImportPath) as string,
-            externalFileRepresentative,
-            externalFilesToUseCaseGraphs
-          );
+        if (!this.resolveNode(importPath)) return;
+        if (this.resolveImportToFileName(this.internalFilePaths, importPath)) {
+          return;
         }
+        const targetFileName = this.resolveImportToFileName(
+          this.externalFilePaths,
+          importPath
+        );
+        if (!targetFileName) return;
+
+        const toFilePath = this.externalFilePaths.get(targetFileName) as string;
+        allEdges.push([filePath, toFilePath]);
+        this.unite(
+          filePath,
+          toFilePath,
+          externalFileRepresentative,
+          externalFilesToUseCaseGraphs
+        );
       });
     }
 
     allEdges.map(([fromNodePath, toNodePath]) => {
-      if (this.internalFilePaths.has(toNodePath.split('/').at(-1) ?? '')) {
+      if (
+        toNodePath &&
+        this.internalFilePaths.has(toNodePath.split('/').at(-1) ?? '')
+      ) {
       }
       const fromNodePathRep = this.findRep(
         fromNodePath,
@@ -295,16 +289,15 @@ export class GraphVerificationInteractor implements GraphVerificationInputBounda
     const externalFilePathRep: string = externalFilePathRepresentatives.get(
       externalFilePath
     ) as string;
+    const rep1Graphs =
+      externalFilePathToUseCaseGraphs.get(externalFilePathRep) ??
+      new Set<string>();
+    const rep2Graphs =
+      externalFilePathToUseCaseGraphs.get(externalFilePath) ??
+      new Set<string>();
     externalFilePathToUseCaseGraphs.set(
       externalFilePathRep,
-      new Set([
-        ...(externalFilePathToUseCaseGraphs.get(
-          externalFilePathRep
-        ) as Set<string>),
-        ...(externalFilePathToUseCaseGraphs.get(
-          externalFilePath
-        ) as Set<string>),
-      ])
+      new Set([...rep1Graphs, ...rep2Graphs])
     );
     return this.findRep(
       externalFilePathRep,
@@ -340,12 +333,13 @@ export class GraphVerificationInteractor implements GraphVerificationInputBounda
     );
     if (rep1 != rep2) {
       externalFilePathRepresentatives.set(rep1, rep2);
+      const rep1Graphs =
+        externalFilePathsToUseCaseGraphs.get(rep1) ?? new Set<string>();
+      const rep2Graphs =
+        externalFilePathsToUseCaseGraphs.get(rep2) ?? new Set<string>();
       externalFilePathsToUseCaseGraphs.set(
         rep2,
-        new Set([
-          ...(externalFilePathsToUseCaseGraphs.get(rep1) as Set<string>),
-          ...(externalFilePathsToUseCaseGraphs.get(rep2) as Set<string>),
-        ])
+        new Set([...rep1Graphs, ...rep2Graphs])
       );
     }
   }
@@ -356,6 +350,10 @@ export class GraphVerificationInteractor implements GraphVerificationInputBounda
    * @returns
    */
   private resolveNode(importPath: string): cleanNode | null {
+    if (!importPath) {
+      console.warn('resolveNode called with undefined/empty importPath');
+      return null;
+    }
     importPath = importPath.toLowerCase().replace(/_/g, '');
     if (importPath.includes('viewmodel')) return 'viewModel'; // must be verified before 'view'
     if (importPath.includes('view')) return 'view';
@@ -400,6 +398,33 @@ export class GraphVerificationInteractor implements GraphVerificationInputBounda
   }
 
   /**
+   * Given a raw import path, find the file name (map key) it refers to within
+   * the given file map. Import paths come straight from the source line (still
+   * containing quotes/relative-path segments and a possibly different
+   * extension), so this matches on the file's basename with its extension
+   * stripped rather than requiring an exact key match.
+   * @param nodeType a map from file name to file path.
+   * @param importPath a raw import path.
+   * @returns the matching file name, or undefined if none match.
+   */
+  private resolveImportToFileName(
+    nodeType: Map<string, string>,
+    importPath: string
+  ): string | undefined {
+    const entries = [...nodeType.entries()].sort(
+      (a, b) => b[0].length - a[0].length
+    );
+    for (const [fileName] of entries) {
+      const fileType = fileName.toLowerCase().replace(/\.[^.]+$/, '');
+      if (!fileType) continue;
+      if (importPath.toLowerCase().includes(fileType)) {
+        return fileName;
+      }
+    }
+    return undefined;
+  }
+
+  /**
    * For each import of a file, determine its what node it belongs to.
    * @param nodeType a map from file name to file path.
    * @param importPath a file path
@@ -409,17 +434,10 @@ export class GraphVerificationInteractor implements GraphVerificationInputBounda
     nodeType: Map<string, string>,
     importPath: string
   ): cleanNode | null {
-    const entries = [...nodeType.entries()].sort(
-      (a, b) => b[0].length - a[0].length
-    );
-    for (const [fileName, filePath] of entries) {
-      const fileType = fileName.toLowerCase().replace(/\.[^.]+$/, '');
-      if (!fileType) continue;
-      if (importPath.toLowerCase().includes(fileType)) {
-        return this.resolveNode(filePath);
-      }
-    }
-    return null;
+    const fileName = this.resolveImportToFileName(nodeType, importPath);
+    if (!fileName) return null;
+    const filePath = nodeType.get(fileName) as string;
+    return this.resolveNode(filePath);
   }
 
   /**

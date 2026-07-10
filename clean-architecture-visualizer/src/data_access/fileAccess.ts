@@ -100,6 +100,8 @@ export class FileAccess implements FileAccessInterface {
    * @param curr is your current working directory path.
    * @returns the path to highest in depth src directory.
    */
+  private static readonly ignoredDirNames = new Set(['node_modules', '.git']);
+
   async bfsFindDir(curr: string, target: string): Promise<string | null> {
     const queue: string[] = [curr];
     const visited = new Set<string>();
@@ -114,6 +116,7 @@ export class FileAccess implements FileAccessInterface {
 
       for (const entry of entries) {
         if (!entry.isDirectory()) continue;
+        if (FileAccess.ignoredDirNames.has(entry.name)) continue;
 
         const fullPath = path.join(currentPath, entry.name);
 
