@@ -75,7 +75,7 @@ router.get('/analysis/violations/:interactionId', async (req, res) => {
   );
   const controller = new GetViolationsController(interactor);
   const presenter = new GetViolationsPresenter(outputData);
-  
+
   await controller.execute();
   const result = presenter.getOutputData();
   if (!result) {

@@ -80,7 +80,7 @@ export class GetViolationsInteractor implements GetViolationsInputBoundary {
     useCaseName: string
   ): string[] {
     const fileKeySet = new Set(fileKeys);
-    
+
     return this.db
       .getAllNodes()
       .filter(
@@ -88,9 +88,11 @@ export class GetViolationsInteractor implements GetViolationsInputBoundary {
           (n.type === from || n.type === to) &&
           n.filePath !== undefined &&
           ((n.filePath.split('/').length > 0
-            ? fileKeySet.has(n.filePath.split('/').at(-1) as string) && n.id.split('/').at(-1)?.match(/-(.*)/)?.includes(useCaseName)
+            ? fileKeySet.has(n.filePath.split('/').at(-1) as string) &&
+              n.id.split('/').at(-1)?.match(/-(.*)/)?.includes(useCaseName)
             : false) ||
-            fileKeySet.has(n.filePath) && n.id.split('/').at(-1)?.match(/-(.*)/)?.includes(useCaseName))
+            (fileKeySet.has(n.filePath) &&
+              n.id.split('/').at(-1)?.match(/-(.*)/)?.includes(useCaseName)))
       )
       .map((n) => n.id);
   }
@@ -107,15 +109,19 @@ export class GetViolationsInteractor implements GetViolationsInputBoundary {
   ): Promise<FileContext | undefined> {
     const fileKeySet = new Set(fileKeys);
 
-    const matchingNode = this.db.getAllNodes().find(
-      (n) =>
-        n.type === from &&
-        n.filePath !== undefined &&
-        ((n.filePath.split('/').length > 0
-          ? fileKeySet.has(n.filePath.split('/').at(-1) as string) && n.id.split('/').at(-1)?.match(/-(.*)/)?.includes(useCaseName)
-          : false) ||
-          fileKeySet.has(n.filePath) && n.id.split('/').at(-1)?.match(/-(.*)/)?.includes(useCaseName))
-    );
+    const matchingNode = this.db
+      .getAllNodes()
+      .find(
+        (n) =>
+          n.type === from &&
+          n.filePath !== undefined &&
+          ((n.filePath.split('/').length > 0
+            ? fileKeySet.has(n.filePath.split('/').at(-1) as string) &&
+              n.id.split('/').at(-1)?.match(/-(.*)/)?.includes(useCaseName)
+            : false) ||
+            (fileKeySet.has(n.filePath) &&
+              n.id.split('/').at(-1)?.match(/-(.*)/)?.includes(useCaseName)))
+      );
     if (!matchingNode?.filePath) return undefined;
     const fileName = matchingNode.filePath.split('/').at(-1);
     if (!fileName) return undefined;
@@ -123,7 +129,7 @@ export class GetViolationsInteractor implements GetViolationsInputBoundary {
       this.fileAccess.getFileSnippet(matchingNode.filePath, to),
       this.fileAccess.getLineNumber(matchingNode.filePath, to),
     ]);
-    
+
     return {
       file: fileName,
       ...(snippet && { snippet }),
