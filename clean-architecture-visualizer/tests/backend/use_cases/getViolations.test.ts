@@ -55,13 +55,12 @@ describe('GetViolationsInteractor', () => {
   describe('execute — Violation Mapping', () => {
     const fromNode = 'controller';
     const toNode = 'entities';
-    const filePath = 'src/interface_adapters/UserController.java';
+    const filePath = 'src/interface_adapters/uc-1/UserController.java';
 
     beforeEach(() => {
       // Setup a node that belongs to the "from" side of the violation
       genericDBAccess.upsertNode({
-        id: 'node-controller-1',
-        name: 'UserController',
+        id: "src/interface_adapters/uc-1/UserController.java-Process User",
         type: fromNode,
         layer: 'interfaceAdapters',
         filePath: filePath,
@@ -90,7 +89,7 @@ describe('GetViolationsInteractor', () => {
       await interactor.execute();
 
       const violation = outputData.result[0];
-      expect(violation.related_node_ids).toContain('node-controller-1');
+      expect(violation.related_node_ids).toContain("src/interface_adapters/uc-1/UserController.java-Process User");
       expect(violation.related_edge_id).toBe(`${fromNode}->${toNode}`);
     });
 
@@ -153,8 +152,7 @@ describe('execute — Violation Mapping for differently formatted file path.', (
   beforeEach(() => {
     genericDBAccess.upsertNode({
       // node id's are file paths since they are unique
-      id: 'src/interface_adapters/UserController.java',
-      name: 'UserController',
+      id: "src/interface_adapters/uc-1/UserController.java-Process User",
       type: fromNode,
       layer: 'interfaceAdapters',
       filePath: filePath,
@@ -184,7 +182,7 @@ describe('execute — Violation Mapping for differently formatted file path.', (
 
     const violation = outputData.result[0];
     expect(violation.related_node_ids).toContain(
-      'src/interface_adapters/UserController.java'
+      "src/interface_adapters/uc-1/UserController.java-Process User"
     );
     expect(violation.related_edge_id).toBe(`${fromNode}->${toNode}`);
   });
