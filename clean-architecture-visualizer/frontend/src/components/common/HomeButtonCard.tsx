@@ -1,71 +1,79 @@
-import React from 'react';
-import { Link as RouterLink } from 'react-router-dom';
-import { Box, Typography, Card, CardActionArea, CardContent } from '@mui/material';
+import React from 'react'
+import { Link } from 'react-router-dom'
+import { Box } from '@mui/material'
+import styles from './HomeButtonCard.module.css'
 
 interface HomeButtonCardProps {
-  title: string;
-  description: string;
-  to: string;
-  icon: React.ReactElement;
-  bgColor: string;
-  iconColor?: string;
+  title: string
+  description: string
+  to: string
+  icon: React.ReactElement
+  bgColor: string
+  iconColor?: string
+  badge?: string
+  badgeBg?: string
+  badgeColor?: string
+  ctaLabel?: string
+  ctaColor?: string
 }
 
-const HomeButtonCard = ({ 
-  title, 
-  description, 
-  to, 
-  icon, 
-  bgColor, 
-  iconColor = 'white' 
-}: HomeButtonCardProps) => {
+export default function HomeButtonCard({
+  title,
+  description,
+  to,
+  icon,
+  bgColor,
+  iconColor = 'white',
+  badge,
+  badgeBg = '#EBF4FC',
+  badgeColor = '#207FD4',
+  ctaLabel = 'Get started',
+  ctaColor = 'primary.main',
+}: HomeButtonCardProps) {
   return (
-    <Card elevation={0} sx={{ background: 'transparent', width: '100%' }}>
-      <CardActionArea 
-        component={RouterLink} 
-        to={to} 
-        sx={{ 
-          borderRadius: 4, 
-          p: 2, 
-          textAlign: 'center',
-          '&:hover .icon-box': { transform: 'scale(1.05)' }
-        }}
-      >
-        <Box 
-          className="icon-box"
-          sx={{ 
-            width: 140, 
-            height: 140, 
-            mx: 'auto', 
-            mb: 3,
-            bgcolor: bgColor, 
-            borderRadius: 8, 
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'center', 
-            transition: 'transform 0.2s ease-in-out'
-          }}
+    <Link to={to} className={styles.card}>
+      <div className={styles.illustration}>
+        {badge && (
+          <Box
+            component="span"
+            className={styles.stepBadge}
+            sx={{
+              bgcolor: badgeBg,
+              color: badgeColor,
+            }}
+          >
+            {badge}
+          </Box>
+        )}
+
+        <Box
+          className={styles.illustrationInner}
+          sx={{ bgcolor: bgColor }}
         >
-          {/* Ensure the icon itself is treated as a block or flex item */}
-          {React.cloneElement(icon as React.ReactElement, { 
-            sx: { 
-                fontSize: 70, 
-                color: iconColor,
-                display: 'block' 
-            } 
+          {React.cloneElement(icon, {
+            sx: {
+              ...icon.props.sx,
+              fontSize: 72,
+              color: iconColor,
+            },
           })}
         </Box>
-        <CardContent sx={{ p: 0 }}>
-          <Typography variant="h5" fontWeight="bold" gutterBottom>
-            {title}
-          </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 220, mx: 'auto' }}>
-            {description}
-          </Typography>
-        </CardContent>
-      </CardActionArea>
-    </Card>
-  );
-};
+      </div>
 
-export default HomeButtonCard;
+      <div className={styles.body}>
+        <h2 className={styles.title}>{title}</h2>
+
+        <p className={styles.description}>{description}</p>
+
+        <Box
+          component="span"
+          className={styles.cta}
+          sx={{ color: ctaColor }}
+        >
+          {ctaLabel}
+          <span aria-hidden>›</span>
+        </Box>
+      </div>
+    </Link>
+  )
+}
