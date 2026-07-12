@@ -89,7 +89,7 @@ export class GetViolationsInteractor implements GetViolationsInputBoundary {
           n.filePath !== undefined &&
           ((n.filePath.split('/').length > 0
             ? fileKeySet.has(n.filePath.split('/').at(-1) as string) &&
-            this.findNodeContainsUseCase(n.id, useCaseName)
+              this.findNodeContainsUseCase(n.id, useCaseName)
             : false) ||
             (fileKeySet.has(n.filePath) &&
               this.findNodeContainsUseCase(n.id, useCaseName)))
@@ -140,10 +140,15 @@ export class GetViolationsInteractor implements GetViolationsInputBoundary {
   /*
   Determines if the nodeId if part of the use case graph.
   */
-  private findNodeContainsUseCase(nodeId : string, useCaseName : string) : boolean {
-    if(nodeId.length < useCaseName.length){
+  private findNodeContainsUseCase(
+    nodeId: string,
+    useCaseName: string
+  ): boolean {
+    if (nodeId.length < useCaseName.length) {
       return false;
     }
-    return nodeId.slice(nodeId.length - useCaseName.length).includes(useCaseName);
+    return nodeId
+      .slice(nodeId.length - useCaseName.length)
+      .includes(useCaseName);
   }
 }

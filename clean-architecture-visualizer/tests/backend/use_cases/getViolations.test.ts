@@ -224,7 +224,10 @@ describe('findNodeContainsUseCase - Ensures function only checks the last charac
       outputData
     );
 
-    const result = (interactor as any).findNodeContainsUseCase('blah', 'Process User');
+    const result = (interactor as any).findNodeContainsUseCase(
+      'blah',
+      'Process User'
+    );
     expect(result).toBe(false);
   });
 
@@ -237,7 +240,10 @@ describe('findNodeContainsUseCase - Ensures function only checks the last charac
       outputData
     );
 
-    const result = (interactor as any).findNodeContainsUseCase('src/interface_adapters/uc-1/User-Controller.java-Process User', 'Process User');
+    const result = (interactor as any).findNodeContainsUseCase(
+      'src/interface_adapters/uc-1/User-Controller.java-Process User',
+      'Process User'
+    );
     expect(result).toBe(true);
   });
 
@@ -250,7 +256,10 @@ describe('findNodeContainsUseCase - Ensures function only checks the last charac
       outputData
     );
 
-    const result = (interactor as any).findNodeContainsUseCase('src/interface_adapters/uc-1/User-Controller.java-usecase1', 'Process User');
+    const result = (interactor as any).findNodeContainsUseCase(
+      'src/interface_adapters/uc-1/User-Controller.java-usecase1',
+      'Process User'
+    );
     expect(result).toBe(false);
   });
 
@@ -263,7 +272,10 @@ describe('findNodeContainsUseCase - Ensures function only checks the last charac
       outputData
     );
 
-    const result = (interactor as any).findNodeContainsUseCase('src/interface_adapters/uc-1/User-Controller-Process User.java-usecase1', 'Process User');
+    const result = (interactor as any).findNodeContainsUseCase(
+      'src/interface_adapters/uc-1/User-Controller-Process User.java-usecase1',
+      'Process User'
+    );
     expect(result).toBe(false);
   });
 });
