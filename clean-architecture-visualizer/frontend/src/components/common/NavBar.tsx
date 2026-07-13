@@ -1,4 +1,4 @@
-import { Link, NavLink, useLocation } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import { Box, Typography } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import CaveLogo from '../../assets/locales/logo_dark.svg';
@@ -9,30 +9,29 @@ const LOGO_GROUP_WIDTH = 180;
 const NAV_ITEM_MIN_WIDTH = 100;
 const NAV_ITEM_HEIGHT = 40;
 
-const NAV_ITEMS = [
-  { to: '/', labelKey: 'navBar.home', end: true as const },
-  { to: '/learning', labelKey: 'navBar.diagram', matchDiagram: true },
-  { to: '/test-yourself', labelKey: 'navBar.testYourself' },
-] as const;
+const CAVE_LEARN_URL =
+  'https://ca-visualizer-for-education.github.io/cave-learn/';
 
-function isNavItemActive(
-  to: string,
-  matchDiagram: boolean | undefined,
-  pathname: string,
-  navIsActive: boolean
-): boolean {
-  if (to === '/') {
-    return navIsActive;
-  }
-  if (matchDiagram) {
-    return navIsActive || pathname.includes('/diagram');
-  }
-  return navIsActive;
-}
+const navItemSx = (isActive: boolean) => ({
+  flexShrink: 0,
+  minWidth: NAV_ITEM_MIN_WIDTH,
+  width: NAV_ITEM_MIN_WIDTH,
+  height: NAV_ITEM_HEIGHT,
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  px: 2.5,
+  borderRadius: '999px',
+  fontSize: 15,
+  fontWeight: 500,
+  lineHeight: 1,
+  color: isActive ? 'text.primary' : 'text.secondary',
+  bgcolor: isActive ? '#f5f1ea' : 'transparent',
+  whiteSpace: 'nowrap',
+});
 
 export default function NavBar() {
   const { t } = useTranslation('common');
-  const { pathname } = useLocation();
 
   return (
     <Box
@@ -90,23 +89,6 @@ export default function NavBar() {
         >
           {t('branding.name')}
         </Typography>
-        <Box
-          component="span"
-          sx={{
-            flexShrink: 0,
-            bgcolor: 'useCases.main',
-            color: '#fff',
-            fontSize: 10,
-            fontWeight: 700,
-            lineHeight: 1.2,
-            px: 0.75,
-            py: 0.25,
-            borderRadius: '4px',
-            letterSpacing: '0.06em',
-          }}
-        >
-          {t('navBar.learnBadge')}
-        </Box>
       </Box>
 
       <Box
@@ -118,48 +100,45 @@ export default function NavBar() {
           gap: 1,
         }}
       >
-        {NAV_ITEMS.map(({ to, labelKey, ...item }) => (
-          <NavLink
-            key={to}
-            to={to}
-            end={'end' in item ? item.end : false}
-            style={{ textDecoration: 'none', flexShrink: 0 }}
-          >
-            {({ isActive: navIsActive }) => {
-              const isActive = isNavItemActive(
-                to,
-                'matchDiagram' in item ? item.matchDiagram : false,
-                pathname,
-                navIsActive
-              );
+        <NavLink to="/" end style={{ textDecoration: 'none', flexShrink: 0 }}>
+          {({ isActive }) => (
+            <Box component="span" sx={navItemSx(isActive)}>
+              {t('navBar.home')}
+            </Box>
+          )}
+        </NavLink>
 
-              return (
-                <Box
-                  component="span"
-                  sx={{
-                    flexShrink: 0,
-                    minWidth: NAV_ITEM_MIN_WIDTH,
-                    width: NAV_ITEM_MIN_WIDTH,
-                    height: NAV_ITEM_HEIGHT,
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    px: 2.5,
-                    borderRadius: '999px',
-                    fontSize: 15,
-                    fontWeight: 500,
-                    lineHeight: 1,
-                    color: isActive ? 'text.primary' : 'text.secondary',
-                    bgcolor: isActive ? '#f5f1ea' : 'transparent',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {t(labelKey)}
-                </Box>
-              );
-            }}
-          </NavLink>
-        ))}
+        <NavLink
+          to="/checker"
+          style={{ textDecoration: 'none', flexShrink: 0 }}
+        >
+          {({ isActive }) => (
+            <Box component="span" sx={navItemSx(isActive)}>
+              {t('navBar.checker')}
+            </Box>
+          )}
+        </NavLink>
+
+        <Box
+          component="a"
+          href={CAVE_LEARN_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          sx={{ ...navItemSx(false), textDecoration: 'none' }}
+        >
+          {t('navBar.learn')}
+        </Box>
+
+        <NavLink
+          to="/project-starter"
+          style={{ textDecoration: 'none', flexShrink: 0 }}
+        >
+          {({ isActive }) => (
+            <Box component="span" sx={navItemSx(isActive)}>
+              {t('navBar.start')}
+            </Box>
+          )}
+        </NavLink>
       </Box>
     </Box>
   );

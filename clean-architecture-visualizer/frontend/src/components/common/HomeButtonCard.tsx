@@ -17,6 +17,8 @@ interface HomeButtonCardProps {
   iconColor?: string;
 }
 
+const isExternalLink = (to: string) => /^https?:\/\//.test(to);
+
 const HomeButtonCard = ({
   title,
   description,
@@ -25,11 +27,14 @@ const HomeButtonCard = ({
   bgColor,
   iconColor = 'white',
 }: HomeButtonCardProps) => {
+  const linkProps = isExternalLink(to)
+    ? { component: 'a', href: to, target: '_blank', rel: 'noopener noreferrer' }
+    : { component: RouterLink, to };
+
   return (
     <Card elevation={0} sx={{ background: 'transparent', width: '100%' }}>
       <CardActionArea
-        component={RouterLink}
-        to={to}
+        {...linkProps}
         sx={{
           borderRadius: 4,
           p: 2,

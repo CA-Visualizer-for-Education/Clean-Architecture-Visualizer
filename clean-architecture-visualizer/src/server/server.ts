@@ -8,7 +8,6 @@ import { fileURLToPath } from 'url';
 import { createServer as createViteServer, type ViteDevServer } from 'vite';
 
 import analysis from './routes/analysis.js';
-import codebase from './routes/codebase.js';
 import template from './routes/template.js';
 
 let server: Server | null = null;
@@ -30,7 +29,6 @@ export async function startServer(backendOnly: boolean): Promise<Server> {
 
   // Routes
   app.use('/api', analysis);
-  app.use('/api', codebase);
   app.use('/api', template);
 
   // Create Vite server in middleware mode

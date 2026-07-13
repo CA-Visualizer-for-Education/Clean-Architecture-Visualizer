@@ -5,18 +5,13 @@
   "navBar": {
     "ariaLabel": "Main navigation",
     "home": "Home",
-    "diagram": "Diagram",
-    "testYourself": "Test Yourself",
-    "learnBadge": "LEARN"
-  },
-  "testYourselfPage": {
-    "title": "Test Yourself",
-    "description": "This page is a placeholder. Content coming soon."
+    "checker": "Checker",
+    "learn": "Learn",
+    "start": "Start"
   },
   "navigation": {
     "pages": {
       "home": "Home",
-      "learningMode": "Learning Mode",
       "checkerMode": "Checker Mode",
       "projectStarter": "Project Starter",
       "currentPage": "Current page"
