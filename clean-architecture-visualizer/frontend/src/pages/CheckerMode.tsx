@@ -10,11 +10,7 @@ import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
 import SearchIcon from '@mui/icons-material/Search';
 import CircularProgress from '@mui/material/CircularProgress';
-import {
-  InfoIcon,
-  CheckCircleIcon,
-  ErrorIcon,
-} from '../assets/icons';
+import { InfoIcon, CheckCircleIcon, ErrorIcon } from '../assets/icons';
 import { useAnalysisSummary } from '../actions/useAnalysis';
 import { UseCase, Interaction } from '../lib/types';
 

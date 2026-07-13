@@ -17,23 +17,23 @@ export default function App() {
       <AppGlobalStyles />
       <Router>
         <Navbar />
-            <div style={{ paddingTop: NAV_BAR_HEIGHT }}>
-                <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/learn" element={<LearningMode />} />
-                <Route path="/checker" element={<CheckerMode />} />
-                <Route path="/project-starter" element={<ProjectStarter />} />
-                <Route
-                    path="/use-case/:useCaseId/interaction/:interactionId/diagram"
-                    element={<UseCaseInteractionDiagram />}
-                />
-                <Route
-                    path="/use-case/:useCaseId/interaction/:interactionId/code"
-                    element={<UseCaseInteractionCode />}
-                />
-                </Routes>
-            </div>
-        </Router>
+        <div style={{ paddingTop: NAV_BAR_HEIGHT }}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/learn" element={<LearningMode />} />
+            <Route path="/checker" element={<CheckerMode />} />
+            <Route path="/project-starter" element={<ProjectStarter />} />
+            <Route
+              path="/use-case/:useCaseId/interaction/:interactionId/diagram"
+              element={<UseCaseInteractionDiagram />}
+            />
+            <Route
+              path="/use-case/:useCaseId/interaction/:interactionId/code"
+              element={<UseCaseInteractionCode />}
+            />
+          </Routes>
+        </div>
+      </Router>
     </ThemeProvider>
   );
 }

@@ -1,20 +1,20 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Box } from '@mui/material';
-import styles from './HomeButtonCard.module.css'
+import styles from './HomeButtonCard.module.css';
 
 interface HomeButtonCardProps {
-  title: string
-  description: string
-  to: string
-  icon: React.ReactElement
-  bgColor?: string
-  iconColor?: string
-  badge?: string
-  badgeBg?: string
-  badgeColor?: string
-  ctaLabel?: string
-  ctaColor?: string
+  title: string;
+  description: string;
+  to: string;
+  icon: React.ReactElement;
+  bgColor?: string;
+  iconColor?: string;
+  badge?: string;
+  badgeBg?: string;
+  badgeColor?: string;
+  ctaLabel?: string;
+  ctaColor?: string;
 }
 
 export default function HomeButtonCard({
@@ -46,10 +46,7 @@ export default function HomeButtonCard({
           </Box>
         )}
 
-        <Box
-          className={styles.illustrationInner}
-          sx={{ bgcolor: bgColor }}
-        >
+        <Box className={styles.illustrationInner} sx={{ bgcolor: bgColor }}>
           {React.cloneElement(icon, {
             sx: {
               ...icon.props.sx,
@@ -65,15 +62,11 @@ export default function HomeButtonCard({
 
         <p className={styles.description}>{description}</p>
 
-        <Box
-          component="span"
-          className={styles.cta}
-          sx={{ color: ctaColor }}
-        >
+        <Box component="span" className={styles.cta} sx={{ color: ctaColor }}>
           {ctaLabel}
           <span aria-hidden>›</span>
         </Box>
       </div>
     </Link>
-  )
+  );
 }

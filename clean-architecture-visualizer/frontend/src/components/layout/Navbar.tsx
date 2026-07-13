@@ -1,56 +1,56 @@
-'use client'
+'use client';
 
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom';
 // import { useState, useRef, useEffect } from 'react'
-import { useState, useEffect } from 'react'
-import { asset } from '../../lib/asset'
-import styles from './Navbar.module.css'
+import { useState, useEffect } from 'react';
+import { asset } from '../../lib/asset';
+import styles from './Navbar.module.css';
 
-export const NAV_BAR_HEIGHT = 64
+export const NAV_BAR_HEIGHT = 64;
 
 const NAV_ITEMS = [
   { href: '/', label: 'Home', exact: true as const },
   { href: '/checker', label: 'Checker', matchDiagram: true as const },
   { href: '/learn', label: 'Learn' },
   { href: '/project-starter', label: 'Project Starter' },
-] as const
+] as const;
 
 function isNavItemActive(
   href: string,
   exact: boolean | undefined,
   matchDiagram: boolean | undefined,
-  pathname: string,
+  pathname: string
 ): boolean {
-  if (exact) return pathname === href
-  if (matchDiagram) return pathname === href || pathname.startsWith(`${href}/`)
-  return pathname === href || pathname.startsWith(`${href}/`)
+  if (exact) return pathname === href;
+  if (matchDiagram) return pathname === href || pathname.startsWith(`${href}/`);
+  return pathname === href || pathname.startsWith(`${href}/`);
 }
 
 export default function Navbar() {
   const pathname = useLocation().pathname;
-  const [menuOpen, setMenuOpen] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false);
 
-//   useEffect(() => {
-//     setMenuOpen(false)
-//   }, [pathname])
+  //   useEffect(() => {
+  //     setMenuOpen(false)
+  //   }, [pathname])
 
   useEffect(() => {
-    if (!menuOpen) return
+    if (!menuOpen) return;
 
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setMenuOpen(false)
-    }
-    document.addEventListener('keydown', onKeyDown)
-    return () => document.removeEventListener('keydown', onKeyDown)
-  }, [menuOpen])
+      if (e.key === 'Escape') setMenuOpen(false);
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [menuOpen]);
 
   const navLinks = NAV_ITEMS.map(({ href, label, ...item }) => {
     const isActive = isNavItemActive(
       href,
       'exact' in item ? item.exact : false,
       'matchDiagram' in item ? item.matchDiagram : false,
-      pathname,
-    )
+      pathname
+    );
 
     return (
       <Link
@@ -61,13 +61,24 @@ export default function Navbar() {
       >
         {label}
       </Link>
-    )
-  })
+    );
+  });
 
   return (
     <nav className={styles.navbar} aria-label="Main navigation">
-      <Link to="/" className={styles.logo} aria-label="Home" onClick={() => setMenuOpen(false)}>
-        <img src={asset('/logo_dark.svg')} alt="" width={36} height={36} className={styles.logoImage} />
+      <Link
+        to="/"
+        className={styles.logo}
+        aria-label="Home"
+        onClick={() => setMenuOpen(false)}
+      >
+        <img
+          src={asset('/logo_dark.svg')}
+          alt=""
+          width={36}
+          height={36}
+          className={styles.logoImage}
+        />
         <span className={styles.logoText}>CAVE</span>
       </Link>
 
@@ -105,5 +116,5 @@ export default function Navbar() {
         </>
       )}
     </nav>
-  )
+  );
 }

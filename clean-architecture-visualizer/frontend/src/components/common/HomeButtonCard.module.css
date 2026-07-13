@@ -5,7 +5,9 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 .card:hover {
@@ -81,4 +83,6 @@
   margin-top: var(--space-1);
 }
 
-.cta:hover { opacity: 0.75; }
+.cta:hover {
+  opacity: 0.75;
+}

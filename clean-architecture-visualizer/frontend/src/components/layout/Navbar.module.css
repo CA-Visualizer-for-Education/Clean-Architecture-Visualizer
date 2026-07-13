@@ -111,7 +111,9 @@
   width: 100%;
   background-color: currentColor;
   border-radius: 1px;
-  transition: transform 0.2s ease, opacity 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
 }
 
 .menuIconOpen > span:nth-child(1) {

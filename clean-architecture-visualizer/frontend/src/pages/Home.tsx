@@ -14,44 +14,44 @@ const Home = () => {
   const { t } = useTranslation('home');
   const [infoOpen, setInfoOpen] = React.useState(false);
 
-    // Define the navigation data for the grid
-    const navItems = [
-        {
-            title: t('cards.checker.title'),
-            description: t('cards.checker.description'),
-            to: "/checker",
-            icon: <CheckCircleOutlineIcon />,
-            iconColor: "adapters.main",
-            badge: t('cards.checker.badge'),
-            badgeBg: "adapters.light",
-            badgeColor: "adapters.dark",
-            ctaLabel: t('cards.checker.cta'),
-            ctaColor: "adapters.dark",
-        },
-        {
-            title: t('cards.learn.title'),
-            description: t('cards.learn.description'),
-            to: "/learn",
-            icon: <MenuBookIcon />,
-            iconColor: "drivers.main",
-            badge: t('cards.learn.badge'),
-            badgeBg: "drivers.light",
-            badgeColor: "drivers.dark",
-            ctaLabel: t('cards.learn.cta'),
-            ctaColor: "drivers.dark",
-        },
-        {
-            title: t('cards.starter.title'),
-            description: t('cards.starter.description'),
-            to: "/project-starter",
-            icon: <AssignmentOutlinedIcon />,
-            iconColor: "useCases.dark",
-            badge: t('cards.starter.badge'),
-            badgeBg: "useCases.light",
-            badgeColor: "useCases.dark",
-            ctaLabel: t('cards.starter.cta'),
-            ctaColor: "useCases.dark"
-        },
+  // Define the navigation data for the grid
+  const navItems = [
+    {
+      title: t('cards.checker.title'),
+      description: t('cards.checker.description'),
+      to: '/checker',
+      icon: <CheckCircleOutlineIcon />,
+      iconColor: 'adapters.main',
+      badge: t('cards.checker.badge'),
+      badgeBg: 'adapters.light',
+      badgeColor: 'adapters.dark',
+      ctaLabel: t('cards.checker.cta'),
+      ctaColor: 'adapters.dark',
+    },
+    {
+      title: t('cards.learn.title'),
+      description: t('cards.learn.description'),
+      to: '/learn',
+      icon: <MenuBookIcon />,
+      iconColor: 'drivers.main',
+      badge: t('cards.learn.badge'),
+      badgeBg: 'drivers.light',
+      badgeColor: 'drivers.dark',
+      ctaLabel: t('cards.learn.cta'),
+      ctaColor: 'drivers.dark',
+    },
+    {
+      title: t('cards.starter.title'),
+      description: t('cards.starter.description'),
+      to: '/project-starter',
+      icon: <AssignmentOutlinedIcon />,
+      iconColor: 'useCases.dark',
+      badge: t('cards.starter.badge'),
+      badgeBg: 'useCases.light',
+      badgeColor: 'useCases.dark',
+      ctaLabel: t('cards.starter.cta'),
+      ctaColor: 'useCases.dark',
+    },
   ];
 
   return (
