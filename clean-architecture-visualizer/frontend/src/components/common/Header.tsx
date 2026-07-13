@@ -1,9 +1,8 @@
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import type { ReactNode } from 'react';
 import Dropdown, { DropdownOption } from './Dropdown.tsx';
-import { Box, Paper, Typography } from '@mui/material';
-import { HomeIcon } from '../../assets/icons';
+import { Box, Paper } from '@mui/material';
 import { useAnalysisSummary } from '../../actions/useAnalysis.ts';
 import { Interaction, UseCase } from '../../lib/types.ts';
 

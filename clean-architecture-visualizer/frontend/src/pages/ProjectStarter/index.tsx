@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Box, Divider, Snackbar, Alert, IconButton } from '@mui/material';
+import { Box, Divider, Snackbar, Alert } from '@mui/material';
 import '../../i18n/config';
 import { useTranslation } from 'react-i18next';
 import {
@@ -16,8 +16,6 @@ import {
   FieldLabel,
   StyledTextField,
 } from './layout';
-import { Link } from 'react-router-dom';
-import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 
 const ProjectStarter = () => {
   const { t } = useTranslation('projectStarter');
