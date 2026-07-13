@@ -24,6 +24,7 @@ We teach:
 - How to grow a large program in a team using all of this (with a full-semester project)
 
 The problem: lots of students struggle to understand Clean Architecture (CA) and buy into it. Some start to get it once they really understand that the context is a large, long-lived project rather than a 4-month toy program. I want to make this much easier for them: I want a CA visualizer and explorer that sits on top of a Git repo.
+
 ## Course principles
 
 Here are a set of principles that we use to motivate a layered architecture. The bold words are CA terminology.
@@ -43,15 +44,17 @@ Here are a set of principles that we use to motivate a layered architecture. The
   - The Interactor invokes a **Presenter**, sending it any new data to show to the user as an **Output Data** object.
   - The Presenter updates any relevant View Models.
   - Using the Observer pattern, the View reacts to the View Model changes and updates the UI.
+
 ### The Interactors are the beating hearts of a CA program
 
 Want to swap the UI and DB? **The Interactor code should not change**, nor should the unit tests for that Interactor. That means Interactors are isolated: they depend on nothing but Entities, so each Interactor needs to specify the following:
 
-* How a Controller should invoke the Interactor (an **Input Boundary**: a Java interface, usually with a single method)
-- What user info the Controller needs to send (in an **Input Data** object, which is the only parameter in the Input Boundary; sometimes called a "request model")
-- What CRUD operations the Interactor needs from a Data Access object (another Java interface or set of interfaces)
-- What information it needs to display to the user (an **Output Data** object; sometimes called a “response model”)
-- What method the Interactor will call on the Presenter (an **Output Boundary** that the Presenter implements: a Java interface, usually with a single method)
+- How a Controller should invoke the Interactor (an **Input Boundary**: a Java interface, usually with a single method)
+
+* What user info the Controller needs to send (in an **Input Data** object, which is the only parameter in the Input Boundary; sometimes called a "request model")
+* What CRUD operations the Interactor needs from a Data Access object (another Java interface or set of interfaces)
+* What information it needs to display to the user (an **Output Data** object; sometimes called a “response model”)
+* What method the Interactor will call on the Presenter (an **Output Boundary** that the Presenter implements: a Java interface, usually with a single method)
 
 Here’s the cycle in a nutshell. All the bold parts are entirely new code for each user interaction. Follow the data through the image below.
 

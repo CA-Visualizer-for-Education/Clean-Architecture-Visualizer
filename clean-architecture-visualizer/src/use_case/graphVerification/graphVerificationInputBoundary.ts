@@ -1,4 +1,5 @@
+import type { GraphVerificationInputData } from './graphVerificationInputData.js';
+
 export interface GraphVerificationInputBoundary {
-    execute(): Promise<void>;
-    toggleCommandLine(): void
+  execute(inputData: GraphVerificationInputData): Promise<void>;
 }

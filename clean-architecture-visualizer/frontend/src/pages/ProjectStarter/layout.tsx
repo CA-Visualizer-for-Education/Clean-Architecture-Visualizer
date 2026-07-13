@@ -1,5 +1,12 @@
 import { styled } from '@mui/material/styles';
-import { Box, Typography, Button, Container, TextField, TypographyProps } from '@mui/material';
+import {
+  Box,
+  Typography,
+  Button,
+  Container,
+  TextField,
+  TypographyProps,
+} from '@mui/material';
 
 export const PageWrapper = styled(Container)(({ theme }) => ({
   paddingTop: theme.spacing(6),
@@ -60,7 +67,7 @@ export const FieldLabel = styled(Typography)<FieldLabelProps>(({ theme }) => ({
   fontWeight: 700,
   marginBottom: theme.spacing(1),
   color: theme.palette.text.primary,
-  display: 'block', 
+  display: 'block',
 })) as typeof Typography;
 
 export const StyledTextField = styled(TextField)(({ theme }) => ({

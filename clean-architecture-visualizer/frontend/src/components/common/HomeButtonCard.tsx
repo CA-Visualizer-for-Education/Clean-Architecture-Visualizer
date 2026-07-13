@@ -1,6 +1,6 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
-import { Box } from '@mui/material'
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { Box } from '@mui/material';
 import styles from './HomeButtonCard.module.css'
 
 interface HomeButtonCardProps {

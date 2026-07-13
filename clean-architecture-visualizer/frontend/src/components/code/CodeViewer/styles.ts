@@ -22,7 +22,7 @@ export const EditorCard = styled(Paper)(({ theme }) => ({
   overflow: 'hidden',
   border: `1px solid ${theme.palette.divider}`,
   boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.05)',
-  flexGrow: 1, 
+  flexGrow: 1,
   display: 'flex',
   flexDirection: 'column',
   paddingTop: theme.spacing(2),
@@ -40,10 +40,12 @@ export const LayerChip = styled(Chip, {
   fontSize: '0.75rem',
 }));
 
-export const StatusContainer = styled(Box)<{ isError?: boolean }>(({ isError, theme }) => ({
-  padding: theme.spacing(4),
-  color: isError ? theme.palette.error.main : theme.palette.text.secondary,
-}));
+export const StatusContainer = styled(Box)<{ isError?: boolean }>(
+  ({ isError, theme }) => ({
+    padding: theme.spacing(4),
+    color: isError ? theme.palette.error.main : theme.palette.text.secondary,
+  })
+);
 
 export const BreadcrumbPath = styled(Typography, {
   shouldForwardProp: (prop) => prop !== 'isLast',

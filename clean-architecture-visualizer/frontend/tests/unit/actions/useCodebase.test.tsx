@@ -1,7 +1,11 @@
 import { describe, it, expect } from 'vitest';
 import { http, HttpResponse } from 'msw';
-import { renderHook, waitFor } from '../../test-utils'; 
-import { useFileTree, useFileViewer, useFileRelations } from '@/actions/useCodebase';
+import { renderHook, waitFor } from '../../test-utils';
+import {
+  useFileTree,
+  useFileViewer,
+  useFileRelations,
+} from '@/actions/useCodebase';
 import { server } from '../../../src/mocks/server';
 
 describe('Codebase Hooks', () => {
@@ -31,7 +35,7 @@ describe('Codebase Hooks', () => {
 
     const { result } = renderHook(() => useFileViewer(interactionId, filePath));
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    
+
     // MSW params are automatically decoded, so we check if it matched the original
     expect(capturedPath).toBe(filePath);
     expect(result.current.data.content).toContain('User');
@@ -40,7 +44,9 @@ describe('Codebase Hooks', () => {
   it('useFileRelations is disabled if either ID or path is missing', () => {
     const { result, rerender } = renderHook(
       ({ id, path }) => useFileRelations(id, path),
-      { initialProps: { id: '', path: 'test.ts' } }
+      {
+        initialProps: { id: '', path: 'test.ts' },
+      }
     );
 
     expect(result.current.fetchStatus).toBe('idle');

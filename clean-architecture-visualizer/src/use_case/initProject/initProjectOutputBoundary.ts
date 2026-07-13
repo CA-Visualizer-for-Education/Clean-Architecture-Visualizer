@@ -1,3 +1,3 @@
 export interface InitProjectOutputBoundary {
-    getOutputData(): boolean;
+  getOutputData(): boolean;
 }

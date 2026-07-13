@@ -32,8 +32,8 @@ export default defineConfig({
     trace: 'on-first-retry',
 
     extraHTTPHeaders: {
-    'x-test-mode': 'true',
-  },
+      'x-test-mode': 'true',
+    },
   },
 
   /* Configure projects for major browsers */

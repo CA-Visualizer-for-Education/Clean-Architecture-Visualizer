@@ -1,14 +1,14 @@
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { FileNode } from '../../../lib';
-import { 
-  NodeContainer, 
-  ExpandIconWrapper, 
-  NodeLabel, 
+import {
+  NodeContainer,
+  ExpandIconWrapper,
+  NodeLabel,
   NodeText,
   StyledFolderIcon,
   StyledFolderOpenIcon,
-  StyledFileIcon 
+  StyledFileIcon,
 } from './styles';
 
 export interface TreeNodeProps {
@@ -41,33 +41,44 @@ export const TreeNode = ({
     <>
       <NodeContainer isActive={isActive} depth={depth} onClick={handleToggle}>
         <ExpandIconWrapper>
-          {isDir && (isExpanded ? <ExpandMoreIcon sx={{ fontSize: 18 }} /> : <ChevronRightIcon sx={{ fontSize: 18 }} />)}
+          {isDir &&
+            (isExpanded ? (
+              <ExpandMoreIcon sx={{ fontSize: 18 }} />
+            ) : (
+              <ChevronRightIcon sx={{ fontSize: 18 }} />
+            ))}
         </ExpandIconWrapper>
-        
+
         <NodeLabel>
           {isDir ? (
-            isExpanded ? <StyledFolderOpenIcon color="primary" /> : <StyledFolderIcon color="action" />
+            isExpanded ? (
+              <StyledFolderOpenIcon color="primary" />
+            ) : (
+              <StyledFolderIcon color="action" />
+            )
           ) : (
-            <StyledFileIcon color={isActive ? "primary" : "action"} />
-          )} 
-          
+            <StyledFileIcon color={isActive ? 'primary' : 'action'} />
+          )}
+
           <NodeText variant="body2" isActive={isActive}>
             {node.name}
           </NodeText>
         </NodeLabel>
       </NodeContainer>
 
-      {isDir && isExpanded && node.children?.map((child) => (
-        <TreeNode
-          key={child.id}
-          node={child}
-          onSelect={onSelect}
-          activeFilePath={activeFilePath}
-          expandedFolders={expandedFolders}
-          toggleFolder={toggleFolder}
-          depth={depth + 1}
-        />
-      ))}
+      {isDir &&
+        isExpanded &&
+        node.children?.map((child) => (
+          <TreeNode
+            key={child.id}
+            node={child}
+            onSelect={onSelect}
+            activeFilePath={activeFilePath}
+            expandedFolders={expandedFolders}
+            toggleFolder={toggleFolder}
+            depth={depth + 1}
+          />
+        ))}
     </>
   );
 };

@@ -1,13 +1,12 @@
 export class GetViolationsOutputData {
+  private apiOutputData?: { [key: string]: any };
 
-    private apiOutputData?: { [key: string]: any }
+  setOutputData(outputData: { [key: string]: any }[]) {
+    this.apiOutputData = outputData;
+  }
 
-    setOutputData(outputData: { [key: string]: any }[]) {
-        this.apiOutputData = outputData;
-    }
-    
-    getOutputData(): object {
-        if (this.apiOutputData) return this.apiOutputData;
-        return {};
-    }
+  getOutputData(): object {
+    if (this.apiOutputData) return this.apiOutputData;
+    return {};
+  }
 }

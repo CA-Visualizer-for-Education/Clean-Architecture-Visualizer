@@ -17,9 +17,12 @@ This section is for getting the app running quickly and making your first change
 ### Quick start
 
 1. Use Node.js `20.19.0` or later. Verify your local versions before installing dependencies:
+
    ```bash
    node --version
    npm --version
+
+   ```
 
 2. Install dependencies:
 
@@ -104,19 +107,19 @@ npm run preview
 
 The following scripts are defined for development, testing, and quality checks:
 
-| Command | Description |
-| :--- | :--- |
-| `npm run dev` | Starts Vite dev server at `http://localhost:5173`. |
-| `npm run dev:backend` | Starts Vite in backend mode. |
-| `npm run build` | Runs TypeScript project build and production bundling. |
-| `npm run preview` | Serves the local production build for verification. |
-| `npm run setup` | Installs Playwright browsers for e2e tests. |
-| `npm run lint` | Runs ESLint with warnings treated as failures. |
-| `npm run type-check` | Runs TypeScript checks without emitting files. |
-| `npm run test:unit` | Executes Vitest unit tests. |
-| `npm run test:e2e` | Runs Playwright end-to-end tests. |
-| `npm run test:e2e:ui` | Runs Playwright tests in UI mode. |
-| `npm run test:e2e:debug` | Runs Playwright in debug mode. |
+| Command                  | Description                                            |
+| :----------------------- | :----------------------------------------------------- |
+| `npm run dev`            | Starts Vite dev server at `http://localhost:5173`.     |
+| `npm run dev:backend`    | Starts Vite in backend mode.                           |
+| `npm run build`          | Runs TypeScript project build and production bundling. |
+| `npm run preview`        | Serves the local production build for verification.    |
+| `npm run setup`          | Installs Playwright browsers for e2e tests.            |
+| `npm run lint`           | Runs ESLint with warnings treated as failures.         |
+| `npm run type-check`     | Runs TypeScript checks without emitting files.         |
+| `npm run test:unit`      | Executes Vitest unit tests.                            |
+| `npm run test:e2e`       | Runs Playwright end-to-end tests.                      |
+| `npm run test:e2e:ui`    | Runs Playwright tests in UI mode.                      |
+| `npm run test:e2e:debug` | Runs Playwright in debug mode.                         |
 
 ### Suggested daily loop
 
@@ -206,9 +209,9 @@ Example:
 import { styled } from '@mui/material/styles';
 
 export const Panel = styled('section')(({ theme }) => ({
-   backgroundColor: theme.palette.background.paper,
-   color: theme.palette.text.primary,
-   border: `1px solid ${theme.palette.divider}`,
+  backgroundColor: theme.palette.background.paper,
+  color: theme.palette.text.primary,
+  border: `1px solid ${theme.palette.divider}`,
 }));
 ```
 
@@ -234,15 +237,15 @@ Suggested pattern:
 import { Container, Title } from './styles';
 
 type Props = {
-   title: string;
+  title: string;
 };
 
 export default function FeatureCard({ title }: Props) {
-   return (
-      <Container>
-         <Title>{title}</Title>
-      </Container>
-   );
+  return (
+    <Container>
+      <Title>{title}</Title>
+    </Container>
+  );
 }
 ```
 
@@ -251,14 +254,14 @@ export default function FeatureCard({ title }: Props) {
 import { styled } from '@mui/material/styles';
 
 export const Container = styled('article')(({ theme }) => ({
-   backgroundColor: theme.palette.background.paper,
-   borderRadius: theme.shape.borderRadius,
-   padding: theme.spacing(2),
+  backgroundColor: theme.palette.background.paper,
+  borderRadius: theme.shape.borderRadius,
+  padding: theme.spacing(2),
 }));
 
 export const Title = styled('h3')(({ theme }) => ({
-   color: theme.palette.text.primary,
-   margin: 0,
+  color: theme.palette.text.primary,
+  margin: 0,
 }));
 ```
 
@@ -315,12 +318,12 @@ Example JSON (`frontend/src/i18n/locales/en/home.json`):
 
 ```json
 {
-   "cards": {
-      "checker": {
-         "title": "Checker Mode",
-         "description": "Validate architecture violations in your project"
-      }
-   }
+  "cards": {
+    "checker": {
+      "title": "Checker Mode",
+      "description": "Validate architecture violations in your project"
+    }
+  }
 }
 ```
 
@@ -330,8 +333,8 @@ Example JSON (`frontend/src/i18n/locales/en/home.json`):
 import { useTranslation } from 'react-i18next';
 
 export default function Example() {
-   const { t } = useTranslation('home');
-   return <h2>{t('cards.checker.title')}</h2>;
+  const { t } = useTranslation('home');
+  return <h2>{t('cards.checker.title')}</h2>;
 }
 ```
 
@@ -351,4 +354,3 @@ Current codebase patterns:
 - Prefer feature-scoped keys such as `cards.checker.title` instead of flat keys.
 - Keep key names stable and descriptive; update values more often than key identifiers.
 - Reuse existing keys in `common.json` for shared labels/buttons before creating duplicates.
-

@@ -39,7 +39,7 @@ src/
     └── java/
 ```
 
-Run this first in your project folder. Cave will scaffold the recommended folder layout so you can start developing! These folders will not immediately be tracked by git as they are empty. If you want to 
+Run this first in your project folder. Cave will scaffold the recommended folder layout so you can start developing! These folders will not immediately be tracked by git as they are empty. If you want to
 
 ---
 
@@ -89,6 +89,18 @@ Verifies your project's adherence to clean architecture — no need to open the 
 ```bash
 cave verify
 ```
+
+---
+
+### `cave end`
+
+Ends the project by closing the server and cleaning up the database.
+
+```bash
+cave end
+```
+
+---
 
 Cave will analyze your project and report any violations of clean architecture principles directly in your terminal.
 

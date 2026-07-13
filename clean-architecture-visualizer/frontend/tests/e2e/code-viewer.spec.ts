@@ -1,8 +1,9 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Code Viewer E2E', () => {
-
-  test('should expand folders, open a file, and render in Monaco', async ({ page }) => {
+  test('should expand folders, open a file, and render in Monaco', async ({
+    page,
+  }) => {
     // 1. Navigate to the Code View
     await page.goto('/use-case/1/interaction/1/code');
 
@@ -35,7 +36,7 @@ test.describe('Code Viewer E2E', () => {
     // 7. Verify the editor contains code
     // check for a common Java keyword that should be in the file
     await expect(monacoEditor).toContainText('public class');
-    
+
     // 8. Verify breadcrumbs update
     await expect(page.getByText('SignupController.java')).toHaveCount(2);
   });

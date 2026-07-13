@@ -1,3 +1,3 @@
 export interface GetRelationsOutputBoundary {
-    getOutputData(): object;
+  getOutputData(): object;
 }

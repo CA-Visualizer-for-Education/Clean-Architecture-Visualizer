@@ -11,8 +11,8 @@ import enUseCaseInteractionDiagram from './locales/en/useCaseInteractionDiagram.
 import enProjectStarter from './locales/en/projectStarter.json';
 import enLearning from './locales/en/learning.json';
 
-const isTestMode = 
-  import.meta.env.VITE_TEST_MODE === 'true' || 
+const isTestMode =
+  import.meta.env.VITE_TEST_MODE === 'true' ||
   new URLSearchParams(window.location.search).get('lng') === 'cimode';
 
 i18n.use(initReactI18next).init({

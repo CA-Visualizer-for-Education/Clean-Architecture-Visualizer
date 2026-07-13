@@ -22,17 +22,17 @@ interface HomeButtonGridProps {
 
 const HomeButtonGrid = ({ items }: HomeButtonGridProps) => {
   return (
-    <Grid 
-      container 
-      spacing={2} 
-      justifyContent="center" 
+    <Grid
+      container
+      spacing={2}
+      justifyContent="center"
       sx={{ flexWrap: { xs: 'wrap', md: 'nowrap' } }}
     >
       {items.map((item) => (
-        <Grid 
+        <Grid
           key={item.to}
-          size={{ xs: 12, md: 4 }} 
-          display="flex" 
+          size={{ xs: 12, md: 4 }}
+          display="flex"
           justifyContent="center"
         >
           <HomeButtonCard

@@ -12,44 +12,46 @@ describe('FileExplorer Component', () => {
   };
 
   const mockFileTree: FileNode = {
-  id: 'root',
-  name: 'root',
-  type: 'directory',
-  path: '/',
-  children: [
-    { id: '1', name: 'src', type: 'directory', path: 'src/', children: [] },
-    { id: '2', name: 'package.json', type: 'file', path: 'package.json' },
-  ],
-};
+    id: 'root',
+    name: 'root',
+    type: 'directory',
+    path: '/',
+    children: [
+      { id: '1', name: 'src', type: 'directory', path: 'src/', children: [] },
+      { id: '2', name: 'package.json', type: 'file', path: 'package.json' },
+    ],
+  };
 
-it('toggles folder expansion when the icon is clicked', async () => {
-  server.use(
-    http.get('*/api/codebase/file-tree', () => HttpResponse.json(mockFileTree))
-  );
+  it('toggles folder expansion when the icon is clicked', async () => {
+    server.use(
+      http.get('*/api/codebase/file-tree', () =>
+        HttpResponse.json(mockFileTree)
+      )
+    );
 
-  render(<FileExplorer {...defaultProps} />);
+    render(<FileExplorer {...defaultProps} />);
 
-  await screen.findByText('src');
-  const toggleIcon = screen.getByTestId('ChevronRightIcon');
-  
-  fireEvent.click(toggleIcon);
+    await screen.findByText('src');
+    const toggleIcon = screen.getByTestId('ChevronRightIcon');
 
-  const expandedIcon = await screen.findByTestId('ExpandMoreIcon');
-  expect(expandedIcon).toBeInTheDocument();
-});
+    fireEvent.click(toggleIcon);
 
-it('auto-expands folders based on activeFilePath', async () => {
-  server.use(
-    http.get('*/api/codebase/file-tree', () => HttpResponse.json(mockFileTree))
-  );
+    const expandedIcon = await screen.findByTestId('ExpandMoreIcon');
+    expect(expandedIcon).toBeInTheDocument();
+  });
 
-  render(
-    <FileExplorer {...defaultProps} activeFilePath="src/App.tsx" />
-  );
+  it('auto-expands folders based on activeFilePath', async () => {
+    server.use(
+      http.get('*/api/codebase/file-tree', () =>
+        HttpResponse.json(mockFileTree)
+      )
+    );
 
-  await screen.findByText('src');
-  
-  const expandIcon = await screen.findByTestId('ExpandMoreIcon');
-  expect(expandIcon).toBeInTheDocument();
-});
+    render(<FileExplorer {...defaultProps} activeFilePath="src/App.tsx" />);
+
+    await screen.findByText('src');
+
+    const expandIcon = await screen.findByTestId('ExpandMoreIcon');
+    expect(expandIcon).toBeInTheDocument();
+  });
 });

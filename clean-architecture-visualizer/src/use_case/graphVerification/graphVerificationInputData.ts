@@ -1,9 +1,7 @@
 export class GraphVerificationInputData {
-    constructor(
-        private readonly toCommandLine: boolean
-    ) {}
+  constructor(private readonly toCommandLine: boolean) {}
 
-    isToCommandLine(): boolean {
-        return this.toCommandLine;
-    }
+  isToCommandLine(): boolean {
+    return this.toCommandLine;
+  }
 }

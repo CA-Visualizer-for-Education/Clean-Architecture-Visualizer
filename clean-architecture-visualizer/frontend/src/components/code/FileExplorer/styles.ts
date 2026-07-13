@@ -62,12 +62,12 @@ export const NodeText = styled(Typography, {
 
 export const StyledFolderIcon = styled(FolderIcon)(({ theme }) => ({
   fontSize: 18,
-  color: theme.palette.action.active, 
+  color: theme.palette.action.active,
 }));
 
 export const StyledFolderOpenIcon = styled(FolderOpenIcon)(({ theme }) => ({
   fontSize: 18,
-  color: theme.palette.primary.dark, 
+  color: theme.palette.primary.dark,
 }));
 
 export const StyledFileIcon = styled(InsertDriveFileIcon, {

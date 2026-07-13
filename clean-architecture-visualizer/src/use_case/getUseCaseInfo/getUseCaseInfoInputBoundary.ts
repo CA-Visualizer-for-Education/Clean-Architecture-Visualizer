@@ -1,3 +1,3 @@
 export interface GetUseCaseInfoInputBoundary {
-    execute(): Promise<void>;
+  execute(): Promise<void>;
 }

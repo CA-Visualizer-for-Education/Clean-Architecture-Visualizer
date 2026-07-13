@@ -1,6 +1,6 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { StrictMode } from 'react';
 import ReactDOM from 'react-dom/client';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import App from './App';
 import './globals.css';
 import './index.css';
@@ -13,7 +13,9 @@ async function enableMocking() {
   const isBackendMode = import.meta.env.MODE === 'backend';
   const useMsw = isBackendMode
     ? false
-    : (explicitMswToggle ? explicitMswToggle === 'true' : true);
+    : explicitMswToggle
+      ? explicitMswToggle === 'true'
+      : true;
 
   if (!isDev || !useMsw) {
     return;
@@ -21,14 +23,14 @@ async function enableMocking() {
 
   try {
     const { worker } = await import('./mocks/browser');
-    // `worker.start()` returns a promise; we await it to ensure 
+    // `worker.start()` returns a promise; we await it to ensure
     // mocks are ready before the app fetches data.
     await worker.start({
-      onUnhandledRequest: 'warn', 
+      onUnhandledRequest: 'warn',
     });
   } catch (error) {
     console.error('MSW failed to initialize:', error);
-    // don't throw here so the app can still try to load 
+    // don't throw here so the app can still try to load
     // (perhaps connecting to a local backend instead).
   }
 }

@@ -5,7 +5,6 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "dev:backend": "vite --mode backend",
     "build": "tsc -b && vite build",
     "setup": "playwright install",
     "preview": "vite preview",

@@ -1,5 +1,5 @@
-export type cleanLayer = 
-    | "interfaceAdapters"
-    | "frameworksAndDrivers"
-    | "enterpriseBusinessRules"
-    | "applicationBusinessRules"
+export type cleanLayer =
+  | 'interfaceAdapters'
+  | 'frameworksAndDrivers'
+  | 'enterpriseBusinessRules'
+  | 'applicationBusinessRules';

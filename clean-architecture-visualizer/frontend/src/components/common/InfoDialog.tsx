@@ -1,12 +1,12 @@
 import React from 'react';
-import { 
-  Dialog, 
-  DialogContent, 
-  Typography, 
-  IconButton, 
-  Box, 
+import {
+  Dialog,
+  DialogContent,
+  Typography,
+  IconButton,
+  Box,
   Button,
-  Stack
+  Stack,
 } from '@mui/material';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import CloseIcon from '@mui/icons-material/Close';
@@ -20,28 +20,32 @@ interface InfoDialogProps {
   onButtonClick?: () => void;
 }
 
-const InfoDialog = ({ 
-  open, 
-  onClose, 
-  title, 
-  content, 
-  buttonText = "Close", 
-  onButtonClick 
+const InfoDialog = ({
+  open,
+  onClose,
+  title,
+  content,
+  buttonText = 'Close',
+  onButtonClick,
 }: InfoDialogProps) => {
-
   return (
-    <Dialog 
-      open={open} 
+    <Dialog
+      open={open}
       onClose={onClose}
       fullWidth
       maxWidth="sm"
       PaperProps={{
-        sx: { borderRadius: 4, p: 1 }
+        sx: { borderRadius: 4, p: 1 },
       }}
     >
       <IconButton
         onClick={onClose}
-        sx={{ position: 'absolute', right: 16, top: 16, color: 'text.secondary' }}
+        sx={{
+          position: 'absolute',
+          right: 16,
+          top: 16,
+          color: 'text.secondary',
+        }}
       >
         <CloseIcon />
       </IconButton>
@@ -55,26 +59,24 @@ const InfoDialog = ({
               {title}
             </Typography>
           </Box>
-          
+
           {/* Content - This will now render the HTML from i18n */}
-          <Box sx={{ color: 'text.secondary', lineHeight: 1.6 }}>
-            {content}
-          </Box>
+          <Box sx={{ color: 'text.secondary', lineHeight: 1.6 }}>{content}</Box>
 
           {/* Action */}
-          <Button 
-            variant="contained" 
+          <Button
+            variant="contained"
             onClick={onButtonClick || onClose}
             disableElevation
-            sx={{ 
-              bgcolor: 'grey.200', 
+            sx={{
+              bgcolor: 'grey.200',
               color: 'text.primary',
               alignSelf: 'flex-start',
               '&:hover': { bgcolor: 'grey.300' },
               textTransform: 'none',
               fontWeight: '700',
               borderRadius: 2,
-              px: 4
+              px: 4,
             }}
           >
             {buttonText}

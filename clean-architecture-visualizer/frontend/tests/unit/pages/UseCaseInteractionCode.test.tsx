@@ -21,7 +21,9 @@ vi.mock('@/components/code/CodeViewer', () => ({
   }) => (
     <div>
       <span data-testid="active-file-path">{filePath ?? 'none'}</span>
-      <button onClick={() => onFileChange('src/framework_drivers/Database.java')}>
+      <button
+        onClick={() => onFileChange('src/framework_drivers/Database.java')}
+      >
         follow-relation
       </button>
     </div>
@@ -46,7 +48,10 @@ describe('UseCaseInteractionCode Page', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(useNavigate).mockReturnValue(mockNavigate);
-    vi.mocked(useSearchParams).mockReturnValue([new URLSearchParams(), mockSetSearchParams]);
+    vi.mocked(useSearchParams).mockReturnValue([
+      new URLSearchParams(),
+      mockSetSearchParams,
+    ]);
   });
 
   it('renders error message when interactionId is missing', () => {
@@ -54,13 +59,15 @@ describe('UseCaseInteractionCode Page', () => {
 
     render(<UseCaseInteractionCode />);
 
-    expect(screen.getByText(/Error: Interaction ID is missing/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Error: Interaction ID is missing/i)
+    ).toBeInTheDocument();
   });
 
   it('renders the layout with correct action buttons', () => {
-    vi.mocked(useParams).mockReturnValue({ 
-      useCaseId: 'uc-123', 
-      interactionId: 'int-456' 
+    vi.mocked(useParams).mockReturnValue({
+      useCaseId: 'uc-123',
+      interactionId: 'int-456',
     });
 
     render(<UseCaseInteractionCode />);
@@ -70,9 +77,9 @@ describe('UseCaseInteractionCode Page', () => {
   });
 
   it('navigates back to the diagram view when the button is clicked', () => {
-    vi.mocked(useParams).mockReturnValue({ 
-      useCaseId: 'uc-123', 
-      interactionId: 'int-456' 
+    vi.mocked(useParams).mockReturnValue({
+      useCaseId: 'uc-123',
+      interactionId: 'int-456',
     });
 
     render(<UseCaseInteractionCode />);
@@ -80,19 +87,23 @@ describe('UseCaseInteractionCode Page', () => {
     const diagramBtn = screen.getByText('actions.backToDiagram');
     fireEvent.click(diagramBtn);
 
-    expect(mockNavigate).toHaveBeenCalledWith('/use-case/uc-123/interaction/int-456/diagram');
+    expect(mockNavigate).toHaveBeenCalledWith(
+      '/use-case/uc-123/interaction/int-456/diagram'
+    );
   });
 
   it('manages the "Back to Previous" button state correctly', () => {
-    vi.mocked(useParams).mockReturnValue({ 
-      useCaseId: 'uc-123', 
-      interactionId: 'int-456' 
+    vi.mocked(useParams).mockReturnValue({
+      useCaseId: 'uc-123',
+      interactionId: 'int-456',
     });
 
     render(<UseCaseInteractionCode />);
 
-    const backBtn = screen.getByText('actions.backToPrevious').closest('button');
-    
+    const backBtn = screen
+      .getByText('actions.backToPrevious')
+      .closest('button');
+
     expect(backBtn).toBeDisabled();
   });
 
@@ -102,14 +113,16 @@ describe('UseCaseInteractionCode Page', () => {
       interactionId: 'int-456',
     });
     vi.mocked(useSearchParams).mockReturnValue([
-      new URLSearchParams('file=src%2Finterface_adapters%2FUserSignOutController.java'),
+      new URLSearchParams(
+        'file=src%2Finterface_adapters%2FUserSignOutController.java'
+      ),
       mockSetSearchParams,
     ]);
 
     render(<UseCaseInteractionCode />);
 
     expect(screen.getByTestId('active-file-path')).toHaveTextContent(
-      'src/interface_adapters/UserSignOutController.java',
+      'src/interface_adapters/UserSignOutController.java'
     );
   });
 
@@ -123,9 +136,13 @@ describe('UseCaseInteractionCode Page', () => {
 
     fireEvent.click(screen.getByText('pick-file'));
 
-    expect(mockSetSearchParams).toHaveBeenCalledWith(expect.any(Function), { replace: true });
+    expect(mockSetSearchParams).toHaveBeenCalledWith(expect.any(Function), {
+      replace: true,
+    });
 
-    const updateFn = mockSetSearchParams.mock.calls.at(-1)?.[0] as (prev: URLSearchParams) => URLSearchParams;
+    const updateFn = mockSetSearchParams.mock.calls.at(-1)?.[0] as (
+      prev: URLSearchParams
+    ) => URLSearchParams;
     const updated = updateFn(new URLSearchParams());
     expect(updated.get('file')).toBe('src/views/UserSignOutView.java');
   });
@@ -140,9 +157,13 @@ describe('UseCaseInteractionCode Page', () => {
 
     fireEvent.click(screen.getByText('follow-relation'));
 
-    expect(mockSetSearchParams).toHaveBeenCalledWith(expect.any(Function), { replace: true });
+    expect(mockSetSearchParams).toHaveBeenCalledWith(expect.any(Function), {
+      replace: true,
+    });
 
-    const updateFn = mockSetSearchParams.mock.calls.at(-1)?.[0] as (prev: URLSearchParams) => URLSearchParams;
+    const updateFn = mockSetSearchParams.mock.calls.at(-1)?.[0] as (
+      prev: URLSearchParams
+    ) => URLSearchParams;
     const updated = updateFn(new URLSearchParams());
     expect(updated.get('file')).toBe('src/framework_drivers/Database.java');
   });

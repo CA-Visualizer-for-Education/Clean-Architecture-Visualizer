@@ -2,7 +2,6 @@ import { describe, it, expect } from 'vitest';
 import { render, screen, fireEvent } from '../../test-utils';
 import Home from '@/pages/Home';
 
-
 describe('Home Page', () => {
   it('renders the main title from translations', () => {
     render(<Home />);
@@ -18,11 +17,11 @@ describe('Home Page', () => {
 
   it('opens the info dialog when the info button is clicked', async () => {
     render(<Home />);
-    
+
     const infoButton = screen.getByLabelText('infoDialog.title');
     fireEvent.click(infoButton);
 
-  const dialogTitle = await screen.findByText('infoDialog.title');
-  expect(dialogTitle).toBeInTheDocument();
+    const dialogTitle = await screen.findByText('infoDialog.title');
+    expect(dialogTitle).toBeInTheDocument();
   });
 });

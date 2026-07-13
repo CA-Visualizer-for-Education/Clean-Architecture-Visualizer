@@ -1,5 +1,9 @@
 // Clean Architecture layer identifiers used across diagram and code view models.
-export type CALayer = 'Frameworks' | 'InterfaceAdapters' | 'ApplicationBusinessRules' | 'EnterpriseBusinessRules';
+export type CALayer =
+  | 'Frameworks'
+  | 'InterfaceAdapters'
+  | 'ApplicationBusinessRules'
+  | 'EnterpriseBusinessRules';
 export type CALayerKey = 'entities' | 'useCases' | 'adapters' | 'drivers';
 
 // Canonical value sets; related union types are derived from these constants.
@@ -26,10 +30,18 @@ export type CANodeStatus = (typeof NODE_STATUSES)[number];
 export const EDGE_TYPES = ['DEPENDENCY', 'ASSOCIATION', 'INHERITANCE'] as const;
 export type CAEdgeType = (typeof EDGE_TYPES)[number];
 
-export const EDGE_STATUSES = ['VALID', 'VIOLATION', 'INCORRECT_DEPENDENCY'] as const;
+export const EDGE_STATUSES = [
+  'VALID',
+  'VIOLATION',
+  'INCORRECT_DEPENDENCY',
+] as const;
 export type CAEdgeStatus = (typeof EDGE_STATUSES)[number];
 
-export const ARROW_HEAD_TYPES = ['filledTriangle', 'hollowTriangle', 'none'] as const;
+export const ARROW_HEAD_TYPES = [
+  'filledTriangle',
+  'hollowTriangle',
+  'none',
+] as const;
 export type ArrowHeadType = (typeof ARROW_HEAD_TYPES)[number];
 
 // UI metadata for mapping architecture layers to palette groups and display labels.
@@ -79,6 +91,7 @@ export interface InteractionDetail {
   interaction_name: string;
   nodes: CANode[];
   edges: CAEdge[];
+  decoupling: boolean;
 }
 
 // --- Violation Types ---

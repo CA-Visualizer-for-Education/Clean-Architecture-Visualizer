@@ -1,6 +1,6 @@
-import type { CreateUseCaseOutputData } from "./createUseCaseOutputData.js";
+import type { CreateUseCaseOutputData } from './createUseCaseOutputData.js';
 
 export interface CreateUseCaseOutputBoundary {
-    showSuccessView(createUseCaseOutputData: CreateUseCaseOutputData): void;
-    showFailView(error: string): void;
+  showSuccessView(createUseCaseOutputData: CreateUseCaseOutputData): void;
+  showFailView(error: string): void;
 }

@@ -1,8 +1,13 @@
 Angelina Jiang,
 Anna Myllyniemi,
+Annie Wang,
+Cindy Yang,
+Ethan Diep,
 Eric Xu,
+Jayden Ong
 Matthew Dahlgren,
+Olivier Denis,
+Raymond Wu,
 Seokjin Yoo,
 Vithu Thayalan,
 Vivian Deng
-Olivier Denis,

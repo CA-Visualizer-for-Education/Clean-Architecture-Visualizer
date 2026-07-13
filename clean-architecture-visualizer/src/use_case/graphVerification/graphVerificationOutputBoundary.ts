@@ -1,3 +1,7 @@
+import type { GraphVerificationOutputData } from './graphVerificationOutputData.js';
+
 export interface GraphVerificationOutputBoundary {
-    getOutputData(): [string[], boolean[]];
+  prepareSuccessView(
+    graphVerificationOutputData: GraphVerificationOutputData
+  ): void;
 }
