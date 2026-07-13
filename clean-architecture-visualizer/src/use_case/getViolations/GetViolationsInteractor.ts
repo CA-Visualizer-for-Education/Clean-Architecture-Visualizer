@@ -89,10 +89,10 @@ export class GetViolationsInteractor implements GetViolationsInputBoundary {
           n.filePath !== undefined &&
           ((n.filePath.split('/').length > 0
             ? fileKeySet.has(n.filePath.split('/').at(-1) as string) &&
-              n.id.split('/').at(-1)?.match(/-(.*)/)?.includes(useCaseName)
+              this.findNodeContainsUseCase(n.id, useCaseName)
             : false) ||
             (fileKeySet.has(n.filePath) &&
-              n.id.split('/').at(-1)?.match(/-(.*)/)?.includes(useCaseName)))
+              this.findNodeContainsUseCase(n.id, useCaseName)))
       )
       .map((n) => n.id);
   }
@@ -117,10 +117,10 @@ export class GetViolationsInteractor implements GetViolationsInputBoundary {
           n.filePath !== undefined &&
           ((n.filePath.split('/').length > 0
             ? fileKeySet.has(n.filePath.split('/').at(-1) as string) &&
-              n.id.split('/').at(-1)?.match(/-(.*)/)?.includes(useCaseName)
+              this.findNodeContainsUseCase(n.id, useCaseName)
             : false) ||
             (fileKeySet.has(n.filePath) &&
-              n.id.split('/').at(-1)?.match(/-(.*)/)?.includes(useCaseName)))
+              this.findNodeContainsUseCase(n.id, useCaseName)))
       );
     if (!matchingNode?.filePath) return undefined;
     const fileName = matchingNode.filePath.split('/').at(-1);
@@ -135,5 +135,20 @@ export class GetViolationsInteractor implements GetViolationsInputBoundary {
       ...(snippet && { snippet }),
       ...(line_number && { line_number }),
     };
+  }
+
+  /*
+  Determines if the nodeId if part of the use case graph.
+  */
+  private findNodeContainsUseCase(
+    nodeId: string,
+    useCaseName: string
+  ): boolean {
+    if (nodeId.length < useCaseName.length) {
+      return false;
+    }
+    return nodeId
+      .slice(nodeId.length - useCaseName.length)
+      .includes(useCaseName);
   }
 }
