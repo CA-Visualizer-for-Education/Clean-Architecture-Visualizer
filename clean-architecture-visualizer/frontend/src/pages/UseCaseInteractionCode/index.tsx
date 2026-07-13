@@ -20,8 +20,10 @@ import { usePersistentBoolean } from '../../hooks/usePersistentBoolean';
 import { USE_CASE_SIDEBAR_OPEN_STORAGE_KEY } from '../../lib/storageKeys';
 
 const UseCaseInteractionCode = () => {
-  const { useCaseId, interactionId } =
-    useParams<{ useCaseId: string; interactionId: string }>();
+  const { useCaseId, interactionId } = useParams<{
+    useCaseId: string;
+    interactionId: string;
+  }>();
   const [searchParams, setSearchParams] = useSearchParams();
   const { t } = useTranslation('useCaseInteractionCode');
 
@@ -30,30 +32,36 @@ const UseCaseInteractionCode = () => {
   const { width, startResizing } = useResizableSidebar(300);
 
   const activeFilePath = searchParams.get('file');
-  const [isOpen, setIsOpen] = usePersistentBoolean(USE_CASE_SIDEBAR_OPEN_STORAGE_KEY, true);
+  const [isOpen, setIsOpen] = usePersistentBoolean(
+    USE_CASE_SIDEBAR_OPEN_STORAGE_KEY,
+    true
+  );
   const [history, setHistory] = useState<string[]>([]);
 
   const setFileQuery = (path: string | null) => {
-    setSearchParams((prev) => {
-      const next = new URLSearchParams(prev);
-      if (path) {
-        next.set('file', path);
-      } else {
-        next.delete('file');
-      }
-      return next;
-    }, { replace: true });
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        if (path) {
+          next.set('file', path);
+        } else {
+          next.delete('file');
+        }
+        return next;
+      },
+      { replace: true }
+    );
   };
 
   const handleNavigate = (newPath: string) => {
     if (activeFilePath) {
-      setHistory(prev => [...prev, activeFilePath]);
+      setHistory((prev) => [...prev, activeFilePath]);
     }
     setFileQuery(newPath);
   };
 
   const handleBack = () => {
-    setHistory(prev => {
+    setHistory((prev) => {
       if (!prev.length) return prev;
       const previousPath = prev[prev.length - 1];
       setFileQuery(previousPath);
@@ -73,7 +81,11 @@ const UseCaseInteractionCode = () => {
             <CtaButton
               variant="outlined"
               startIcon={<span>←</span>}
-              onClick={() => navigate(`/use-case/${useCaseId}/interaction/${interactionId}/diagram`)}
+              onClick={() =>
+                navigate(
+                  `/use-case/${useCaseId}/interaction/${interactionId}/diagram`
+                )
+              }
             >
               {t('actions.backToDiagram')}
             </CtaButton>

@@ -15,9 +15,13 @@ import {
   NODE_STATUSES,
 } from '../lib/types';
 
-const validComponentTypes: ReadonlySet<CAComponentType> = new Set(COMPONENT_TYPES);
+const validComponentTypes: ReadonlySet<CAComponentType> = new Set(
+  COMPONENT_TYPES
+);
 
-const validLayers: ReadonlySet<CALayer> = new Set(Object.keys(LAYER_METADATA) as CALayer[]);
+const validLayers: ReadonlySet<CALayer> = new Set(
+  Object.keys(LAYER_METADATA) as CALayer[]
+);
 
 const validNodeStatuses: ReadonlySet<CANode['status']> = new Set(NODE_STATUSES);
 
@@ -49,28 +53,31 @@ function toCANodes(rawNodes: unknown): CANode[] {
     const status = node.status;
 
     if (
-      typeof id !== 'string'
-      || typeof type !== 'string'
-      || typeof layer !== 'string'
-      || typeof status !== 'string'
-      || !validComponentTypes.has(type as CAComponentType)
-      || !validLayers.has(layer as CALayer)
-      || !validNodeStatuses.has(status as CANode['status'])
+      typeof id !== 'string' ||
+      typeof type !== 'string' ||
+      typeof layer !== 'string' ||
+      typeof status !== 'string' ||
+      !validComponentTypes.has(type as CAComponentType) ||
+      !validLayers.has(layer as CALayer) ||
+      !validNodeStatuses.has(status as CANode['status'])
     ) {
       return [];
     }
 
     const name = typeof node.name === 'string' ? node.name : undefined;
-    const file_path = typeof node.file_path === 'string' ? node.file_path : undefined;
+    const file_path =
+      typeof node.file_path === 'string' ? node.file_path : undefined;
 
-    return [{
-      id,
-      name,
-      type: type as CAComponentType,
-      layer: layer as CALayer,
-      file_path,
-      status: status as CANode['status'],
-    }];
+    return [
+      {
+        id,
+        name,
+        type: type as CAComponentType,
+        layer: layer as CALayer,
+        file_path,
+        status: status as CANode['status'],
+      },
+    ];
   });
 }
 
@@ -92,29 +99,36 @@ function toCAEdges(rawEdges: unknown): CAEdge[] {
     const status = edge.status;
 
     if (
-      typeof id !== 'string'
-      || typeof source !== 'string'
-      || typeof target !== 'string'
-      || typeof type !== 'string'
-      || typeof status !== 'string'
-      || !validEdgeTypes.has(type as CAEdge['type'])
-      || !validEdgeStatuses.has(status as CAEdge['status'])
+      typeof id !== 'string' ||
+      typeof source !== 'string' ||
+      typeof target !== 'string' ||
+      typeof type !== 'string' ||
+      typeof status !== 'string' ||
+      !validEdgeTypes.has(type as CAEdge['type']) ||
+      !validEdgeStatuses.has(status as CAEdge['status'])
     ) {
       return [];
     }
 
-    return [{
-      id,
-      source,
-      target,
-      type: type as CAEdge['type'],
-      status: status as CAEdge['status'],
-    }];
+    return [
+      {
+        id,
+        source,
+        target,
+        type: type as CAEdge['type'],
+        status: status as CAEdge['status'],
+      },
+    ];
   });
 }
 
-function getInteractionsForUseCase(summary: AnalysisSummary, useCaseName: string): Interaction[] {
-  const useCase = summary.use_cases.find((candidate) => candidate.name === useCaseName);
+function getInteractionsForUseCase(
+  summary: AnalysisSummary,
+  useCaseName: string
+): Interaction[] {
+  const useCase = summary.use_cases.find(
+    (candidate) => candidate.name === useCaseName
+  );
 
   if (!useCase) {
     throw new Error(`Use case not found in analysis summary: ${useCaseName}`);
@@ -130,19 +144,23 @@ function getInteractionsForUseCase(summary: AnalysisSummary, useCaseName: string
 function selectInteraction(
   interactions: Interaction[],
   useCaseName: string,
-  interactionName?: string,
+  interactionName?: string
 ): Interaction {
   if (interactionName) {
-    const interaction = interactions.find((candidate) => candidate.interaction_name === interactionName);
+    const interaction = interactions.find(
+      (candidate) => candidate.interaction_name === interactionName
+    );
     if (!interaction) {
-      throw new Error(`Interaction not found for use case ${useCaseName}: ${interactionName}`);
+      throw new Error(
+        `Interaction not found for use case ${useCaseName}: ${interactionName}`
+      );
     }
     return interaction;
   }
 
   if (interactions.length > 1) {
     throw new Error(
-      `Use case ${useCaseName} has multiple interactions; provide an interaction name to select one.`,
+      `Use case ${useCaseName} has multiple interactions; provide an interaction name to select one.`
     );
   }
 
@@ -151,12 +169,18 @@ function selectInteraction(
 
 export async function getUseCaseDiagramData(
   useCaseName: string,
-  interactionName?: string,
+  interactionName?: string
 ): Promise<UseCaseDiagramData> {
-  const summary = await getAnalysisSummary() as AnalysisSummary;
+  const summary = (await getAnalysisSummary()) as AnalysisSummary;
   const interactions = getInteractionsForUseCase(summary, useCaseName);
-  const interaction = selectInteraction(interactions, useCaseName, interactionName);
-  const detail = await getInteractionDetails(interaction.interaction_id) as Record<string, unknown>;
+  const interaction = selectInteraction(
+    interactions,
+    useCaseName,
+    interactionName
+  );
+  const detail = (await getInteractionDetails(
+    interaction.interaction_id
+  )) as Record<string, unknown>;
 
   return {
     interactionId: interaction.interaction_id,

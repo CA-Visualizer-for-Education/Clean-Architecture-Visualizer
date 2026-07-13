@@ -1,5 +1,5 @@
 import { beforeAll, afterEach, afterAll } from 'vitest';
-import { server } from '../src/mocks/server'; 
+import { server } from '../src/mocks/server';
 import './mocks/i18next';
 import '@testing-library/jest-dom';
 

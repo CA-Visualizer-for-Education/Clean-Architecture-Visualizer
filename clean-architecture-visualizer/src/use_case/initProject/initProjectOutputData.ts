@@ -1,13 +1,12 @@
 export class InitProjectOutputData {
+  private apiOutputData?: boolean;
 
-    private apiOutputData?: boolean;
+  setOutputData(outputData: boolean) {
+    this.apiOutputData = outputData;
+  }
 
-    setOutputData(outputData: boolean) {
-        this.apiOutputData = outputData;
-    }
-    
-    getOutputData(): boolean {
-        if (this.apiOutputData) return this.apiOutputData;
-        return false;
-    }
+  getOutputData(): boolean {
+    if (this.apiOutputData) return this.apiOutputData;
+    return false;
+  }
 }

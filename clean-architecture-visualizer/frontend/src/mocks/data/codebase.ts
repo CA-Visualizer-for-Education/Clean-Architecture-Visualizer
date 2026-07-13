@@ -1,136 +1,136 @@
-import { FileRelation, FileContent } from "../../lib";
+import { FileRelation, FileContent } from '../../lib';
 
 export const mockFileTree = {
-  id: "src",
-  name: "src",
-  type: "directory",
-  path: "src/",
+  id: 'src',
+  name: 'src',
+  type: 'directory',
+  path: 'src/',
   children: [
     {
-      id: "src/interface_adapters",
-      name: "interface_adapters",
-      type: "directory",
-      path: "src/interface_adapters/",
-      layer: "InterfaceAdapters",
+      id: 'src/interface_adapters',
+      name: 'interface_adapters',
+      type: 'directory',
+      path: 'src/interface_adapters/',
+      layer: 'InterfaceAdapters',
       children: [
         {
-          id: "src/interface_adapters/UserSignOutController.java",
-          name: "UserSignOutController.java",
-          type: "file",
-          path: "src/interface_adapters/UserSignOutController.java",
+          id: 'src/interface_adapters/UserSignOutController.java',
+          name: 'UserSignOutController.java',
+          type: 'file',
+          path: 'src/interface_adapters/UserSignOutController.java',
           hasViolation: false,
         },
         {
-          id: "src/interface_adapters/UserSignOutPresenter.java",
-          name: "UserSignOutPresenter.java",
-          type: "file",
-          path: "src/interface_adapters/UserSignOutPresenter.java",
+          id: 'src/interface_adapters/UserSignOutPresenter.java',
+          name: 'UserSignOutPresenter.java',
+          type: 'file',
+          path: 'src/interface_adapters/UserSignOutPresenter.java',
           hasViolation: true,
         },
         {
-          id: "src/interface_adapters/UserSignOutViewModel.java",
-          name: "UserSignOutViewModel.java",
-          type: "file",
-          path: "src/interface_adapters/UserSignOutViewModel.java",
+          id: 'src/interface_adapters/UserSignOutViewModel.java',
+          name: 'UserSignOutViewModel.java',
+          type: 'file',
+          path: 'src/interface_adapters/UserSignOutViewModel.java',
           hasViolation: true,
         },
       ],
     },
     {
-      id: "src/use_cases",
-      name: "use_cases",
-      type: "directory",
-      path: "src/use_cases/",
-      layer: "ApplicationBusinessRules",
+      id: 'src/use_cases',
+      name: 'use_cases',
+      type: 'directory',
+      path: 'src/use_cases/',
+      layer: 'ApplicationBusinessRules',
       children: [
         {
-          id: "src/use_cases/UserSignOutInteractor.java",
-          name: "UserSignOutInteractor.java",
-          type: "file",
-          path: "src/use_cases/UserSignOutInteractor.java",
+          id: 'src/use_cases/UserSignOutInteractor.java',
+          name: 'UserSignOutInteractor.java',
+          type: 'file',
+          path: 'src/use_cases/UserSignOutInteractor.java',
           hasViolation: true,
         },
         {
-          id: "src/use_cases/UserSignOutInputBoundary.java",
-          name: "UserSignOutInputBoundary.java",
-          type: "file",
-          path: "src/use_cases/UserSignOutInputBoundary.java",
+          id: 'src/use_cases/UserSignOutInputBoundary.java',
+          name: 'UserSignOutInputBoundary.java',
+          type: 'file',
+          path: 'src/use_cases/UserSignOutInputBoundary.java',
           hasViolation: false,
         },
         {
-          id: "src/use_cases/UserSignOutInputData.java",
-          name: "UserSignOutInputData.java",
-          type: "file",
-          path: "src/use_cases/UserSignOutInputData.java",
+          id: 'src/use_cases/UserSignOutInputData.java',
+          name: 'UserSignOutInputData.java',
+          type: 'file',
+          path: 'src/use_cases/UserSignOutInputData.java',
           hasViolation: false,
         },
         {
-          id: "src/use_cases/UserSignOutOutputBoundary.java",
-          name: "UserSignOutOutputBoundary.java",
-          type: "file",
-          path: "src/use_cases/UserSignOutOutputBoundary.java",
+          id: 'src/use_cases/UserSignOutOutputBoundary.java',
+          name: 'UserSignOutOutputBoundary.java',
+          type: 'file',
+          path: 'src/use_cases/UserSignOutOutputBoundary.java',
           hasViolation: false,
         },
         {
-          id: "src/use_cases/UserSignOutOutputData.java",
-          name: "UserSignOutOutputData.java",
-          type: "file",
-          path: "src/use_cases/UserSignOutOutputData.java",
-          hasViolation: false,
-        },
-      ],
-    },
-    {
-      id: "src/entities",
-      name: "entities",
-      type: "directory",
-      path: "src/entities/",
-      layer: "EnterpriseBusinessRules",
-      children: [
-        {
-          id: "src/entities/UserSession.java",
-          name: "UserSession.java",
-          type: "file",
-          path: "src/entities/UserSession.java",
+          id: 'src/use_cases/UserSignOutOutputData.java',
+          name: 'UserSignOutOutputData.java',
+          type: 'file',
+          path: 'src/use_cases/UserSignOutOutputData.java',
           hasViolation: false,
         },
       ],
     },
     {
-      id: "src/views",
-      name: "views",
-      type: "directory",
-      path: "src/views/",
-      layer: "Frameworks",
+      id: 'src/entities',
+      name: 'entities',
+      type: 'directory',
+      path: 'src/entities/',
+      layer: 'EnterpriseBusinessRules',
       children: [
         {
-          id: "src/views/UserSignOutView.java",
-          name: "UserSignOutView.java",
-          type: "file",
-          path: "src/views/UserSignOutView.java",
+          id: 'src/entities/UserSession.java',
+          name: 'UserSession.java',
+          type: 'file',
+          path: 'src/entities/UserSession.java',
           hasViolation: false,
         },
       ],
     },
     {
-      id: "src/framework_drivers",
-      name: "framework_drivers",
-      type: "directory",
-      path: "src/framework_drivers/",
-      layer: "Frameworks",
+      id: 'src/views',
+      name: 'views',
+      type: 'directory',
+      path: 'src/views/',
+      layer: 'Frameworks',
       children: [
         {
-          id: "src/framework_drivers/UserSignOutDataAccess.java",
-          name: "UserSignOutDataAccess.java",
-          type: "file",
-          path: "src/framework_drivers/UserSignOutDataAccess.java",
+          id: 'src/views/UserSignOutView.java',
+          name: 'UserSignOutView.java',
+          type: 'file',
+          path: 'src/views/UserSignOutView.java',
+          hasViolation: false,
+        },
+      ],
+    },
+    {
+      id: 'src/framework_drivers',
+      name: 'framework_drivers',
+      type: 'directory',
+      path: 'src/framework_drivers/',
+      layer: 'Frameworks',
+      children: [
+        {
+          id: 'src/framework_drivers/UserSignOutDataAccess.java',
+          name: 'UserSignOutDataAccess.java',
+          type: 'file',
+          path: 'src/framework_drivers/UserSignOutDataAccess.java',
           hasViolation: false,
         },
         {
-          id: "src/framework_drivers/Database.java",
-          name: "Database.java",
-          type: "file",
-          path: "src/framework_drivers/Database.java",
+          id: 'src/framework_drivers/Database.java',
+          name: 'Database.java',
+          type: 'file',
+          path: 'src/framework_drivers/Database.java',
           hasViolation: false,
         },
       ],
@@ -139,8 +139,8 @@ export const mockFileTree = {
 };
 
 export const mockFiles: Record<string, FileContent> = {
-  "src/interface_adapters/UserSignOutController.java": {
-    file_path: "src/interface_adapters/UserSignOutController.java",
+  'src/interface_adapters/UserSignOutController.java': {
+    file_path: 'src/interface_adapters/UserSignOutController.java',
     content: `package interface_adapters;
 
 import use_cases.UserSignOutInputBoundary;
@@ -159,13 +159,13 @@ public class UserSignOutController {
     interactor.execute(inputData);
     }
 }`,
-    language: "java",
-    layer: "InterfaceAdapters",
+    language: 'java',
+    layer: 'InterfaceAdapters',
     lines_with_violations: [],
   },
-  "src/interface_adapters/UserSignOutPresenter.java": {
-  file_path: "src/interface_adapters/UserSignOutPresenter.java",
-  content: `package interface_adapters;
+  'src/interface_adapters/UserSignOutPresenter.java': {
+    file_path: 'src/interface_adapters/UserSignOutPresenter.java',
+    content: `package interface_adapters;
 
 import framework_drivers.Database;
 import use_cases.UserSignOutOutputBoundary;
@@ -185,13 +185,13 @@ public class UserSignOutPresenter implements UserSignOutOutputBoundary {
     viewModel.setStatus(outputData.message());
   }
 }`,
-  language: "java",
-  layer: "InterfaceAdapters",
-  lines_with_violations: [3],
+    language: 'java',
+    layer: 'InterfaceAdapters',
+    lines_with_violations: [3],
   },
-  "src/interface_adapters/UserSignOutViewModel.java": {
-  file_path: "src/interface_adapters/UserSignOutViewModel.java",
-  content: `package interface_adapters;
+  'src/interface_adapters/UserSignOutViewModel.java': {
+    file_path: 'src/interface_adapters/UserSignOutViewModel.java',
+    content: `package interface_adapters;
 
 public class UserSignOutViewModel {
   private String status = "";
@@ -206,12 +206,12 @@ public class UserSignOutViewModel {
     return status;
   }
 }`,
-  language: "java",
-  layer: "InterfaceAdapters",
-  lines_with_violations: [5],
+    language: 'java',
+    layer: 'InterfaceAdapters',
+    lines_with_violations: [5],
   },
-  "src/use_cases/UserSignOutInteractor.java": {
-    file_path: "src/use_cases/UserSignOutInteractor.java",
+  'src/use_cases/UserSignOutInteractor.java': {
+    file_path: 'src/use_cases/UserSignOutInteractor.java',
     content: `package use_cases;
 
 import framework_drivers.Database;
@@ -233,64 +233,64 @@ public class UserSignOutInteractor implements UserSignOutInputBoundary {
     outputBoundary.present(new UserSignOutOutputData("Signed out: " + session.userId()));
     }
 }`,
-    language: "java",
-    layer: "ApplicationBusinessRules",
+    language: 'java',
+    layer: 'ApplicationBusinessRules',
     lines_with_violations: [3],
   },
-  "src/use_cases/UserSignOutInputBoundary.java": {
-  file_path: "src/use_cases/UserSignOutInputBoundary.java",
-  content: `package use_cases;
+  'src/use_cases/UserSignOutInputBoundary.java': {
+    file_path: 'src/use_cases/UserSignOutInputBoundary.java',
+    content: `package use_cases;
 
 public interface UserSignOutInputBoundary {
   void execute(UserSignOutInputData inputData);
 }`,
-  language: "java",
-  layer: "ApplicationBusinessRules",
-  lines_with_violations: [],
+    language: 'java',
+    layer: 'ApplicationBusinessRules',
+    lines_with_violations: [],
   },
-  "src/use_cases/UserSignOutInputData.java": {
-  file_path: "src/use_cases/UserSignOutInputData.java",
-  content: `package use_cases;
+  'src/use_cases/UserSignOutInputData.java': {
+    file_path: 'src/use_cases/UserSignOutInputData.java',
+    content: `package use_cases;
 
 public record UserSignOutInputData(String userId) {
 }`,
-  language: "java",
-  layer: "ApplicationBusinessRules",
-  lines_with_violations: [],
+    language: 'java',
+    layer: 'ApplicationBusinessRules',
+    lines_with_violations: [],
   },
-  "src/use_cases/UserSignOutOutputBoundary.java": {
-  file_path: "src/use_cases/UserSignOutOutputBoundary.java",
-  content: `package use_cases;
+  'src/use_cases/UserSignOutOutputBoundary.java': {
+    file_path: 'src/use_cases/UserSignOutOutputBoundary.java',
+    content: `package use_cases;
 
 public interface UserSignOutOutputBoundary {
   void present(UserSignOutOutputData outputData);
 }`,
-  language: "java",
-  layer: "ApplicationBusinessRules",
-  lines_with_violations: [],
+    language: 'java',
+    layer: 'ApplicationBusinessRules',
+    lines_with_violations: [],
   },
-  "src/use_cases/UserSignOutOutputData.java": {
-  file_path: "src/use_cases/UserSignOutOutputData.java",
-  content: `package use_cases;
+  'src/use_cases/UserSignOutOutputData.java': {
+    file_path: 'src/use_cases/UserSignOutOutputData.java',
+    content: `package use_cases;
 
 public record UserSignOutOutputData(String message) {
 }`,
-  language: "java",
-  layer: "ApplicationBusinessRules",
-  lines_with_violations: [],
+    language: 'java',
+    layer: 'ApplicationBusinessRules',
+    lines_with_violations: [],
   },
-  "src/entities/UserSession.java": {
-  file_path: "src/entities/UserSession.java",
-  content: `package entities;
+  'src/entities/UserSession.java': {
+    file_path: 'src/entities/UserSession.java',
+    content: `package entities;
 
 public record UserSession(String userId) {
 }`,
-  language: "java",
-  layer: "EnterpriseBusinessRules",
-  lines_with_violations: [],
+    language: 'java',
+    layer: 'EnterpriseBusinessRules',
+    lines_with_violations: [],
   },
-  "src/views/UserSignOutView.java": {
-    file_path: "src/views/UserSignOutView.java",
+  'src/views/UserSignOutView.java': {
+    file_path: 'src/views/UserSignOutView.java',
     content: `package views;
 
 import javax.swing.JPanel;
@@ -307,108 +307,108 @@ public class UserSignOutView extends JPanel {
     return viewModel.getStatus();
   }
 }`,
-    language: "java",
-    layer: "Frameworks",
+    language: 'java',
+    layer: 'Frameworks',
     lines_with_violations: [],
   },
-  "src/framework_drivers/UserSignOutDataAccess.java": {
-    file_path: "src/framework_drivers/UserSignOutDataAccess.java",
+  'src/framework_drivers/UserSignOutDataAccess.java': {
+    file_path: 'src/framework_drivers/UserSignOutDataAccess.java',
     content: `package framework_drivers;
 
 public class UserSignOutDataAccess {
     public void clear() {
     }
 }`,
-    language: "java",
-    layer: "Frameworks",
+    language: 'java',
+    layer: 'Frameworks',
     lines_with_violations: [],
   },
-  "src/framework_drivers/Database.java": {
-    file_path: "src/framework_drivers/Database.java",
+  'src/framework_drivers/Database.java': {
+    file_path: 'src/framework_drivers/Database.java',
     content: `package framework_drivers;
 
 public class Database {
     public void clearSession() {
     }
 }`,
-    language: "java",
-    layer: "Frameworks",
+    language: 'java',
+    layer: 'Frameworks',
     lines_with_violations: [],
   },
 };
 
 export const mockFileRelationsByPath: Record<string, FileRelation[]> = {
-  "src/interface_adapters/UserSignOutController.java": [
+  'src/interface_adapters/UserSignOutController.java': [
     {
-      type: "DEPENDENCY",
-      target_file: "src/use_cases/UserSignOutInputBoundary.java",
+      type: 'DEPENDENCY',
+      target_file: 'src/use_cases/UserSignOutInputBoundary.java',
       line: 3,
-      description: "Controller depends on input boundary.",
-      layer: "ApplicationBusinessRules",
+      description: 'Controller depends on input boundary.',
+      layer: 'ApplicationBusinessRules',
     },
     {
-      type: "DEPENDENCY",
-      target_file: "src/use_cases/UserSignOutInputData.java",
+      type: 'DEPENDENCY',
+      target_file: 'src/use_cases/UserSignOutInputData.java',
       line: 4,
-      description: "Controller creates input data for the use case.",
-      layer: "ApplicationBusinessRules",
+      description: 'Controller creates input data for the use case.',
+      layer: 'ApplicationBusinessRules',
     },
   ],
-  "src/interface_adapters/UserSignOutPresenter.java": [
+  'src/interface_adapters/UserSignOutPresenter.java': [
     {
-      type: "DEPENDENCY",
-      target_file: "src/framework_drivers/Database.java",
+      type: 'DEPENDENCY',
+      target_file: 'src/framework_drivers/Database.java',
       line: 3,
-      description: "Violation: presenter depends on framework driver.",
-      layer: "Frameworks",
+      description: 'Violation: presenter depends on framework driver.',
+      layer: 'Frameworks',
     },
     {
-      type: "DEPENDENCY",
-      target_file: "src/interface_adapters/UserSignOutViewModel.java",
+      type: 'DEPENDENCY',
+      target_file: 'src/interface_adapters/UserSignOutViewModel.java',
       line: 8,
-      description: "Presenter updates the view model.",
-      layer: "InterfaceAdapters",
+      description: 'Presenter updates the view model.',
+      layer: 'InterfaceAdapters',
     },
   ],
-  "src/use_cases/UserSignOutInteractor.java": [
+  'src/use_cases/UserSignOutInteractor.java': [
     {
-      type: "DEPENDENCY",
-      target_file: "src/framework_drivers/Database.java",
+      type: 'DEPENDENCY',
+      target_file: 'src/framework_drivers/Database.java',
       line: 3,
-      description: "Interactor depends on database driver.",
-      layer: "Frameworks",
+      description: 'Interactor depends on database driver.',
+      layer: 'Frameworks',
     },
     {
-      type: "DEPENDENCY",
-      target_file: "src/entities/UserSession.java",
+      type: 'DEPENDENCY',
+      target_file: 'src/entities/UserSession.java',
       line: 4,
-      description: "Interactor uses entity session model.",
-      layer: "EnterpriseBusinessRules",
+      description: 'Interactor uses entity session model.',
+      layer: 'EnterpriseBusinessRules',
     },
     {
-      type: "DEPENDENCY",
-      target_file: "src/use_cases/UserSignOutOutputBoundary.java",
+      type: 'DEPENDENCY',
+      target_file: 'src/use_cases/UserSignOutOutputBoundary.java',
       line: 8,
-      description: "Interactor depends on output boundary.",
-      layer: "ApplicationBusinessRules",
+      description: 'Interactor depends on output boundary.',
+      layer: 'ApplicationBusinessRules',
     },
   ],
-  "src/views/UserSignOutView.java": [
+  'src/views/UserSignOutView.java': [
     {
-      type: "DEPENDENCY",
-      target_file: "src/interface_adapters/UserSignOutViewModel.java",
+      type: 'DEPENDENCY',
+      target_file: 'src/interface_adapters/UserSignOutViewModel.java',
       line: 4,
-      description: "View reads state from view model.",
-      layer: "InterfaceAdapters",
+      description: 'View reads state from view model.',
+      layer: 'InterfaceAdapters',
     },
   ],
-  "src/framework_drivers/UserSignOutDataAccess.java": [
+  'src/framework_drivers/UserSignOutDataAccess.java': [
     {
-      type: "DEPENDENCY",
-      target_file: "src/framework_drivers/Database.java",
+      type: 'DEPENDENCY',
+      target_file: 'src/framework_drivers/Database.java',
       line: 4,
-      description: "Data access delegates persistence to database.",
-      layer: "Frameworks",
+      description: 'Data access delegates persistence to database.',
+      layer: 'Frameworks',
     },
   ],
 };

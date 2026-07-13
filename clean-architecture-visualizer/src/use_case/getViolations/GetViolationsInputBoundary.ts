@@ -1,3 +1,3 @@
 export interface GetViolationsInputBoundary {
-    execute(): Promise<void>;
+  execute(): Promise<void>;
 }

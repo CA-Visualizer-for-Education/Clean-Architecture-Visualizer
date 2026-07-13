@@ -1,5 +1,7 @@
-import type { GraphVerificationOutputData } from "./graphVerificationOutputData.js";
+import type { GraphVerificationOutputData } from './graphVerificationOutputData.js';
 
 export interface GraphVerificationOutputBoundary {
-    prepareSuccessView(graphVerificationOutputData: GraphVerificationOutputData): void;
+  prepareSuccessView(
+    graphVerificationOutputData: GraphVerificationOutputData
+  ): void;
 }

@@ -1,7 +1,11 @@
 import { describe, it, expect } from 'vitest';
 import { http, HttpResponse } from 'msw';
-import { renderHook, waitFor } from '../../test-utils'; 
-import { useAnalysisSummary, useInteraction, useInteractionViolations } from '@/actions/useAnalysis';
+import { renderHook, waitFor } from '../../test-utils';
+import {
+  useAnalysisSummary,
+  useInteraction,
+  useInteractionViolations,
+} from '@/actions/useAnalysis';
 import { server } from '@/mocks/server';
 
 describe('Analysis Hooks', () => {

@@ -24,28 +24,28 @@ Always call `.load()` before any read operation — the in-memory state is not a
 
 This is the top-level type stored in the session file:
 
-| Field | Type | Description |
-|---|---|---|
-| `projectName` | `string` | Name of the project being analyzed |
-| `numUseCases` | `number` | Total number of use cases found |
-| `numViolations` | `number` | Total number of clean architecture violations |
-| `useCases` | `UseCaseEntry[]` | Per-use-case breakdown (see below) |
-| `files` | `FileStorage[]` | All scanned files and their classifications |
-| `edges` | `EdgeStorage[]` | Dependency edges between nodes |
-| `nodes` | `NodeStorage[]` | All nodes discovered in the project |
+| Field           | Type             | Description                                   |
+| --------------- | ---------------- | --------------------------------------------- |
+| `projectName`   | `string`         | Name of the project being analyzed            |
+| `numUseCases`   | `number`         | Total number of use cases found               |
+| `numViolations` | `number`         | Total number of clean architecture violations |
+| `useCases`      | `UseCaseEntry[]` | Per-use-case breakdown (see below)            |
+| `files`         | `FileStorage[]`  | All scanned files and their classifications   |
+| `edges`         | `EdgeStorage[]`  | Dependency edges between nodes                |
+| `nodes`         | `NodeStorage[]`  | All nodes discovered in the project           |
 
 ### Use Case Entry
 
 Each entry in the `useCases` array contains:
 
-| Field | Type | Description |
-|---|---|---|
-| `id` | `string` | Unique identifier |
-| `name` | `string` | Use case name |
-| `outNeighbours` | `neighbourMap` | Adjacency map of node dependencies |
-| `fileKeys` | `string[]` | References into the `files` array |
+| Field            | Type                       | Description                           |
+| ---------------- | -------------------------- | ------------------------------------- |
+| `id`             | `string`                   | Unique identifier                     |
+| `name`           | `string`                   | Use case name                         |
+| `outNeighbours`  | `neighbourMap`             | Adjacency map of node dependencies    |
+| `fileKeys`       | `string[]`                 | References into the `files` array     |
 | `violationEdges` | `[cleanNode, cleanNode][]` | Edges that violate clean architecture |
-| `missingNodes` | `cleanNode[]` | Expected nodes that were not found |
+| `missingNodes`   | `cleanNode[]`              | Expected nodes that were not found    |
 
 ## Storage Types
 
@@ -53,59 +53,59 @@ Each entry in the `useCases` array contains:
 
 Represents a single scanned file:
 
-| Field | Type | Description |
-|---|---|---|
-| `filePath` | `string` | Absolute path to the file |
-| `fileType` | `"java" \| "python" \| "javascript" \| "typescript" \| "unknown"` | The programming language of the source file |
-| `layer` | `cleanLayer` | Which clean architecture layer it belongs to |
-| `node` | `cleanNode` | The node type it represents |
+| Field      | Type                                                              | Description                                  |
+| ---------- | ----------------------------------------------------------------- | -------------------------------------------- |
+| `filePath` | `string`                                                          | Absolute path to the file                    |
+| `fileType` | `"java" \| "python" \| "javascript" \| "typescript" \| "unknown"` | The programming language of the source file  |
+| `layer`    | `cleanLayer`                                                      | Which clean architecture layer it belongs to |
+| `node`     | `cleanNode`                                                       | The node type it represents                  |
 
 ### `EdgeStorage`
 
 Represents a dependency between two nodes:
 
-| Field | Type | Description |
-|---|---|---|
-| `id` | `string` | Unique edge identifier |
-| `source` | `string` | Source node name |
-| `target` | `string` | Target node name |
-| `type` | `"DEPENDENCY"` | Always `DEPENDENCY` |
+| Field    | Type                                | Description                       |
+| -------- | ----------------------------------- | --------------------------------- |
+| `id`     | `string`                            | Unique edge identifier            |
+| `source` | `string`                            | Source node name                  |
+| `target` | `string`                            | Target node name                  |
+| `type`   | `"DEPENDENCY"`                      | Always `DEPENDENCY`               |
 | `status` | `"VALID" \| "INCORRECT_DEPENDENCY"` | Whether the dependency is allowed |
 
 ### `NodeStorage`
 
 Represents a single node in the architecture graph:
 
-| Field | Type | Description |
-|---|---|---|
-| `id` | `string` | Unique node identifier |
-| `name` | `string?` | Display name |
-| `filePath` | `string?` | Path to the corresponding file |
-| `type` | `cleanNode` | Node type classification |
-| `layer` | `cleanLayer` | Clean architecture layer |
-| `status` | `"VALID" \| "MISSING" \| "VIOLATION"` | Health status of the node |
+| Field      | Type                                  | Description                    |
+| ---------- | ------------------------------------- | ------------------------------ |
+| `id`       | `string`                              | Unique node identifier         |
+| `name`     | `string?`                             | Display name                   |
+| `filePath` | `string?`                             | Path to the corresponding file |
+| `type`     | `cleanNode`                           | Node type classification       |
+| `layer`    | `cleanLayer`                          | Clean architecture layer       |
+| `status`   | `"VALID" \| "MISSING" \| "VIOLATION"` | Health status of the node      |
 
 ## Clean Architecture Layers
 
 Cave maps every file to one of four clean architecture layers:
 
-| Value | Layer |
-|---|---|
-| `enterpriseBusinessRules` | Entities |
-| `applicationBusinessRules` | Use Cases |
-| `interfaceAdapters` | Controllers, Presenters, ViewModels |
-| `frameworksAndDrivers` | Views, Databases, Data Access |
+| Value                      | Layer                               |
+| -------------------------- | ----------------------------------- |
+| `enterpriseBusinessRules`  | Entities                            |
+| `applicationBusinessRules` | Use Cases                           |
+| `interfaceAdapters`        | Controllers, Presenters, ViewModels |
+| `frameworksAndDrivers`     | Views, Databases, Data Access       |
 
 ## Node Types
 
 Cave recognises the following node types across all layers:
 
-| Node | Layer |
-|---|---|
-| `entities` | Enterprise Business Rules |
+| Node                                                                          | Layer                      |
+| ----------------------------------------------------------------------------- | -------------------------- |
+| `entities`                                                                    | Enterprise Business Rules  |
 | `inputBoundary` `inputData` `outputBoundary` `outputData` `useCaseInteractor` | Application Business Rules |
-| `controller` `presenter` `viewModel` | Interface Adapters |
-| `view` `dataAccess` `dataAccessInterface` `database` | Frameworks & Drivers |
+| `controller` `presenter` `viewModel`                                          | Interface Adapters         |
+| `view` `dataAccess` `dataAccessInterface` `database`                          | Frameworks & Drivers       |
 
 ## `neighbourMap`
 

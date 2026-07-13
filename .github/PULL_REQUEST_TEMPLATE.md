@@ -1,4 +1,5 @@
 ## Overview
+
 _(Brief overview (a few sentences) of what this PR achieves.)_
 
 ## Proposed Changes
@@ -39,19 +40,19 @@ _(Complete each of the following items for your pull request. Indicate that you 
 Before opening your pull request:
 
 - [ ] I have performed a self-review of my changes.
-    - Check that all changed files included in this pull request are intentional changes.
-    - Check that all changes are relevant to the purpose of this pull request, as described above.
+  - Check that all changed files included in this pull request are intentional changes.
+  - Check that all changes are relevant to the purpose of this pull request, as described above.
 - [ ] I have added tests for my changes, if applicable.
-    - This is **required** for all bug fixes and new features.
+  - This is **required** for all bug fixes and new features.
 - [ ] I have updated the project documentation, if applicable.
-    - This is **required** for new features.
+  - This is **required** for new features.
 - [ ] **(Frontend)** I have added/updated text in `i18n` JSON files for any new user-facing strings to support multilingual features.
-After opening your pull request:
+      After opening your pull request:
 
 - [ ] I have verified that the CI tests have passed.
 - [ ] I have [requested a review](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/requesting-a-pull-request-review) from a project maintainer, and a fellow student.
 - [ ] Technical Debt: If temporary workarounds or "TODOs" were used, I have opened a tracking issue to address them properly.
-    - Linked Issues: 
+  - Linked Issues:
 
 ## Questions and Comments
 

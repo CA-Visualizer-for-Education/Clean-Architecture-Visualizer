@@ -1,7 +1,7 @@
 export class CreateUseCaseInputData {
-    constructor(private readonly useCase: string) {}
+  constructor(private readonly useCase: string) {}
 
-    getUseCaseName(): string {
-        return this.useCase;
-    }
+  getUseCaseName(): string {
+    return this.useCase;
+  }
 }

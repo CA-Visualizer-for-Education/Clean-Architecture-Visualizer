@@ -1,3 +1,3 @@
 export interface GetFileContentInputBoundary {
-    getFileContent(): Promise<void>;
+  getFileContent(): Promise<void>;
 }

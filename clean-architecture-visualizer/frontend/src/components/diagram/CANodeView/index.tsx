@@ -16,7 +16,11 @@ type CANodeViewProps = CANode & {
   onNodeClick?: (info: NodeClickInfo) => void;
 };
 
-export function CANodeView({ isInteractive, onNodeClick, ...nodeObject }: CANodeViewProps) {
+export function CANodeView({
+  isInteractive,
+  onNodeClick,
+  ...nodeObject
+}: CANodeViewProps) {
   const title = nodeObject.name ?? nodeObject.id;
   const layerColor: LayerColor = LAYER_METADATA[nodeObject.layer].paletteKey;
 
@@ -41,7 +45,12 @@ export function CANodeView({ isInteractive, onNodeClick, ...nodeObject }: CANode
       data-ca-node-id={nodeObject.id}
       onClick={handleClick}
     >
-      <Typography variant="body2" align="center" fontWeight="bold" sx={{ fontSize: 'clamp(0.72rem, 0.9vw, 0.875rem)' }}>
+      <Typography
+        variant="body2"
+        align="center"
+        fontWeight="bold"
+        sx={{ fontSize: 'clamp(0.72rem, 0.9vw, 0.875rem)' }}
+      >
         {title}
       </Typography>
     </NodePaper>
