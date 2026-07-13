@@ -7,7 +7,7 @@ interface GridItem {
   description: string;
   to: string;
   icon: React.ReactElement;
-  bgColor: string;
+  bgColor?: string;
   iconColor?: string;
   badge?: string;
   badgeBg?: string;
