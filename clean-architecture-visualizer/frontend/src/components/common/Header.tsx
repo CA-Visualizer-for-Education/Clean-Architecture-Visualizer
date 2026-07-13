@@ -77,41 +77,6 @@ export default function Header({ actions }: HeaderProps) {
             gap: 0,
           }}
         >
-          {/* Home Link */}
-          <Box
-            component={Link}
-            to="/"
-            sx={{
-              textDecoration: 'none',
-              display: 'inline-flex',
-              alignItems: 'center',
-            }}
-          >
-            <Box
-              sx={{
-                width: 32,
-                height: 32,
-                display: 'inline-flex',
-                alignItems: 'center',
-              }}
-            >
-              <HomeIcon
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  verticalAlign: 'middle',
-                }}
-              />
-            </Box>
-            <Typography
-              variant="h6"
-              component="span"
-              sx={{ marginLeft: 1, color: 'text.primary' }}
-            >
-              {t('branding.name')}
-            </Typography>
-          </Box>
-
           <Box
             sx={{
               display: 'flex',

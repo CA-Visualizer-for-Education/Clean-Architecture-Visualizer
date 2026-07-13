@@ -78,19 +78,9 @@ export default function CheckerMode() {
         style={{
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'space-between',
+          justifyContent: 'flex-end',
         }}
       >
-        <Link to="/" style={{ textDecoration: 'none' }}>
-          <HomeIcon
-            style={{
-              width: 32,
-              height: 32,
-              verticalAlign: 'middle',
-              color: '#222',
-            }}
-          />
-        </Link>
         <button
           style={{ background: 'none', border: 'none', cursor: 'pointer' }}
           title="Info"
