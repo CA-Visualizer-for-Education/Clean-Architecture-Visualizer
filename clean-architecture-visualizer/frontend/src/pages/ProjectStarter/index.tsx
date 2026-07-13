@@ -1,7 +1,5 @@
 import { useState } from 'react';
-import { Box, Divider, IconButton, Snackbar, Alert } from '@mui/material';
-import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
-import { Link } from 'react-router-dom';
+import { Box, Divider, Snackbar, Alert } from '@mui/material';
 import '../../i18n/config';
 import { useTranslation } from 'react-i18next';
 import {
@@ -86,17 +84,6 @@ const ProjectStarter = () => {
 
   return (
     <PageWrapper maxWidth="md">
-      <Box sx={{ mb: 4 }}>
-        <IconButton
-          component={Link}
-          to="/"
-          aria-label={t('homeButtonAriaLabel', { defaultValue: 'Go to home' })}
-          sx={{ color: 'text.primary', p: 0 }}
-        >
-          <HomeOutlinedIcon sx={{ fontSize: 48 }} />
-        </IconButton>
-      </Box>
-
       <Box
         sx={{
           display: 'flex',
