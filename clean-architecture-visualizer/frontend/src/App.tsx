@@ -6,8 +6,11 @@ import CheckerMode from './pages/CheckerMode';
 import ProjectStarter from './pages/ProjectStarter';
 import UseCaseInteractionDiagram from './pages/UseCaseInteractionDiagram';
 import UseCaseInteractionCode from './pages/UseCaseInteractionCode';
+import TestYourself from './pages/TestYourself';
+import AppLayout from './layouts/AppLayout';
 import { ThemeProvider } from '@mui/material/styles';
 import { lightTheme } from './lib';
+import './i18n/config';
 
 export default function App() {
   return (
@@ -16,18 +19,21 @@ export default function App() {
       <AppGlobalStyles />
       <Router>
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/learning" element={<LearningMode />} />
-          <Route path="/checker" element={<CheckerMode />} />
-          <Route path="/project-starter" element={<ProjectStarter />} />
-          <Route
-            path="/use-case/:useCaseId/interaction/:interactionId/diagram"
-            element={<UseCaseInteractionDiagram />}
-          />
-          <Route
-            path="/use-case/:useCaseId/interaction/:interactionId/code"
-            element={<UseCaseInteractionCode />}
-          />
+          <Route element={<AppLayout />}>
+            <Route path="/" element={<Home />} />
+            <Route path="/learning" element={<LearningMode />} />
+            <Route path="/test-yourself" element={<TestYourself />} />
+            <Route path="/checker" element={<CheckerMode />} />
+            <Route path="/project-starter" element={<ProjectStarter />} />
+            <Route
+              path="/use-case/:useCaseId/interaction/:interactionId/diagram"
+              element={<UseCaseInteractionDiagram />}
+            />
+            <Route
+              path="/use-case/:useCaseId/interaction/:interactionId/code"
+              element={<UseCaseInteractionCode />}
+            />
+          </Route>
         </Routes>
       </Router>
     </ThemeProvider>

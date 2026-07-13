@@ -2,6 +2,17 @@
   "branding": {
     "name": "CAVE"
   },
+  "navBar": {
+    "ariaLabel": "Main navigation",
+    "home": "Home",
+    "diagram": "Diagram",
+    "testYourself": "Test Yourself",
+    "learnBadge": "LEARN"
+  },
+  "testYourselfPage": {
+    "title": "Test Yourself",
+    "description": "This page is a placeholder. Content coming soon."
+  },
   "navigation": {
     "pages": {
       "home": "Home",

@@ -1,9 +1,8 @@
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import type { ReactNode } from 'react';
 import Dropdown, { DropdownOption } from './Dropdown.tsx';
-import { Box, Paper, Typography } from '@mui/material';
-import { HomeIcon } from '../../assets/icons';
+import { Box, Paper } from '@mui/material';
 import { useAnalysisSummary } from '../../actions/useAnalysis.ts';
 import { Interaction, UseCase } from '../../lib/types.ts';
 
@@ -74,56 +73,21 @@ export default function Header({ actions }: HeaderProps) {
             justifyContent: 'space-between',
             minHeight: 77, // Ensure consistent height even if actions are empty
             p: 2,
-            gap: 0,
+            gap: 2,
           }}
         >
-          {/* Home Link */}
-          <Box
-            component={Link}
-            to="/"
-            sx={{
-              textDecoration: 'none',
-              display: 'inline-flex',
-              alignItems: 'center',
-            }}
-          >
-            <Box
-              sx={{
-                width: 32,
-                height: 32,
-                display: 'inline-flex',
-                alignItems: 'center',
-              }}
-            >
-              <HomeIcon
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  verticalAlign: 'middle',
-                }}
-              />
-            </Box>
-            <Typography
-              variant="h6"
-              component="span"
-              sx={{ marginLeft: 1, color: 'text.primary' }}
-            >
-              {t('branding.name')}
-            </Typography>
-          </Box>
-
           <Box
             sx={{
               display: 'flex',
               alignItems: 'center',
               gap: 1,
-              flexWrap: 'wrap',
+              flexShrink: 0,
             }}
           >
             {actions}
           </Box>
 
-          <Box>
+          <Box sx={{ flexShrink: 0 }}>
             <Dropdown options={navigationOptions} onSelect={handleNavigation} />
           </Box>
         </Box>
