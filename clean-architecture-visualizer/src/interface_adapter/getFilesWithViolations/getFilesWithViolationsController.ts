@@ -1,12 +1,11 @@
-import type {GetFilesWithViolationsInputBoundary} from "../../use_case/getFilesWithViolations/getFilesWithViolationsInputBoundary.js"
+import type { GetFilesWithViolationsInputBoundary } from '../../use_case/getFilesWithViolations/getFilesWithViolationsInputBoundary.js';
 
 export class GetFilesWithViolationsController {
-    
-    constructor(
-        private readonly inputboundary: GetFilesWithViolationsInputBoundary
-    ){}
+  constructor(
+    private readonly inputboundary: GetFilesWithViolationsInputBoundary
+  ) {}
 
-    async execute(): Promise<void> {
-        await this.inputboundary.execute()
-    }
-}  
+  async execute(): Promise<void> {
+    await this.inputboundary.execute();
+  }
+}

@@ -1,3 +1,3 @@
 export interface GetFilesWithViolationsInputBoundary {
-    execute(): Promise<void>;
+  execute(): Promise<void>;
 }
