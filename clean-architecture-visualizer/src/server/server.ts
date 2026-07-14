@@ -5,7 +5,7 @@ import type { Server } from 'http';
 import type { AddressInfo } from 'net';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
-import { createServer as createViteServer, type ViteDevServer } from 'vite';
+import type { ViteDevServer } from 'vite';
 
 import analysis from './routes/analysis.js';
 import template from './routes/template.js';
@@ -41,6 +41,7 @@ export async function startServer(backendOnly: boolean): Promise<Server> {
           res.sendFile(path.join(distDir, 'index.html'));
         });
       } else {
+        const { createServer: createViteServer } = await import('vite');
         viteServer = await createViteServer({
           root: FRONTEND_DIR,
           server: { middlewareMode: true },

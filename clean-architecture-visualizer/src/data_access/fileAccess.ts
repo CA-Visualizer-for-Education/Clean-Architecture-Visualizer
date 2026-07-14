@@ -112,11 +112,18 @@ export class FileAccess implements FileAccessInterface {
       if (visited.has(currentPath)) continue;
       visited.add(currentPath);
 
-      const entries = await fs.readdir(currentPath, { withFileTypes: true });
+      let entries;
+      try {
+        entries = await fs.readdir(currentPath, { withFileTypes: true });
+      } catch {
+        // Directory may be permission-restricted (e.g. ~/.Trash) or removed mid-scan; skip it.
+        continue;
+      }
 
       for (const entry of entries) {
         if (!entry.isDirectory()) continue;
         if (FileAccess.ignoredDirNames.has(entry.name)) continue;
+        if (entry.name.startsWith('.')) continue;
 
         const fullPath = path.join(currentPath, entry.name);
 

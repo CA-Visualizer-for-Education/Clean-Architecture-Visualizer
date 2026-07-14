@@ -1,6 +1,6 @@
 {
   "name": "clean-architecture-visualizer",
-  "version": "0.0.1",
+  "version": "1.0.1",
   "scripts": {
     "build": "tsc && node -e \"require('fs').copyFileSync('package.json', 'dist/package.json')\" && npm run build_frontend",
     "build_frontend": "npm install --prefix frontend && npm run build --prefix frontend",
