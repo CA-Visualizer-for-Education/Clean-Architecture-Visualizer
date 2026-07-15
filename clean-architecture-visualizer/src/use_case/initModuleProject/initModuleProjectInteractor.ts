@@ -21,7 +21,7 @@ export class InitModuleProjectInteractor implements InitModuleProjectInputBounda
       // Create the src directory if it does not exist.
       const res = await this.fileAccess.exists(currPath);
       if (!res) {
-        await this.fileAccess.createDirectory(currPath);
+        throw new Error('You need to create the src directory first.');
       }
       // If main or test already exist, there is a chance the project has already been initialized
       if (
@@ -44,6 +44,7 @@ export class InitModuleProjectInteractor implements InitModuleProjectInputBounda
         'entity',
         'app',
         'views',
+        'database',
       ];
       for (const directoryName of subDirectories) {
         await this.fileAccess.createDirectory(

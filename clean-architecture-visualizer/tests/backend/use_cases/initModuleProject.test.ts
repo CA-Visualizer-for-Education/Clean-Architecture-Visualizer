@@ -42,6 +42,7 @@ describe('InitModuleProjectInteractor', () => {
       `${ROOT_PATH}/src/main/java/entity`,
       `${ROOT_PATH}/src/main/java/app`,
       `${ROOT_PATH}/src/main/java/views`,
+      `${ROOT_PATH}/src/main/java/database`,
     ];
 
     expectedDirs.forEach((dir) => {
@@ -55,33 +56,11 @@ describe('InitModuleProjectInteractor', () => {
     expect(mockOutputData.setOutputData).toHaveBeenCalledWith(true);
   });
 
-  it('Creates CA directory that is packaged by module (src does not exist).', async () => {
+  it('Error occurs because src directory does not exist.', async () => {
     mockFileAccess.getCurrentPath.mockResolvedValue(ROOT_PATH);
     mockFileAccess.exists.mockResolvedValue(false);
     await interactor.execute();
-
-    const expectedDirs = [
-      `${ROOT_PATH}/src/main/java`,
-      `${ROOT_PATH}/src/test/java`,
-      `${ROOT_PATH}/src/main/java/features`,
-      `${ROOT_PATH}/src/main/java/data_access`,
-      `${ROOT_PATH}/src/main/java/entity`,
-      `${ROOT_PATH}/src/main/java/app`,
-      `${ROOT_PATH}/src/main/java/views`,
-    ];
-
-    expect(mockFileAccess.createDirectory).toHaveBeenCalledWith(
-      `${ROOT_PATH}/src`
-    );
-    expectedDirs.forEach((dir) => {
-      expect(mockFileAccess.createDirectory).toHaveBeenCalledWith(dir);
-    });
-
-    expect(mockFileAccess.createDirectory).toHaveBeenCalledTimes(
-      expectedDirs.length + 1
-    );
-
-    expect(mockOutputData.setOutputData).toHaveBeenCalledWith(true);
+    expect(mockOutputData.setOutputData).toHaveBeenCalledWith(false);
   });
 
   it('Sets output to false if the file system fails.', async () => {
