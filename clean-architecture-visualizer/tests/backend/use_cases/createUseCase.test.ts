@@ -55,6 +55,9 @@ describe('CreateUseCaseInteractor', () => {
       expect.stringContaining('LoginUserInputBoundary.java')
     );
     expect(mockFileAccess.createFile).toHaveBeenCalledWith(
+      expect.stringContaining('LoginUserUseCaseInteractor.java')
+    );
+    expect(mockFileAccess.createFile).toHaveBeenCalledWith(
       expect.stringContaining('LoginUserController.java')
     );
 

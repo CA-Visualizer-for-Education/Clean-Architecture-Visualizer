@@ -55,6 +55,9 @@ describe('CreateFeatureInteractor', () => {
       expect.stringContaining('newUseCaseInputBoundary.java')
     );
     expect(mockFileAccess.createFile).toHaveBeenCalledWith(
+      expect.stringContaining('newUseCaseUseCaseInteractor.java')
+    );
+    expect(mockFileAccess.createFile).toHaveBeenCalledWith(
       expect.stringContaining('newUseCaseController.java')
     );
     expect(mockFileAccess.createFile).toHaveBeenCalledTimes(7);
