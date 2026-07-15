@@ -94,9 +94,7 @@ describe('InitProjectInteractor', () => {
     // Arrange
     mockFileAccess.getCurrentPath.mockResolvedValue(ROOT_PATH);
     mockFileAccess.exists.mockResolvedValue(true);
-    mockFileAccess.bfsFindDir.mockResolvedValue(
-      `${ROOT_PATH}/src/main`
-    );
+    mockFileAccess.bfsFindDir.mockResolvedValue(`${ROOT_PATH}/src/main`);
 
     // Act
     await interactor.execute();

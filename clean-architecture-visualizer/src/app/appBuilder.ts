@@ -152,7 +152,10 @@ export class AppBuilder {
       );
     }
     this.initProjectOutputData = new InitProjectOutputData();
-    this.initProjectInteractor = new InteractorClass(this.fileAccess, this.initProjectOutputData);
+    this.initProjectInteractor = new InteractorClass(
+      this.fileAccess,
+      this.initProjectOutputData
+    );
     return this;
   }
 
@@ -168,7 +171,10 @@ export class AppBuilder {
       );
     }
     this.initModuleProjectOutputData = new InitModuleProjectOutputData();
-    this.initModuleProjectInteractor = new InteractorClass(this.fileAccess, this.initModuleProjectOutputData);
+    this.initModuleProjectInteractor = new InteractorClass(
+      this.fileAccess,
+      this.initModuleProjectOutputData
+    );
     return this;
   }
 
@@ -301,26 +307,30 @@ export class AppBuilder {
 
   async runInitProject() {
     await this.initProjectController?.execute();
-    if(this.initProjectOutputData?.getOutputData()){
+    if (this.initProjectOutputData?.getOutputData()) {
       console.log(chalk.green('Your project has been initialized.'));
-    }else{
-      console.log(chalk.red('An error occurred and your project has not been initialized.'))
+    } else {
+      console.log(
+        chalk.red(
+          'An error occurred and your project has not been initialized.'
+        )
+      );
     }
-    
   }
 
   async runInitModuleProject() {
     await this.initModuleProjectController?.execute();
-    if(this.initModuleProjectOutputData?.getOutputData()){
+    if (this.initModuleProjectOutputData?.getOutputData()) {
       console.log(
         chalk.green('Your project packaged by module has been initialized.')
       );
-    }else{
+    } else {
       console.log(
-        chalk.red('An error occurred and your project packaged by module has not been initialized.')
+        chalk.red(
+          'An error occurred and your project packaged by module has not been initialized.'
+        )
       );
     }
-    
   }
 
   async runCreateUseCase(name: string) {
