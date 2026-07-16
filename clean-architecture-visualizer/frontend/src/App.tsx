@@ -7,7 +7,6 @@ import UseCaseInteractionDiagram from './pages/UseCaseInteractionDiagram';
 import AppLayout from './layouts/AppLayout';
 import { ThemeProvider } from '@mui/material/styles';
 import { lightTheme } from './lib';
-import Navbar, { NAV_BAR_HEIGHT } from './components/layout/Navbar';
 import './i18n/config';
 
 export default function App() {
@@ -16,8 +15,6 @@ export default function App() {
     <ThemeProvider theme={lightTheme}>
       <AppGlobalStyles />
       <Router>
-        <Navbar />
-        <div style={{ paddingTop: NAV_BAR_HEIGHT }}>
           <Routes>
           <Route element={<AppLayout />}>
             <Route path="/" element={<Home />} />
@@ -29,7 +26,6 @@ export default function App() {
             />
           </Route>
         </Routes>
-        </div>
       </Router>
     </ThemeProvider>
   );
