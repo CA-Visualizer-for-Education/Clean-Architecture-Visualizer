@@ -51,7 +51,7 @@ router.get('/analysis/interaction/:id', async (req, res) => {
   const controller = new GetUseCaseInfoController(interactor);
   const presenter = new GetUseCaseInfoPresenter(outputData);
 
-  controller.execute();
+  await controller.execute();
   const result = presenter.getOutputData();
 
   if (!result) {
@@ -76,9 +76,8 @@ router.get('/analysis/violations/:interactionId', async (req, res) => {
   const controller = new GetViolationsController(interactor);
   const presenter = new GetViolationsPresenter(outputData);
 
-  controller.execute();
+  await controller.execute();
   const result = presenter.getOutputData();
-
   if (!result) {
     res
       .status(404)

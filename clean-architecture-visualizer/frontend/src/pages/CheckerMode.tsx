@@ -10,7 +10,7 @@ import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
 import SearchIcon from '@mui/icons-material/Search';
 import CircularProgress from '@mui/material/CircularProgress';
-import { InfoIcon, CheckCircleIcon, ErrorIcon } from '../assets/icons';
+import { CheckCircleIcon, ErrorIcon } from '../assets/icons';
 import { useAnalysisSummary } from '../actions/useAnalysis';
 import { UseCase, Interaction } from '../lib/types';
 
@@ -69,28 +69,6 @@ export default function CheckerMode() {
         alignItems: 'stretch',
       }}
     >
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'flex-end',
-        }}
-      >
-        <button
-          style={{ background: 'none', border: 'none', cursor: 'pointer' }}
-          title="Info"
-        >
-          <InfoIcon
-            style={{
-              width: 28,
-              height: 28,
-              verticalAlign: 'middle',
-              color: '#222',
-            }}
-          />
-        </button>
-      </div>
-
       <h1 style={{ textAlign: 'center', fontSize: 40, margin: '16px 0 24px' }}>
         {data.project_name || t('title')}
       </h1>

@@ -5,10 +5,9 @@ import type { Server } from 'http';
 import type { AddressInfo } from 'net';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
-import { createServer as createViteServer, type ViteDevServer } from 'vite';
+import type { ViteDevServer } from 'vite';
 
 import analysis from './routes/analysis.js';
-import codebase from './routes/codebase.js';
 import template from './routes/template.js';
 
 let server: Server | null = null;
@@ -30,7 +29,6 @@ export async function startServer(backendOnly: boolean): Promise<Server> {
 
   // Routes
   app.use('/api', analysis);
-  app.use('/api', codebase);
   app.use('/api', template);
 
   // Create Vite server in middleware mode
@@ -43,6 +41,7 @@ export async function startServer(backendOnly: boolean): Promise<Server> {
           res.sendFile(path.join(distDir, 'index.html'));
         });
       } else {
+        const { createServer: createViteServer } = await import('vite');
         viteServer = await createViteServer({
           root: FRONTEND_DIR,
           server: { middlewareMode: true },

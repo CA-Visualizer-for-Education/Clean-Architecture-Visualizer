@@ -31,7 +31,7 @@ const Home = () => {
     {
       title: t('cards.learn.title'),
       description: t('cards.learn.description'),
-      to: '/learn',
+      to: 'https://ca-visualizer-for-education.github.io/cave-learn/',
       icon: <MenuBookIcon />,
       iconColor: 'drivers.main',
       badge: t('cards.learn.badge'),

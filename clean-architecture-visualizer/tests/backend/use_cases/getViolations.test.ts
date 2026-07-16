@@ -55,13 +55,12 @@ describe('GetViolationsInteractor', () => {
   describe('execute — Violation Mapping', () => {
     const fromNode = 'controller';
     const toNode = 'entities';
-    const filePath = 'src/interface_adapters/UserController.java';
+    const filePath = 'src/interface_adapters/uc-1/UserController.java';
 
     beforeEach(() => {
       // Setup a node that belongs to the "from" side of the violation
       genericDBAccess.upsertNode({
-        id: 'node-controller-1',
-        name: 'UserController',
+        id: 'src/interface_adapters/uc-1/UserController.java-Process User',
         type: fromNode,
         layer: 'interfaceAdapters',
         filePath: filePath,
@@ -90,7 +89,9 @@ describe('GetViolationsInteractor', () => {
       await interactor.execute();
 
       const violation = outputData.result[0];
-      expect(violation.related_node_ids).toContain('node-controller-1');
+      expect(violation.related_node_ids).toContain(
+        'src/interface_adapters/uc-1/UserController.java-Process User'
+      );
       expect(violation.related_edge_id).toBe(`${fromNode}->${toNode}`);
     });
 
@@ -148,13 +149,12 @@ describe('GetViolationsInteractor', () => {
 describe('execute — Violation Mapping for differently formatted file path.', () => {
   const fromNode = 'controller';
   const toNode = 'entities';
-  const filePath = 'src/interface_adapters/UserController.java';
+  const filePath = 'src/interface_adapters/User-Controller.java';
 
   beforeEach(() => {
     genericDBAccess.upsertNode({
       // node id's are file paths since they are unique
-      id: 'src/interface_adapters/UserController.java',
-      name: 'UserController',
+      id: 'src/interface_adapters/uc-1/User-Controller.java-Process User',
       type: fromNode,
       layer: 'interfaceAdapters',
       filePath: filePath,
@@ -165,7 +165,7 @@ describe('execute — Violation Mapping for differently formatted file path.', (
     const mockUseCase = {
       id: 'uc-1',
       name: 'Process User',
-      fileKeys: ['UserController.java'],
+      fileKeys: ['User-Controller.java'],
       violationEdges: [[fromNode, toNode]] as [string, string][],
     };
     (genericDBAccess as any).upsertUseCase(mockUseCase);
@@ -184,8 +184,98 @@ describe('execute — Violation Mapping for differently formatted file path.', (
 
     const violation = outputData.result[0];
     expect(violation.related_node_ids).toContain(
-      'src/interface_adapters/UserController.java'
+      'src/interface_adapters/uc-1/User-Controller.java-Process User'
     );
     expect(violation.related_edge_id).toBe(`${fromNode}->${toNode}`);
+  });
+});
+
+describe('findNodeContainsUseCase - Ensures function only checks the last characters of a node id for use case', () => {
+  const fromNode = 'controller';
+  const toNode = 'entities';
+  const filePath = 'src/interface_adapters/User-Controller.java';
+
+  beforeEach(() => {
+    genericDBAccess.upsertNode({
+      // node id's are file paths since they are unique
+      id: 'src/interface_adapters/uc-1/User-Controller.java-Process User',
+      type: fromNode,
+      layer: 'interfaceAdapters',
+      filePath: filePath,
+      status: 'VALID',
+    });
+
+    // Setup the use case with a violation edge
+    const mockUseCase = {
+      id: 'uc-1',
+      name: 'Process User',
+      fileKeys: ['User-Controller.java'],
+      violationEdges: [[fromNode, toNode]] as [string, string][],
+    };
+    (genericDBAccess as any).upsertUseCase(mockUseCase);
+  });
+
+  it('Ensures that string is not part of use case if id is shorter than the string.', () => {
+    const outputData = makeOutputData();
+    const interactor = new GetViolationsInteractor(
+      genericDBAccess,
+      genericFileAccess,
+      makeInputData('uc-1'),
+      outputData
+    );
+
+    const result = (interactor as any).findNodeContainsUseCase(
+      'blah',
+      'Process User'
+    );
+    expect(result).toBe(false);
+  });
+
+  it('Ensures that string is part of use case if the end of id matches the use case name.', () => {
+    const outputData = makeOutputData();
+    const interactor = new GetViolationsInteractor(
+      genericDBAccess,
+      genericFileAccess,
+      makeInputData('uc-1'),
+      outputData
+    );
+
+    const result = (interactor as any).findNodeContainsUseCase(
+      'src/interface_adapters/uc-1/User-Controller.java-Process User',
+      'Process User'
+    );
+    expect(result).toBe(true);
+  });
+
+  it('Ensures that string is not part of use case if the end of id does not match the use case name.', () => {
+    const outputData = makeOutputData();
+    const interactor = new GetViolationsInteractor(
+      genericDBAccess,
+      genericFileAccess,
+      makeInputData('uc-1'),
+      outputData
+    );
+
+    const result = (interactor as any).findNodeContainsUseCase(
+      'src/interface_adapters/uc-1/User-Controller.java-usecase1',
+      'Process User'
+    );
+    expect(result).toBe(false);
+  });
+
+  it('Ensures that string is not part of use case if the end of id does not match the use case name even if string contains use case name.', () => {
+    const outputData = makeOutputData();
+    const interactor = new GetViolationsInteractor(
+      genericDBAccess,
+      genericFileAccess,
+      makeInputData('uc-1'),
+      outputData
+    );
+
+    const result = (interactor as any).findNodeContainsUseCase(
+      'src/interface_adapters/uc-1/User-Controller-Process User.java-usecase1',
+      'Process User'
+    );
+    expect(result).toBe(false);
   });
 });

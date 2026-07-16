@@ -2,10 +2,16 @@
   "branding": {
     "name": "CAVE"
   },
+  "navBar": {
+    "ariaLabel": "Main navigation",
+    "home": "Home",
+    "checker": "Checker",
+    "learn": "Learn",
+    "start": "Start"
+  },
   "navigation": {
     "pages": {
       "home": "Home",
-      "learningMode": "Learning Mode",
       "checkerMode": "Checker Mode",
       "projectStarter": "Project Starter",
       "currentPage": "Current page"

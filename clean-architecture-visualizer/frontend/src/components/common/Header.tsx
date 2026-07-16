@@ -1,4 +1,4 @@
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import type { ReactNode } from 'react';
 import Dropdown, { DropdownOption } from './Dropdown.tsx';
@@ -12,23 +12,10 @@ type HeaderProps = {
 
 export default function Header({ actions }: HeaderProps) {
   const navigate = useNavigate();
-  const location = useLocation();
   const { t } = useTranslation('common');
   const { data, isLoading } = useAnalysisSummary();
 
-  // Detect if we're on a code view route
-  const isCodeView = location.pathname.includes('/code');
-
   const navigationOptions: DropdownOption[] = [
-    ...(isCodeView
-      ? []
-      : [
-          {
-            key: 'learning-mode',
-            label: t('navigation.pages.learningMode'),
-            to: '/learn',
-          },
-        ]),
     ...(isLoading
       ? [
           {
@@ -43,7 +30,7 @@ export default function Header({ actions }: HeaderProps) {
       (useCase.interactions ?? []).map((interaction: Interaction) => ({
         key: `interaction-${interaction.interaction_id}`,
         label: `${useCase.name}: ${interaction.interaction_name}`,
-        to: `/use-case/${useCase.id}/interaction/${interaction.interaction_id}/${isCodeView ? 'code' : 'diagram'}`,
+        to: `/use-case/${useCase.id}/interaction/${interaction.interaction_id}/diagram`,
       }))
     ),
   ];
@@ -73,7 +60,7 @@ export default function Header({ actions }: HeaderProps) {
             justifyContent: 'space-between',
             minHeight: 77, // Ensure consistent height even if actions are empty
             p: 2,
-            gap: 0,
+            gap: 2,
           }}
         >
           <Box
@@ -81,13 +68,13 @@ export default function Header({ actions }: HeaderProps) {
               display: 'flex',
               alignItems: 'center',
               gap: 1,
-              flexWrap: 'wrap',
+              flexShrink: 0,
             }}
           >
             {actions}
           </Box>
 
-          <Box>
+          <Box sx={{ flexShrink: 0 }}>
             <Dropdown options={navigationOptions} onSelect={handleNavigation} />
           </Box>
         </Box>

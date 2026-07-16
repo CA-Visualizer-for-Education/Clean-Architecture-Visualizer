@@ -4,6 +4,7 @@ import type { cleanNode } from '../../types/cleanNode.js';
 import type { GetViolationsInputData } from './GetViolationsInputData.js';
 import type { GetViolationsInputBoundary } from './GetViolationsInputBoundary.js';
 import type { GetViolationsOutputData } from './GetViolationsOutputData.js';
+import { useCaseGraph } from '../../entity/useCaseGraph.js';
 
 export type ViolationResponse = {
   violations: ViolationEntry[];
@@ -44,12 +45,14 @@ export class GetViolationsInteractor implements GetViolationsInputBoundary {
         const relatedNodeIds = this.resolveRelatedNodeIds(
           from,
           to,
-          useCase.fileKeys
+          useCase.fileKeys,
+          useCase.name
         );
         const fileContext = await this.resolveFileContext(
           from,
           to,
-          useCase.fileKeys
+          useCase.fileKeys,
+          useCase.name
         );
 
         return {
@@ -73,7 +76,8 @@ export class GetViolationsInteractor implements GetViolationsInputBoundary {
   private resolveRelatedNodeIds(
     from: cleanNode,
     to: cleanNode,
-    fileKeys: string[]
+    fileKeys: string[],
+    useCaseName: string
   ): string[] {
     const fileKeySet = new Set(fileKeys);
 
@@ -83,11 +87,12 @@ export class GetViolationsInteractor implements GetViolationsInputBoundary {
         (n) =>
           (n.type === from || n.type === to) &&
           n.filePath !== undefined &&
-          // fileKeySet.has(n.filePath)
           ((n.filePath.split('/').length > 0
-            ? fileKeySet.has(n.filePath.split('/').at(-1) as string)
+            ? fileKeySet.has(n.filePath.split('/').at(-1) as string) &&
+              this.findNodeContainsUseCase(n.id, useCaseName)
             : false) ||
-            fileKeySet.has(n.filePath))
+            (fileKeySet.has(n.filePath) &&
+              this.findNodeContainsUseCase(n.id, useCaseName)))
       )
       .map((n) => n.id);
   }
@@ -99,26 +104,27 @@ export class GetViolationsInteractor implements GetViolationsInputBoundary {
   private async resolveFileContext(
     from: cleanNode,
     to: cleanNode,
-    fileKeys: string[]
+    fileKeys: string[],
+    useCaseName: string
   ): Promise<FileContext | undefined> {
     const fileKeySet = new Set(fileKeys);
 
-    const matchingNode = this.db.getAllNodes().find(
-      (n) =>
-        n.type === from &&
-        n.filePath !== undefined &&
-        ((n.filePath.split('/').length > 0
-          ? fileKeySet.has(n.filePath.split('/').at(-1) as string)
-          : false) ||
-          fileKeySet.has(n.filePath))
-      // fileKeySet.has(n.filePath)
-    );
-
+    const matchingNode = this.db
+      .getAllNodes()
+      .find(
+        (n) =>
+          n.type === from &&
+          n.filePath !== undefined &&
+          ((n.filePath.split('/').length > 0
+            ? fileKeySet.has(n.filePath.split('/').at(-1) as string) &&
+              this.findNodeContainsUseCase(n.id, useCaseName)
+            : false) ||
+            (fileKeySet.has(n.filePath) &&
+              this.findNodeContainsUseCase(n.id, useCaseName)))
+      );
     if (!matchingNode?.filePath) return undefined;
-
     const fileName = matchingNode.filePath.split('/').at(-1);
     if (!fileName) return undefined;
-
     const [snippet, line_number] = await Promise.all([
       this.fileAccess.getFileSnippet(matchingNode.filePath, to),
       this.fileAccess.getLineNumber(matchingNode.filePath, to),
@@ -129,5 +135,20 @@ export class GetViolationsInteractor implements GetViolationsInputBoundary {
       ...(snippet && { snippet }),
       ...(line_number && { line_number }),
     };
+  }
+
+  /*
+  Determines if the nodeId if part of the use case graph.
+  */
+  private findNodeContainsUseCase(
+    nodeId: string,
+    useCaseName: string
+  ): boolean {
+    if (nodeId.length < useCaseName.length) {
+      return false;
+    }
+    return nodeId
+      .slice(nodeId.length - useCaseName.length)
+      .includes(useCaseName);
   }
 }

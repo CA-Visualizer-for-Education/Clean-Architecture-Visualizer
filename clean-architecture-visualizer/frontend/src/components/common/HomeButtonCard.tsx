@@ -1,6 +1,6 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { Box } from '@mui/material';
+import { Link as RouterLink } from 'react-router-dom';
+import { Box, Card, CardActionArea } from '@mui/material';
 import styles from './HomeButtonCard.module.css';
 
 interface HomeButtonCardProps {
@@ -17,56 +17,89 @@ interface HomeButtonCardProps {
   ctaColor?: string;
 }
 
-export default function HomeButtonCard({
+const isExternalLink = (to: string) => /^https?:\/\//.test(to);
+
+const HomeButtonCard = ({
   title,
   description,
   to,
   icon,
-  bgColor,
+  bgColor = 'white',
   iconColor = 'white',
   badge,
   badgeBg = '#EBF4FC',
   badgeColor = '#207FD4',
   ctaLabel = 'Get started',
   ctaColor = 'primary.main',
-}: HomeButtonCardProps) {
+}: HomeButtonCardProps) => {
+  const linkProps = isExternalLink(to)
+    ? { component: 'a' as const, href: to, target: '_blank', rel: 'noopener noreferrer' }
+    : { component: RouterLink, to };
+
   return (
-    <Link to={to} className={styles.card}>
-      <div className={styles.illustration}>
-        {badge && (
+    <Card elevation={0} sx={{ background: 'transparent', width: '100%', bgcolor: bgColor }} className={styles.card}>
+      <CardActionArea
+        {...linkProps}
+        sx={{
+          borderRadius: 4,
+          p: 2,
+          textAlign: 'center',
+          display: 'block',
+          '&:hover .icon-box': { transform: 'scale(1.05)' },
+        }}
+      >
+        <div className={styles.illustration}>
+          {badge && (
+            <Box
+              component="span"
+              className={styles.stepBadge}
+              sx={{
+                bgcolor: badgeBg,
+                color: badgeColor,
+              }}
+            >
+              {badge}
+            </Box>
+          )}
+
           <Box
-            component="span"
-            className={styles.stepBadge}
+            className="icon-box"
             sx={{
-              bgcolor: badgeBg,
-              color: badgeColor,
+              width: 140,
+              height: 140,
+              mx: 'auto',
+              mb: 3,
+              bgcolor: bgColor,
+              borderRadius: 8,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'transform 0.2s ease-in-out',
             }}
           >
-            {badge}
+            {React.cloneElement(icon as React.ReactElement, {
+              sx: {
+                ...((icon as any).props?.sx || {}),
+                fontSize: 72,
+                color: iconColor,
+              },
+            })}
           </Box>
-        )}
+        </div>
 
-        <Box className={styles.illustrationInner} sx={{ bgcolor: bgColor }}>
-          {React.cloneElement(icon, {
-            sx: {
-              ...icon.props.sx,
-              fontSize: 72,
-              color: iconColor,
-            },
-          })}
-        </Box>
-      </div>
+        <div className={styles.body}>
+          <h2 className={styles.title}>{title}</h2>
 
-      <div className={styles.body}>
-        <h2 className={styles.title}>{title}</h2>
+          <p className={styles.description}>{description}</p>
 
-        <p className={styles.description}>{description}</p>
-
-        <Box component="span" className={styles.cta} sx={{ color: ctaColor }}>
-          {ctaLabel}
-          <span aria-hidden>›</span>
-        </Box>
-      </div>
-    </Link>
+          <Box component="span" className={styles.cta} sx={{ color: ctaColor }}>
+            {ctaLabel}
+            <span aria-hidden>›</span>
+          </Box>
+        </div>
+      </CardActionArea>
+    </Card>
   );
-}
+};
+
+export default HomeButtonCard;

@@ -4,7 +4,9 @@ import { Box } from '@mui/material';
 export const PageContainer = styled(Box)({
   display: 'flex',
   flexDirection: 'column',
-  height: '100vh',
+  flex: 1,
+  minHeight: 0,
+  height: '100%',
   overflow: 'hidden',
 });
 
