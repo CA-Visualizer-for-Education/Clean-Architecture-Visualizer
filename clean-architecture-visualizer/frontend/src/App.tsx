@@ -15,7 +15,7 @@ export default function App() {
     <ThemeProvider theme={lightTheme}>
       <AppGlobalStyles />
       <Router>
-          <Routes>
+        <Routes>
           <Route element={<AppLayout />}>
             <Route path="/" element={<Home />} />
             <Route path="/checker" element={<CheckerMode />} />

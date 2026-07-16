@@ -33,11 +33,20 @@ const HomeButtonCard = ({
   ctaColor = 'primary.main',
 }: HomeButtonCardProps) => {
   const linkProps = isExternalLink(to)
-    ? { component: 'a' as const, href: to, target: '_blank', rel: 'noopener noreferrer' }
+    ? {
+        component: 'a' as const,
+        href: to,
+        target: '_blank',
+        rel: 'noopener noreferrer',
+      }
     : { component: RouterLink, to };
 
   return (
-    <Card elevation={0} sx={{ background: 'transparent', width: '100%', bgcolor: bgColor }} className={styles.card}>
+    <Card
+      elevation={0}
+      sx={{ background: 'transparent', width: '100%', bgcolor: bgColor }}
+      className={styles.card}
+    >
       <CardActionArea
         {...linkProps}
         sx={{
@@ -79,7 +88,11 @@ const HomeButtonCard = ({
           >
             {React.cloneElement(icon as React.ReactElement, {
               sx: {
-                ...((icon as React.ReactElement & { props?: { sx?: Record<string, unknown> } }).props?.sx || {}),
+                ...((
+                  icon as React.ReactElement & {
+                    props?: { sx?: Record<string, unknown> };
+                  }
+                ).props?.sx || {}),
                 fontSize: 72,
                 color: iconColor,
               },
