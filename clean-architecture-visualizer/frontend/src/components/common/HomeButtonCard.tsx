@@ -79,7 +79,7 @@ const HomeButtonCard = ({
           >
             {React.cloneElement(icon as React.ReactElement, {
               sx: {
-                ...((icon as any).props?.sx || {}),
+                ...((icon as React.ReactElement & { props?: { sx?: Record<string, unknown> } }).props?.sx || {}),
                 fontSize: 72,
                 color: iconColor,
               },
