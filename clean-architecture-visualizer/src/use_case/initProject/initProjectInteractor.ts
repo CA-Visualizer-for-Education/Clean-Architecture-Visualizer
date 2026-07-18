@@ -18,10 +18,17 @@ export class InitProjectInteractor implements InitProjectInputBoundary {
     try {
       let currPath = await this.fileAccess.getCurrentPath();
       currPath = path.join(currPath, 'src');
+      const res = await this.fileAccess.exists(currPath);
+      if (!res) {
+        throw new Error('You need to create the src directory first.');
+      }
 
-      // 0. Check if any use_case files have already been initialized
-      if (await this.fileAccess.bfsFindDir(currPath, 'use_case')) {
-        throw new Error('project already initialized');
+      // 0. If main or test already exist, there is a chance the project has already been initialized
+      if (
+        (await this.fileAccess.bfsFindDir(currPath, 'main')) ||
+        (await this.fileAccess.bfsFindDir(currPath, 'test'))
+      ) {
+        throw new Error('project already initialized.');
       }
 
       // 1. Define base paths using path.join for cross-platform support
@@ -36,6 +43,7 @@ export class InitProjectInteractor implements InitProjectInputBoundary {
         'interface_adapter',
         'data_access',
         'view',
+        'database',
       ];
 
       await this.fileAccess.createDirectory(javaPath);

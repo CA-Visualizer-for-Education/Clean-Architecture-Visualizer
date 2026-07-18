@@ -18,6 +18,7 @@ describe('InitProjectInteractor', () => {
       // These aren't used in InitProject but are part of the interface
       bfsFindDir: jest.fn<any>(),
       createFile: jest.fn<any>(),
+      exists: jest.fn<any>(),
     } as any;
 
     mockOutputData = {
@@ -30,6 +31,7 @@ describe('InitProjectInteractor', () => {
   it('successfully creates the entire Clean Architecture directory structure', async () => {
     // Arrange
     mockFileAccess.getCurrentPath.mockResolvedValue(ROOT_PATH);
+    mockFileAccess.exists.mockResolvedValue(true);
 
     // Act
     await interactor.execute();
@@ -43,6 +45,7 @@ describe('InitProjectInteractor', () => {
       `${ROOT_PATH}/src/main/java/entity`,
       `${ROOT_PATH}/src/main/java/interface_adapter`,
       `${ROOT_PATH}/src/main/java/data_access`,
+      `${ROOT_PATH}/src/main/java/database`,
       `${ROOT_PATH}/src/main/java/view`,
     ];
 
@@ -90,9 +93,8 @@ describe('InitProjectInteractor', () => {
   it('should fail if already initialized', async () => {
     // Arrange
     mockFileAccess.getCurrentPath.mockResolvedValue(ROOT_PATH);
-    mockFileAccess.bfsFindDir.mockResolvedValue(
-      `${ROOT_PATH}/src/main/java/use_case`
-    );
+    mockFileAccess.exists.mockResolvedValue(true);
+    mockFileAccess.bfsFindDir.mockResolvedValue(`${ROOT_PATH}/src/main`);
 
     // Act
     await interactor.execute();
@@ -100,5 +102,12 @@ describe('InitProjectInteractor', () => {
     // Assert
     expect(mockOutputData.setOutputData).toHaveBeenCalledWith(false);
     expect(mockFileAccess.createDirectory).not.toHaveBeenCalled();
+  });
+
+  it('Error occurs because src directory does not exist.', async () => {
+    mockFileAccess.getCurrentPath.mockResolvedValue(ROOT_PATH);
+    mockFileAccess.exists.mockResolvedValue(false);
+    await interactor.execute();
+    expect(mockOutputData.setOutputData).toHaveBeenCalledWith(false);
   });
 });

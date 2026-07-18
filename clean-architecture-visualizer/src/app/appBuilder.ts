@@ -41,8 +41,10 @@ export class AppBuilder {
   private graphVerificationPresenter?: GraphVerificationOutputBoundary;
   private initProjectInteractor?: InitProjectInputBoundary;
   private initProjectController?: InitProjectController;
+  private initProjectOutputData?: InitProjectOutputData;
   private initModuleProjectInteractor?: InitModuleProjectInputBoundary;
   private initModuleProjectController?: InitModuleProjectController;
+  private initModuleProjectOutputData?: InitModuleProjectOutputData;
   private createUseCaseInteractor?: CreateUseCaseInputBoundary;
   private createUseCaseController?: CreateUseCaseController;
   private createFeatureInteractor?: CreateFeatureInputBoundary;
@@ -149,7 +151,11 @@ export class AppBuilder {
         'FileAccess must be set before building InitProjectInteractor'
       );
     }
-    this.initProjectInteractor = new InteractorClass(this.fileAccess);
+    this.initProjectOutputData = new InitProjectOutputData();
+    this.initProjectInteractor = new InteractorClass(
+      this.fileAccess,
+      this.initProjectOutputData
+    );
     return this;
   }
 
@@ -164,7 +170,11 @@ export class AppBuilder {
         'FileAccess must be set before building InitModuleProjectInteractor'
       );
     }
-    this.initModuleProjectInteractor = new InteractorClass(this.fileAccess);
+    this.initModuleProjectOutputData = new InitModuleProjectOutputData();
+    this.initModuleProjectInteractor = new InteractorClass(
+      this.fileAccess,
+      this.initModuleProjectOutputData
+    );
     return this;
   }
 
@@ -276,7 +286,7 @@ export class AppBuilder {
       createUseCaseInteractor: this.createUseCaseInteractor!,
       createUseCaseController: this.createUseCaseController!,
       createModuleUseCaseInteractor: this.createModuleUseCaseInteractor!,
-      createModuleUseCaseController: this.createModuleUseCaseController,
+      createModuleUseCaseController: this.createModuleUseCaseController!,
       createFeatureInteractor: this.createFeatureInteractor!,
       createFeatureController: this.createFeatureController!,
       graphVerificationController: this.graphVerificationController!,
@@ -285,9 +295,9 @@ export class AppBuilder {
     };
   }
 
-  runGraphVerification() {
+  async runGraphVerification() {
     const formatForCLI = false; // run from app
-    this.graphVerificationController?.execute(formatForCLI);
+    await this.graphVerificationController?.execute(formatForCLI);
   }
 
   async runCLIGraphVerification() {
@@ -295,28 +305,44 @@ export class AppBuilder {
     await this.graphVerificationController?.execute(formatForCLI);
   }
 
-  runInitProject() {
-    this.initProjectController?.execute();
-    console.log(chalk.green('Your project has been initialized.'));
+  async runInitProject() {
+    await this.initProjectController?.execute();
+    if (this.initProjectOutputData?.getOutputData()) {
+      console.log(chalk.green('Your project has been initialized.'));
+    } else {
+      console.log(
+        chalk.red(
+          'An error occurred and your project has not been initialized.'
+        )
+      );
+    }
   }
 
-  runInitModuleProject() {
-    this.initModuleProjectController?.execute();
-    console.log(
-      chalk.green('Your project packaged by module has been initialized.')
-    );
+  async runInitModuleProject() {
+    await this.initModuleProjectController?.execute();
+    if (this.initModuleProjectOutputData?.getOutputData()) {
+      console.log(
+        chalk.green('Your project packaged by module has been initialized.')
+      );
+    } else {
+      console.log(
+        chalk.red(
+          'An error occurred and your project packaged by module has not been initialized.'
+        )
+      );
+    }
   }
 
-  runCreateUseCase(name: string) {
-    this.createUseCaseController?.execute(name);
+  async runCreateUseCase(name: string) {
+    await this.createUseCaseController?.execute(name);
   }
 
-  runCreateFeature(feature: string) {
-    this.createFeatureController?.execute(feature);
+  async runCreateFeature(feature: string) {
+    await this.createFeatureController?.execute(feature);
   }
 
-  runCreateModuleUseCase(feature: string, name: string) {
-    this.createModuleUseCaseController?.execute(feature, name);
+  async runCreateModuleUseCase(feature: string, name: string) {
+    await this.createModuleUseCaseController?.execute(feature, name);
   }
 
   async runEndProject() {

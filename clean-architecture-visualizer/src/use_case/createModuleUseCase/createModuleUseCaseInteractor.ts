@@ -66,7 +66,7 @@ export class CreateModuleUseCaseInteractor implements CreateModuleUseCaseInputBo
       const ucFiles = [
         'InputBoundary',
         'InputData',
-        'Interactor',
+        'UseCaseInteractor',
         'OutputData',
         'OutputBoundary',
       ];

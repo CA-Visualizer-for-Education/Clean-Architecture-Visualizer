@@ -57,7 +57,7 @@ export class CreateUseCaseInteractor implements CreateUseCaseInputBoundary {
       // Use Case Layer Files
       await createJavaFile(targetUseCasePath, 'InputBoundary');
       await createJavaFile(targetUseCasePath, 'InputData');
-      await createJavaFile(targetUseCasePath, 'Interactor');
+      await createJavaFile(targetUseCasePath, 'UseCaseInteractor');
       await createJavaFile(targetUseCasePath, 'OutputData');
       await createJavaFile(targetUseCasePath, 'OutputBoundary');
 
