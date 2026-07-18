@@ -7,8 +7,13 @@ interface GridItem {
   description: string;
   to: string;
   icon: React.ReactElement;
-  bgColor: string;
+  bgColor?: string;
   iconColor?: string;
+  badge?: string;
+  badgeBg?: string;
+  badgeColor?: string;
+  ctaLabel?: string;
+  ctaColor?: string;
 }
 
 interface HomeButtonGridProps {
@@ -37,6 +42,11 @@ const HomeButtonGrid = ({ items }: HomeButtonGridProps) => {
             icon={item.icon}
             bgColor={item.bgColor}
             iconColor={item.iconColor}
+            badge={item.badge}
+            badgeBg={item.badgeBg}
+            badgeColor={item.badgeColor}
+            ctaLabel={item.ctaLabel}
+            ctaColor={item.ctaColor}
           />
         </Grid>
       ))}

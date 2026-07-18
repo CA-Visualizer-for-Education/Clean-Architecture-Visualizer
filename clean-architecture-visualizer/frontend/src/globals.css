@@ -1,0 +1,394 @@
+/* ================================================================
+   CAVE DESIGN SYSTEM — globals.css
+   ================================================================
+   This is the single source of truth for all visual tokens.
+   Import this in app/layout.tsx and it applies site-wide.
+
+   HOW TO USE IN YOUR COMPONENT:
+     1. Reference a CSS variable:   color: var(--color-brand-pink);
+     2. Use a utility class:        className="btn btn--primary"
+     3. For component-specific styles, create a MyComponent.module.css
+        next to your component and import it there.
+
+   SECTIONS:
+     1. CSS Variables (tokens)  — colors, typography, spacing, radius
+     2. Reset & base            — box-sizing, body, links
+     3. Typography              — heading and body scale
+     4. Utility: Buttons        — .btn, .btn--primary, .btn--secondary, .btn--ghost
+     5. Utility: Badges         — .badge, .badge--blue/green/pink/yellow
+     6. Utility: Layout         — .page-shell, .content-area
+   ================================================================ */
+
+/* ================================================================
+   1. CSS VARIABLES (DESIGN TOKENS)
+   ================================================================ */
+
+:root {
+  /* ── Brand colors ──────────────────────────────────────────
+     Pulled from the four concentric rings in the CAVE logo.
+     Use these for diagram layer fills, button accents, and status.
+     ─────────────────────────────────────────────────────────── */
+  --color-brand-blue: #207fd4; /* info · primary action · framework layer */
+  --color-brand-green: #3fae5c; /* success · passing checks · adapter layer */
+  --color-brand-pink: #e2477c; /* violation · focus · app-business layer  */
+  --color-brand-yellow: #f5c242; /* warning · in progress · enterprise layer */
+
+  --color-layer-blue-light: #ebf4fc; /* frameworks-drivers tint */
+  --color-layer-green-light: #ecf7f0; /* interface-adapters tint */
+  --color-layer-pink-light: #fcedf3; /* application-business-rules tint */
+  --color-layer-yellow-light: #fdf8e8; /* enterprise-business-rules tint */
+
+  /* ── Neutral surface tokens — Light theme ──────────────────
+     These change in .dark (see below). Always use the var(),
+     never the hex directly, so dark mode works automatically.
+     ─────────────────────────────────────────────────────────── */
+  --color-bg: #f5f0ea; /* page background */
+  --color-surface: #ffffff; /* cards, nav bar */
+  --color-surface2: #faf6f1; /* secondary surfaces, input fills */
+  --color-border: #e6dfd5; /* subtle dividers between elements */
+
+  /* ── Text tokens — Light theme ─────────────────────────────
+     Use --color-text-mute for labels/captions, --color-text-faint
+     for placeholder copy and empty states.
+     ─────────────────────────────────────────────────────────── */
+  --color-text: #1a1a1f; /* primary body and headings */
+  --color-text-mute: #686760; /* secondary copy, labels */
+  --color-text-faint: #9c978e; /* placeholder text, empty states */
+
+  /* ── Status tokens ─────────────────────────────────────────
+     Used for inline badges (no violations / 2 violations / etc.)
+     and scoring feedback on the Exercise page.
+     ─────────────────────────────────────────────────────────── */
+  --color-success: #3fae5c;
+  --color-error: #e2477c;
+  --color-warn: #f5c242;
+  --color-info: #207fd4;
+
+  /* ── Typography ────────────────────────────────────────────
+     Font families are set as CSS variables by the Next.js
+     font loader in app/layout.tsx. Reference them here.
+     ─────────────────────────────────────────────────────────── */
+  --font-display: var(--font-bricolage), sans-serif; /* hero h1 only */
+  --font-sans: var(--font-jakarta), sans-serif; /* all body + headings */
+  --font-mono: var(--font-jetbrains), monospace; /* labels, eyebrows, code */
+
+  /* Type scale — use these sizes consistently across the site */
+  --text-display: 2.5rem; /* 40px — hero headline (font-display) */
+  --text-h1: 1.875rem; /* 30px */
+  --text-h2: 1.25rem; /* 20px */
+  --text-body: 0.875rem; /* 14px — default body size */
+  --text-small: 0.75rem; /* 12px — captions, labels */
+  --text-micro: 0.6875rem; /* 11px — eyebrow / uppercase micro labels */
+
+  /* Line heights */
+  --leading-tight: 1.2;
+  --leading-normal: 1.5;
+  --leading-loose: 1.75;
+
+  /* Letter spacing for eyebrow / micro uppercase labels */
+  --tracking-eyebrow: 0.09em;
+
+  /* ── Spacing ────────────────────────────────────────────────
+     Use multiples of 4px. Reference via calc() if needed.
+     ─────────────────────────────────────────────────────────── */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* ── Border radius ─────────────────────────────────────────
+     --radius-pill for all CAVE buttons and chip badges.
+     --radius-card for content cards.
+     --radius-sm   for small inner elements.
+     ─────────────────────────────────────────────────────────── */
+  --radius-pill: 999px;
+  --radius-card: 16px;
+  --radius-sm: 8px;
+
+  /* ── Shadows ────────────────────────────────────────────────
+     Use sparingly — CAVE is mostly flat with borders.
+     ─────────────────────────────────────────────────────────── */
+  --shadow-card: 0 1px 4px rgba(0, 0, 0, 0.06);
+  --shadow-raised: 0 4px 16px rgba(0, 0, 0, 0.1);
+
+  /* ── Z-index scale ──────────────────────────────────────────
+     Keep a clear stacking order across components.
+     ─────────────────────────────────────────────────────────── */
+  --z-base: 0;
+  --z-raised: 10;
+  --z-overlay: 100;
+  --z-navbar: 200;
+  --z-modal: 300;
+
+  /* Fixed navbar height — keep in sync with components/layout/Navbar.module.css */
+  --navbar-height: 64px;
+}
+
+/* Dark theme overrides — activated by adding class="dark" to <html> */
+.dark {
+  --color-bg: #15161a;
+  --color-surface: #1e1f24;
+  --color-surface2: #252730;
+  --color-border: #33353f;
+  --color-text: #f5f0ea;
+  --color-text-mute: #a8a49c;
+  --color-text-faint: #686760;
+
+  /* Status colors are brighter in dark mode for WCAG AA contrast */
+  --color-success: #6ee89a;
+  --color-error: #ff7aab;
+  --color-warn: #ffd56b;
+  --color-info: #afb8ef;
+}
+
+/* ================================================================
+   2. RESET & BASE
+   ================================================================ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  line-height: var(--leading-normal);
+  color: var(--color-text);
+  background-color: var(--color-bg);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+/* ================================================================
+   3. TYPOGRAPHY
+   ================================================================
+   Use these classes directly in JSX, or copy the properties
+   into your CSS module for local variants.
+   ================================================================ */
+
+/* Display — hero headline (Bricolage Grotesque) */
+.text-display {
+  font-family: var(--font-display);
+  font-size: var(--text-display);
+  font-weight: 700;
+  line-height: var(--leading-tight);
+  color: var(--color-text);
+}
+
+/* Heading 1 — section titles (Plus Jakarta Sans 700) */
+.text-h1 {
+  font-family: var(--font-sans);
+  font-size: var(--text-h1);
+  font-weight: 700;
+  line-height: var(--leading-tight);
+  color: var(--color-text);
+}
+
+/* Heading 2 — card titles, panel headers */
+.text-h2 {
+  font-family: var(--font-sans);
+  font-size: var(--text-h2);
+  font-weight: 700;
+  line-height: var(--leading-tight);
+  color: var(--color-text);
+}
+
+/* Body — default paragraph text */
+.text-body {
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  font-weight: 400;
+  line-height: var(--leading-loose);
+  color: var(--color-text-mute);
+}
+
+/* Mono — component IDs, code labels, scores */
+.text-mono {
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
+  font-weight: 500;
+}
+
+/* Eyebrow — uppercase micro labels above headlines */
+/* Example: "INTERACTIVE · SELF-PACED · OPEN SOURCE" */
+.text-eyebrow {
+  font-family: var(--font-sans);
+  font-size: var(--text-micro);
+  font-weight: 600;
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--color-text-mute);
+}
+
+/* ================================================================
+   4. UTILITY: BUTTONS
+   ================================================================
+   Always use .btn as a base, then add a modifier.
+   Buttons always have pill radius (--radius-pill).
+
+   Available modifiers:
+     .btn--primary    dark fill, white text — default CTA
+     .btn--secondary  outline only, no fill — secondary action
+     .btn--ghost      no border, no fill — subtle/inline action
+     .btn--accent     brand-pink fill — high-emphasis accent
+
+   Sizes (optional, defaults to medium):
+     .btn--sm         smaller padding + text
+     .btn--lg         larger padding + text
+   ================================================================ */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-pill);
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  font-weight: 600;
+  cursor: pointer;
+  border: 1.5px solid transparent;
+  transition:
+    opacity 0.15s ease,
+    background-color 0.15s ease;
+  white-space: nowrap;
+}
+
+.btn:hover {
+  opacity: 0.85;
+}
+.btn:active {
+  opacity: 0.7;
+}
+
+.btn--primary {
+  background-color: var(--color-text);
+  color: var(--color-bg);
+}
+
+.btn--secondary {
+  background-color: transparent;
+  border-color: var(--color-border);
+  color: var(--color-text);
+}
+
+.btn--ghost {
+  background-color: transparent;
+  color: var(--color-text-mute);
+}
+
+.btn--ghost:hover {
+  background-color: var(--color-surface2);
+  opacity: 1;
+}
+
+.btn--accent {
+  background-color: var(--color-brand-pink);
+  color: #fff;
+}
+
+.btn--sm {
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--text-small);
+}
+
+.btn--lg {
+  padding: var(--space-3) var(--space-6);
+  font-size: 1rem;
+}
+
+/* ================================================================
+   5. UTILITY: BADGES
+   ================================================================
+   Small pill labels used for layer names, status indicators,
+   score readouts, and the "LEARN" label in the navbar logo.
+
+   Base class: .badge
+   Color modifiers (use the one matching the CA layer):
+     .badge--blue    framework layer / info
+     .badge--green   adapter layer / success / no violations
+     .badge--pink    app-business layer / violation
+     .badge--yellow  enterprise layer / warning
+     .badge--neutral muted grey — used for counts, misc labels
+   ================================================================ */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-pill);
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+.badge--blue {
+  background-color: var(--color-brand-blue);
+  color: #fff;
+}
+
+.badge--green {
+  background-color: var(--color-brand-green);
+  color: #fff;
+}
+
+.badge--pink {
+  background-color: var(--color-brand-pink);
+  color: #fff;
+}
+
+.badge--yellow {
+  background-color: var(--color-brand-yellow);
+  color: #1a1a1f; /* dark text on yellow for contrast */
+}
+
+.badge--neutral {
+  background-color: var(--color-surface2);
+  color: var(--color-text-mute);
+  border: 1px solid var(--color-border);
+}
+
+/* ================================================================
+   6. UTILITY: LAYOUT
+   ================================================================
+   .page-shell     wraps the content below the fixed navbar
+   .content-area   max-width container, horizontally centered
+   ================================================================ */
+
+/* Offset for the fixed navbar */
+.page-shell {
+  padding-top: var(--navbar-height);
+  min-height: 100vh;
+}
+
+/* Centered content column — use inside page components */
+.content-area {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: var(--space-8) var(--space-6);
+}
