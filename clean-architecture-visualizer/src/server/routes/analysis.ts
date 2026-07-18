@@ -15,6 +15,10 @@ import { GetViolationsInteractor } from '../../use_case/getViolations/GetViolati
 import { FileAccess } from '../../data_access/fileAccess.js';
 import { GetViolationsController } from '../../interface_adapter/getViolations/getViolationsController.js';
 import { GetViolationsPresenter } from '../../interface_adapter/getViolations/getViolationsPresenter.js';
+import { GetFilesWithViolationsOutputData } from '../../use_case/getFilesWithViolations/getFilesWithViolationsOutputData.js';
+import { GetFilesWithViolationsInteractor } from '../../use_case/getFilesWithViolations/getFilesWithViolationsInteractor.js';
+import { GetFilesWithViolationsController } from '../../interface_adapter/getFilesWithViolations/getFilesWithViolationsController.js';
+import { GetFilesWithViolationsPresenter } from '../../interface_adapter/getFilesWithViolations/getFilesWithViolationsPresenter.js';
 
 const router = Router();
 
@@ -84,6 +88,18 @@ router.get('/analysis/violations/:interactionId', async (req, res) => {
       .json({ error: `Interaction '${req.params.interactionId}' not found.` });
     return;
   }
+
+  res.json(result);
+});
+
+router.get('/analysis/files-with-violations', (_req, res) => {
+  const outputData = new GetFilesWithViolationsOutputData();
+  const interactor = new GetFilesWithViolationsInteractor(dbAccess, outputData);
+  const controller = new GetFilesWithViolationsController(interactor);
+  const presenter = new GetFilesWithViolationsPresenter(outputData);
+
+  controller.execute();
+  const result = presenter.getOutputData();
 
   res.json(result);
 });

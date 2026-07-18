@@ -13,3 +13,6 @@ clean-architecture-visualizer/frontend/public/
 # Secrets
 .DS_Store
 .env
+
+# Local task tracking
+tasks/
