@@ -15,12 +15,12 @@ Cave is a CLI (Command Line Interface) tool designed for CSC207 students to help
 
 ## Commands
 
-### `cave init`
+### `cave init <language>`
 
-Initializes your CSC207 project with a sample clean architecture directory structure.
+Initializes your CSC207 project with a sample clean architecture directory structure in the chosen programming language.
 
 ```bash
-cave init
+cave init <language>
 ```
 
 The created structure should like like:
@@ -39,19 +39,46 @@ src/
     └── java/
 ```
 
-Run this first in your project folder. Cave will scaffold the recommended folder layout so you can start developing! These folders will not immediately be tracked by git as they are empty. If you want to
+Run this first in your project folder. Cave will scaffold the recommended folder layout so you can start developing! These folders will not immediately be tracked by git as they are empty.
+
+---
+
+### `cave module_init <language>`
+
+Initializes your CSC207 project with a sample clean architecture directory structure in the chosen programming language, packaged by module.
+
+```bash
+cave module_init <language>
+```
+
+The created structure should like like:
+
+```
+src/
+├── main/
+│   └── java/
+│       ├── app/
+│       ├── entity/
+│       ├── features/
+│       ├── data_access/
+│       └── view/
+└── test/
+    └── java/
+```
+
+Run this first in your project folder. Cave will scaffold the recommended folder layout so you can start developing! These folders will not immediately be tracked by git as they are empty.
 
 ---
 
 ### `cave usecase <usecasename>`
 
-Initializes the folders and Java file structure for a new use case.
+Initializes the folders and file structure for a new use case.
 
 ```bash
 cave usecase <usecasename>
 ```
 
-Replace `<usecasename>` with the name of your use case. Cave will generate the appropriate directories and boilerplate Java files following clean architecture conventions similar to the structure shown below:
+Replace `<usecasename>` with the name of your use case. Cave will generate the appropriate directories and boilerplate files following clean architecture conventions similar to the structure shown below (assume we initialize a Java project):
 
 ```
 src/main/java/use_case/
@@ -63,6 +90,50 @@ src/main/java/use_case/
     └── <usecasename>OutputBoundary.java
 
 src/main/java/interface_adapter/
+└── <usecasename>/
+    ├── <usecasename>Controller.java
+    └── <usecasename>Presenter.java
+```
+
+---
+
+### `cave feature <featurename>`
+
+Initializes the folder for a new feature. This only works on projects packaged by module.
+
+```bash
+cave module_usecase <featurename> <usecasename>
+```
+
+Replace `<featurename>` with the name of your feature. Cave will generate the appropriate directory as shown below (assume we initialize a Java project):
+
+```
+src/main/java/features
+└── <featurename>
+```
+
+---
+
+### `cave module_usecase <featurename> <usecasename>`
+
+Initializes the folders and file structure for a new use case, in the specified feature, in a project packaged by module.
+
+```bash
+cave module_usecase <featurename> <usecasename>
+```
+
+Replace `<featurename>` with the name of your feature. Replace `<usecasename>` with the name of your use case. Cave will generate the appropriate directories and boilerplate files following clean architecture conventions similar to the structure shown below (assume we initialize a Java project):
+
+```
+src/main/java/features/<featurename>/use_case/
+└── <usecasename>/
+    ├── <usecasename>InputBoundary.java
+    ├── <usecasename>InputData.java
+    ├── <usecasename>Interactor.java
+    ├── <usecasename>OutputData.java
+    └── <usecasename>OutputBoundary.java
+
+src/main/java/features/<featurename>/interface_adapter/
 └── <usecasename>/
     ├── <usecasename>Controller.java
     └── <usecasename>Presenter.java

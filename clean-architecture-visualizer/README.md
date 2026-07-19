@@ -13,15 +13,15 @@ npm install -g clean-architecture-visualizer
 ## Usage
 
 ```bash
-cave init                          # scaffold a new CSC207-style CA project
-cave module_init                   # scaffold a new project, organized by feature module
-cave usecase <name>                # generate the boilerplate for a new use case
-cave feature <feature>             # add a new feature to the project
-cave module_usecase <feature> <usecase>  # add a use case to an existing feature
-cave verify                        # check that use cases follow Clean Architecture rules
-cave start                         # start the backend server and frontend visualizer
-cave start --backend-only          # start only the backend server
-cave end                           # stop the server and clean up temp files
+cave init <language>                            # scaffold a new CSC207-style CA project in the chosen programming language
+cave module_init <language>                     # scaffold a new project, organized by feature module in the chosen language
+cave usecase <name>                             # generate the boilerplate for a new use case
+cave feature <feature>                          # add a new feature to the project
+cave module_usecase <feature> <usecase>         # add a use case to an existing feature
+cave verify                                     # check that use cases follow Clean Architecture rules
+cave start                                      # start the backend server and frontend visualizer
+cave start --backend-only                       # start only the backend server
+cave end                                        # stop the server and clean up temp files
 ```
 
 `cave start` launches a local web UI for browsing use case diagrams and CA layer violations in your project.
