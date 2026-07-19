@@ -74,8 +74,7 @@ describe('CreateUseCaseInteractor', () => {
   it('successfully creates directories and files for a valid use case name in python', async () => {
     // Arrange
     mockFileAccess.getCurrentPath.mockResolvedValue('/root');
-    mockFileAccess.bfsFindDir
-      .mockResolvedValueOnce('root/src/python');
+    mockFileAccess.bfsFindDir.mockResolvedValueOnce('root/src/python');
     mockFileAccess.bfsFindDir.mockImplementation(
       async (path, dirName) => `/root/src/${dirName}`
     );

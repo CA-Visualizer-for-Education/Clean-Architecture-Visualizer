@@ -1,7 +1,7 @@
 export class InitModuleProjectInputData {
-    constructor(private readonly language: string){}
+  constructor(private readonly language: string) {}
 
-    getLanguage(): string {
-        return this.language;
-    }
+  getLanguage(): string {
+    return this.language;
+  }
 }

@@ -41,8 +41,9 @@ describe('Template API', () => {
     const mockData = { message: 'Project initiated successfully' };
 
     server.use(
-      http.post(`*/api/template/generate/${encodeURIComponent('javascript')}`, () =>
-        HttpResponse.json(mockData, { status: 201 })
+      http.post(
+        `*/api/template/generate/${encodeURIComponent('javascript')}`,
+        () => HttpResponse.json(mockData, { status: 201 })
       )
     );
 
@@ -55,8 +56,9 @@ describe('Template API', () => {
     const mockData = { message: 'Project initiated successfully' };
 
     server.use(
-      http.post(`*/api/template/generate/${encodeURIComponent('typescript')}`, () =>
-        HttpResponse.json(mockData, { status: 201 })
+      http.post(
+        `*/api/template/generate/${encodeURIComponent('typescript')}`,
+        () => HttpResponse.json(mockData, { status: 201 })
       )
     );
 
@@ -69,8 +71,9 @@ describe('Template API', () => {
     const mockData = { message: 'Project initiated successfully' };
 
     server.use(
-      http.post(`*/api/template/module_generate/${encodeURIComponent('java')}`, () =>
-        HttpResponse.json(mockData, { status: 201 })
+      http.post(
+        `*/api/template/module_generate/${encodeURIComponent('java')}`,
+        () => HttpResponse.json(mockData, { status: 201 })
       )
     );
 
@@ -83,8 +86,9 @@ describe('Template API', () => {
     const mockData = { message: 'Project initiated successfully' };
 
     server.use(
-      http.post(`*/api/template/module_generate/${encodeURIComponent('python')}`, () =>
-        HttpResponse.json(mockData, { status: 201 })
+      http.post(
+        `*/api/template/module_generate/${encodeURIComponent('python')}`,
+        () => HttpResponse.json(mockData, { status: 201 })
       )
     );
 
@@ -97,8 +101,9 @@ describe('Template API', () => {
     const mockData = { message: 'Project initiated successfully' };
 
     server.use(
-      http.post(`*/api/template/module_generate/${encodeURIComponent('javascript')}`, () =>
-        HttpResponse.json(mockData, { status: 201 })
+      http.post(
+        `*/api/template/module_generate/${encodeURIComponent('javascript')}`,
+        () => HttpResponse.json(mockData, { status: 201 })
       )
     );
 
@@ -111,8 +116,9 @@ describe('Template API', () => {
     const mockData = { message: 'Project initiated successfully' };
 
     server.use(
-      http.post(`*/api/template/module_generate/${encodeURIComponent('typescript')}`, () =>
-        HttpResponse.json(mockData, { status: 201 })
+      http.post(
+        `*/api/template/module_generate/${encodeURIComponent('typescript')}`,
+        () => HttpResponse.json(mockData, { status: 201 })
       )
     );
 

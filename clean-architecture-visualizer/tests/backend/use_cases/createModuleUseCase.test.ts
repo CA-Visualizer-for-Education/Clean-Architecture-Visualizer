@@ -71,8 +71,7 @@ describe('CreateFeatureInteractor', () => {
 
   it('Successfully creates files in specified directories in specified use case in specified feature in python.', async () => {
     mockFileAccess.getCurrentPath.mockResolvedValue('/root');
-    mockFileAccess.bfsFindDir
-      .mockResolvedValueOnce('/root/src/python');
+    mockFileAccess.bfsFindDir.mockResolvedValueOnce('/root/src/python');
     mockFileAccess.bfsFindDir
       .mockImplementationOnce(async (_, dirName) => `/root/src/${dirName}`)
       .mockImplementationOnce(
@@ -211,10 +210,10 @@ describe('CreateFeatureInteractor', () => {
   it('Fails to create files because input feature does not exist.', async () => {
     mockFileAccess.getCurrentPath.mockResolvedValue('/root');
     mockFileAccess.bfsFindDir
-    .mockResolvedValueOnce(null)
-    .mockResolvedValueOnce(null)
-    .mockResolvedValueOnce(null)
-    .mockResolvedValueOnce('root/src/typescript');
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce('root/src/typescript');
 
     mockFileAccess.bfsFindDir
       .mockImplementationOnce(async (_, dirName) => `/root/src/${dirName}`)

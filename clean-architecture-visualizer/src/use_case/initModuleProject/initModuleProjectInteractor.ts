@@ -15,14 +15,16 @@ export class InitModuleProjectInteractor implements InitModuleProjectInputBounda
     this.outputData = outputData;
   }
 
-  async execute(initModuleProjectInputData: InitModuleProjectInputData): Promise<void> {
+  async execute(
+    initModuleProjectInputData: InitModuleProjectInputData
+  ): Promise<void> {
     try {
       const acceptedLanguage = ['typescript', 'javascript', 'java', 'python'];
       const language = initModuleProjectInputData.getLanguage();
-      if(!acceptedLanguage.includes(language.toLowerCase())){
+      if (!acceptedLanguage.includes(language.toLowerCase())) {
         throw new Error('You must enter a valid programming language.');
       }
-      
+
       let currPath = await this.fileAccess.getCurrentPath();
       currPath = path.join(currPath, 'src');
       // Create the src directory if it does not exist.
@@ -39,7 +41,11 @@ export class InitModuleProjectInteractor implements InitModuleProjectInputBounda
       }
 
       // The project does support TS, JS, Python, and Java
-      const programmingPath = path.join(currPath, 'main', language.toLowerCase());
+      const programmingPath = path.join(
+        currPath,
+        'main',
+        language.toLowerCase()
+      );
       const testPath = path.join(currPath, 'test', language.toLowerCase());
       await this.fileAccess.createDirectory(programmingPath);
       await this.fileAccess.createDirectory(testPath);

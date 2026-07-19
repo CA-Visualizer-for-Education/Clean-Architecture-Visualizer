@@ -19,7 +19,7 @@ export class InitProjectInteractor implements InitProjectInputBoundary {
     try {
       const acceptedLanguage = ['typescript', 'javascript', 'java', 'python'];
       const language = initProjectInputData.getLanguage();
-      if(!acceptedLanguage.includes(language.toLowerCase())){
+      if (!acceptedLanguage.includes(language.toLowerCase())) {
         throw new Error('You must enter a valid programming language.');
       }
 
@@ -39,7 +39,11 @@ export class InitProjectInteractor implements InitProjectInputBoundary {
       }
 
       // 1. Define base paths using path.join for cross-platform support
-      const programmingPath = path.join(currPath, 'main', language.toLowerCase());
+      const programmingPath = path.join(
+        currPath,
+        'main',
+        language.toLowerCase()
+      );
       const testPath = path.join(currPath, 'test', language.toLowerCase());
 
       // 2. Define sub-directories within the java path

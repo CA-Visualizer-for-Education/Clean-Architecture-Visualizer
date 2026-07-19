@@ -45,12 +45,15 @@ describe('Template Hooks', () => {
       .mockResolvedValue(undefined);
 
     server.use(
-      http.post(`*/api/template/generate/${encodeURIComponent('python')}`, () => {
-        return HttpResponse.json(
-          { message: 'Project initiated successfully' },
-          { status: 201 }
-        );
-      })
+      http.post(
+        `*/api/template/generate/${encodeURIComponent('python')}`,
+        () => {
+          return HttpResponse.json(
+            { message: 'Project initiated successfully' },
+            { status: 201 }
+          );
+        }
+      )
     );
 
     const { result } = renderHook(() => useGenerateProject());
@@ -68,12 +71,15 @@ describe('Template Hooks', () => {
       .mockResolvedValue(undefined);
 
     server.use(
-      http.post(`*/api/template/generate/${encodeURIComponent('javascript')}`, () => {
-        return HttpResponse.json(
-          { message: 'Project initiated successfully' },
-          { status: 201 }
-        );
-      })
+      http.post(
+        `*/api/template/generate/${encodeURIComponent('javascript')}`,
+        () => {
+          return HttpResponse.json(
+            { message: 'Project initiated successfully' },
+            { status: 201 }
+          );
+        }
+      )
     );
 
     const { result } = renderHook(() => useGenerateProject());
@@ -91,12 +97,15 @@ describe('Template Hooks', () => {
       .mockResolvedValue(undefined);
 
     server.use(
-      http.post(`*/api/template/generate/${encodeURIComponent('typescript')}`, () => {
-        return HttpResponse.json(
-          { message: 'Project initiated successfully' },
-          { status: 201 }
-        );
-      })
+      http.post(
+        `*/api/template/generate/${encodeURIComponent('typescript')}`,
+        () => {
+          return HttpResponse.json(
+            { message: 'Project initiated successfully' },
+            { status: 201 }
+          );
+        }
+      )
     );
 
     const { result } = renderHook(() => useGenerateProject());
@@ -114,12 +123,15 @@ describe('Template Hooks', () => {
       .mockResolvedValue(undefined);
 
     server.use(
-      http.post(`*/api/template/module_generate/${encodeURIComponent('java')}`, () => {
-        return HttpResponse.json(
-          { message: 'Project initiated successfully' },
-          { status: 201 }
-        );
-      })
+      http.post(
+        `*/api/template/module_generate/${encodeURIComponent('java')}`,
+        () => {
+          return HttpResponse.json(
+            { message: 'Project initiated successfully' },
+            { status: 201 }
+          );
+        }
+      )
     );
 
     const { result } = renderHook(() => useGenerateModuleProject());
@@ -137,12 +149,15 @@ describe('Template Hooks', () => {
       .mockResolvedValue(undefined);
 
     server.use(
-      http.post(`*/api/template/module_generate/${encodeURIComponent('python')}`, () => {
-        return HttpResponse.json(
-          { message: 'Project initiated successfully' },
-          { status: 201 }
-        );
-      })
+      http.post(
+        `*/api/template/module_generate/${encodeURIComponent('python')}`,
+        () => {
+          return HttpResponse.json(
+            { message: 'Project initiated successfully' },
+            { status: 201 }
+          );
+        }
+      )
     );
 
     const { result } = renderHook(() => useGenerateModuleProject());
@@ -160,12 +175,15 @@ describe('Template Hooks', () => {
       .mockResolvedValue(undefined);
 
     server.use(
-      http.post(`*/api/template/module_generate/${encodeURIComponent('javascript')}`, () => {
-        return HttpResponse.json(
-          { message: 'Project initiated successfully' },
-          { status: 201 }
-        );
-      })
+      http.post(
+        `*/api/template/module_generate/${encodeURIComponent('javascript')}`,
+        () => {
+          return HttpResponse.json(
+            { message: 'Project initiated successfully' },
+            { status: 201 }
+          );
+        }
+      )
     );
 
     const { result } = renderHook(() => useGenerateModuleProject());
@@ -183,12 +201,15 @@ describe('Template Hooks', () => {
       .mockResolvedValue(undefined);
 
     server.use(
-      http.post(`*/api/template/module_generate/${encodeURIComponent('typescript')}`, () => {
-        return HttpResponse.json(
-          { message: 'Project initiated successfully' },
-          { status: 201 }
-        );
-      })
+      http.post(
+        `*/api/template/module_generate/${encodeURIComponent('typescript')}`,
+        () => {
+          return HttpResponse.json(
+            { message: 'Project initiated successfully' },
+            { status: 201 }
+          );
+        }
+      )
     );
 
     const { result } = renderHook(() => useGenerateModuleProject());

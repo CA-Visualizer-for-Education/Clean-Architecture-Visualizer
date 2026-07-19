@@ -24,20 +24,21 @@ export class CreateModuleUseCaseInteractor implements CreateModuleUseCaseInputBo
         ['java', 'java'],
         ['javascript', 'js'],
         ['typescript', 'ts'],
-
-      ])
-      for(const [language, ext] of languageToExtension){
-        if(await this.fileAccess.bfsFindDir(currPath, language)){
+      ]);
+      for (const [language, ext] of languageToExtension) {
+        if (await this.fileAccess.bfsFindDir(currPath, language)) {
           extension = ext;
           break;
         }
       }
 
-      if(extension === undefined) {
-        this.presenter.showFailView('Your project does not have a specified programming language.');
+      if (extension === undefined) {
+        this.presenter.showFailView(
+          'Your project does not have a specified programming language.'
+        );
         return;
       }
-      
+
       // check if features directory exists
       const featuresDirectory = await this.fileAccess.bfsFindDir(
         currPath,
