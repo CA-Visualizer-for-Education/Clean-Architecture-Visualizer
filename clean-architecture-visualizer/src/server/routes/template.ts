@@ -22,13 +22,13 @@ const router = Router();
 
 const fileAccess = new FileAccess();
 
-router.post('/template/generate', async (_req, res) => {
+router.post('/template/generate/:language', async (req, res) => {
   const outputData = new InitProjectOutputData();
   const interactor = new InitProjectInteractor(fileAccess, outputData);
   const controller = new InitProjectController(interactor);
   const presenter = new InitProjectPresenter(outputData);
 
-  await controller.execute();
+  await controller.execute(req.params.language);
   const result = presenter.getOutputData();
 
   if (!result) {
@@ -39,13 +39,13 @@ router.post('/template/generate', async (_req, res) => {
   res.status(201).json({ message: `Project initiated successfully` });
 });
 
-router.post('/template/module_generate', async (_req, res) => {
+router.post('/template/module_generate/:language', async (req, res) => {
   const outputData = new InitModuleProjectOutputData();
   const interactor = new InitModuleProjectInteractor(fileAccess, outputData);
   const controller = new InitModuleProjectController(interactor);
   const presenter = new InitModuleProjectPresenter(outputData);
 
-  await controller.execute();
+  await controller.execute(req.params.language);
   const result = presenter.getOutputData();
 
   if (!result) {

@@ -305,8 +305,8 @@ export class AppBuilder {
     await this.graphVerificationController?.execute(formatForCLI);
   }
 
-  async runInitProject() {
-    await this.initProjectController?.execute();
+  async runInitProject(language: string) {
+    await this.initProjectController?.execute(language);
     if (this.initProjectOutputData?.getOutputData()) {
       console.log(chalk.green('Your project has been initialized.'));
     } else {
@@ -318,8 +318,8 @@ export class AppBuilder {
     }
   }
 
-  async runInitModuleProject() {
-    await this.initModuleProjectController?.execute();
+  async runInitModuleProject(language: string) {
+    await this.initModuleProjectController?.execute(language);
     if (this.initModuleProjectOutputData?.getOutputData()) {
       console.log(
         chalk.green('Your project packaged by module has been initialized.')
