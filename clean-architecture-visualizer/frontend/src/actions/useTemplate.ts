@@ -11,7 +11,7 @@ export const useGenerateProject = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: generateProject,
+    mutationFn: (language: string) => generateProject(language),
     onSuccess: () => {
       // invalidate data here
       queryClient.invalidateQueries({ queryKey: ['file-tree'] });
@@ -23,7 +23,7 @@ export const useGenerateModuleProject = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: generateModuleProject,
+    mutationFn: (language: string) => generateModuleProject(language),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['file-tree'] });
     },

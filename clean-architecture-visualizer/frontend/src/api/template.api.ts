@@ -3,9 +3,9 @@ import apiClient from './apiClient';
 /**
  * Initiates the base folder structure for a Clean Architecture project.
  */
-export const generateProject = async () => {
+export const generateProject = async (language: string) => {
   const { data } = await apiClient.post<{ message: string }>(
-    '/template/generate'
+    `/template/generate/${encodeURIComponent(language)}`
   );
   return data;
 };
@@ -13,9 +13,9 @@ export const generateProject = async () => {
 /**
  * Initiates the base folder structure for a Clean Architecture project packaged by module.
  */
-export const generateModuleProject = async () => {
+export const generateModuleProject = async (language: string) => {
   const { data } = await apiClient.post<{ message: string }>(
-    '/template/module_generate'
+    `/template/module_generate/${encodeURIComponent(language)}`
   );
   return data;
 };

@@ -51,13 +51,13 @@ describe('ProjectStarter Page', () => {
     ).toBeInTheDocument();
   });
 
-  it('shows a success snackbar after generating a project', async () => {
+  it('shows a success snackbar after generating a project in java', async () => {
     render(<ProjectStarter />);
 
     fireEvent.click(screen.getByRole('button', { name: 'startNew.button' }));
 
     expect(templateMock.generateMutation).toHaveBeenCalledWith(
-      undefined,
+      'java',
       expect.any(Object)
     );
     expect(
