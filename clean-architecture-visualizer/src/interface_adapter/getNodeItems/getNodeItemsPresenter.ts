@@ -1,7 +1,7 @@
 import type { GetNodeItemsOutputData } from "../../use_case/getNodeItems/getNodeItemsOutputData.js";
 import type { GetNodeItemsOutputBoundary } from "../../use_case/getNodeItems/getNodeItemsOutputBoundary.js";
 
-export class GetFileTreePresenter implements GetNodeItemsOutputBoundary {
+export class GetNodeItemsPresenter implements GetNodeItemsOutputBoundary {
 
     constructor(private readonly outputData: GetNodeItemsOutputData) {}
     getOutputData(): object {

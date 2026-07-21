@@ -1,18 +1,30 @@
 import type { GetNodeItemsInputBoundary } from "./getNodeItemsInputBoundary.js";
 import type { SessionDBAccessInterface } from "../../data_access/sessionDBAccessInterface.js";
+import type { GetNodeItemsInputData } from "./getNodeItemsInputData.js";
 import type { GetNodeItemsOutputData } from "./getNodeItemsOutputData.js";
 
 export class GetNodeItemsInteractor implements GetNodeItemsInputBoundary {
     constructor(
         private readonly db: SessionDBAccessInterface,
+        private readonly inputData: GetNodeItemsInputData,
         private readonly outputData: GetNodeItemsOutputData,
     ) {}
 
     async getNodeItems(): Promise<void> {
         const files = this.db.getAllFiles();
-        let result: { [key: string]: any } = {};
+        const usecase = this.inputData.getUseCase();
 
-        for (const file of files){
+        if (!usecase){
+            return;
+        }
+
+        const result: { [key: string]: any } = {};
+
+        for (const filePath of usecase){
+            const file = this.db.getFileByPath(filePath);
+            if (!file)
+                continue;
+
             const node = file.node;
             const fileName = file.filePath.split("/").at(-1) ?? file.filePath;
 

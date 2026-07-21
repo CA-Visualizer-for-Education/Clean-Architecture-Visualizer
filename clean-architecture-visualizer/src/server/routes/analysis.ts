@@ -15,6 +15,12 @@ import { GetViolationsInteractor } from "../../use_case/getViolations/GetViolati
 import { FileAccess } from "../../data_access/fileAccess.js";
 import { GetViolationsController } from "../../interface_adapter/getViolations/getViolationsController.js";
 import { GetViolationsPresenter } from "../../interface_adapter/getViolations/getViolationsPresenter.js";
+import { GetNodeItemsInteractor } from "../../use_case/getNodeItems/getNodeItemsInteractor.js";
+import { GetNodeItemsInputData } from "../../use_case/getNodeItems/getNodeItemsInputData.js";
+import { GetNodeItemsOutputData } from "../../use_case/getNodeItems/getNodeItemsOutputData.js";
+import { GetNodeItemsController } from "../../interface_adapter/getNodeItems/getNodeItemsController.js";
+import { GetNodeItemsPresenter } from "../../interface_adapter/getNodeItems/getNodeItemsPresenter.js";
+
 
 const router = Router();
 
@@ -64,6 +70,22 @@ router.get("/analysis/violations/:interactionId", async (req, res) => {
     const result = presenter.getOutputData();
     if (!result) {
         res.status(404).json({ error: `Interaction '${req.params.interactionId}' not found.` });
+        return;
+    }
+    res.json(result);
+});
+
+router.get("/analysis/node-items/:useCaseId", (req, res) => {
+    const inputData = new GetNodeItemsInputData(req.params.useCaseId)
+    const outputData = new GetNodeItemsOutputData();
+    const interactor = new GetNodeItemsInteractor(dbAccess, inputData, outputData);
+    const controller = new GetNodeItemsController(interactor);
+    const presenter = new GetNodeItemsPresenter(outputData);
+
+    controller.execute();
+    const result = presenter.getOutputData();
+    if (!result) {
+        res.status(404).json({ error: `Node '${req.params.useCaseId}' not found.` });
         return;
     }
     res.json(result);
