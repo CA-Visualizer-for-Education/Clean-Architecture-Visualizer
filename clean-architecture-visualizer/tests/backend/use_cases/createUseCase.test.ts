@@ -230,7 +230,7 @@ describe('CreateUseCaseInteractor', () => {
     // Assert
     expect(mockPresenter.showSuccessView).not.toHaveBeenCalled();
     expect(mockPresenter.showFailView).toHaveBeenCalledWith(
-      'Usecase Test already exists.'
+      'Usecase Test already exists. Please choose a different name.'
     );
     // Ensure no files or directories were attempted to be created
     expect(mockFileAccess.createFile).not.toHaveBeenCalled();

@@ -20,9 +20,11 @@ export class InitModuleProjectInteractor implements InitModuleProjectInputBounda
   ): Promise<void> {
     try {
       const acceptedLanguage = ['typescript', 'javascript', 'java', 'python'];
-      const language = initModuleProjectInputData.getLanguage();
+      let language = initModuleProjectInputData.getLanguage().trim();
       if (!acceptedLanguage.includes(language.toLowerCase())) {
-        throw new Error('You must enter a valid programming language.');
+        throw new Error(
+          'You must enter a valid programming language of: java, python, typescript, or javascript. Blank defaults to Java.'
+        );
       }
 
       let currPath = await this.fileAccess.getCurrentPath();

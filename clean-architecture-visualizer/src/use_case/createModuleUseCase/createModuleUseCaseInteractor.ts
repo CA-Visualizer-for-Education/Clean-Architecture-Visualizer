@@ -34,7 +34,7 @@ export class CreateModuleUseCaseInteractor implements CreateModuleUseCaseInputBo
 
       if (extension === undefined) {
         this.presenter.showFailView(
-          'Your project does not have a specified programming language.'
+          'Your project does not have a specified programming language. You must create a directory that has the name: java, python, typescript, or javascript.'
         );
         return;
       }
@@ -58,14 +58,16 @@ export class CreateModuleUseCaseInteractor implements CreateModuleUseCaseInputBo
       );
       if (!currFeatureDirectory) {
         this.presenter.showFailView(
-          'The input feature does not exist in the features directory.'
+          'The input feature does not exist in the features directory. Please choose a feature that does exist or create this feature.'
         );
         return;
       }
 
       // check if usecase already exists.
       if (await this.fileAccess.bfsFindDir(featuresDirectory, usecase)) {
-        this.presenter.showFailView('The input usecase already exists.');
+        this.presenter.showFailView(
+          'The input usecase already exists. Please choose a different name.'
+        );
         return;
       }
 

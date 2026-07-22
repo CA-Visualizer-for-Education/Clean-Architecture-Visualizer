@@ -64,18 +64,18 @@ program
   });
 
 program
-  .command('init <language>')
+  .command('init [language]')
   .description('Create the template for a new CSC207 project')
-  .action(async (language: string) => {
+  .action(async (language: string = 'java') => {
     app.runInitProject(language);
   });
 
 program
-  .command('module_init <language>')
+  .command('module_init [language]')
   .description(
     'Create the template for a new CSC207 project, packaged by module.'
   )
-  .action(async (language: string) => {
+  .action(async (language: string = 'java') => {
     app.runInitModuleProject(language);
   });
 

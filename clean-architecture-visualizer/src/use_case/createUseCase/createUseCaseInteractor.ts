@@ -36,7 +36,7 @@ export class CreateUseCaseInteractor implements CreateUseCaseInputBoundary {
 
       if (extension === undefined) {
         this.presenter.showFailView(
-          'Your project does not have a specified programming language.'
+          'Your project does not have a specified programming language. You must create a directory that has the name: java, python, typescript, or javascript.'
         );
         return;
       }
@@ -62,7 +62,9 @@ export class CreateUseCaseInteractor implements CreateUseCaseInputBoundary {
       const useCaseExists = await this.fileAccess.exists(targetUseCasePath);
       const interfaceExists = await this.fileAccess.exists(targetInterfacePath);
       if (useCaseExists || interfaceExists) {
-        this.presenter.showFailView(`Usecase ${useCaseName} already exists.`);
+        this.presenter.showFailView(
+          `Usecase ${useCaseName} already exists. Please choose a different name.`
+        );
         return;
       }
 

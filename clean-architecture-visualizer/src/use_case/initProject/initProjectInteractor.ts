@@ -18,9 +18,11 @@ export class InitProjectInteractor implements InitProjectInputBoundary {
   async execute(initProjectInputData: InitProjectInputData): Promise<void> {
     try {
       const acceptedLanguage = ['typescript', 'javascript', 'java', 'python'];
-      const language = initProjectInputData.getLanguage();
+      let language = initProjectInputData.getLanguage().trim();
       if (!acceptedLanguage.includes(language.toLowerCase())) {
-        throw new Error('You must enter a valid programming language.');
+        throw new Error(
+          'You must enter a valid programming language of: java, python, typescript, or javascript. Blank defaults to Java.'
+        );
       }
 
       let currPath = await this.fileAccess.getCurrentPath();

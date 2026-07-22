@@ -225,7 +225,7 @@ describe('CreateFeatureInteractor', () => {
     await interactor.execute(inputData);
     expect(mockPresenter.showSuccessView).not.toHaveBeenCalled();
     expect(mockPresenter.showFailView).toHaveBeenCalledWith(
-      'The input feature does not exist in the features directory.'
+      'The input feature does not exist in the features directory. Please choose a feature that does exist or create this feature.'
     );
   });
 
@@ -247,7 +247,7 @@ describe('CreateFeatureInteractor', () => {
     await interactor.execute(inputData);
     expect(mockPresenter.showSuccessView).not.toHaveBeenCalled();
     expect(mockPresenter.showFailView).toHaveBeenCalledWith(
-      'The input usecase already exists.'
+      'The input usecase already exists. Please choose a different name.'
     );
   });
   it('Fails to create files because use case already exists in another directory.', async () => {
@@ -268,7 +268,7 @@ describe('CreateFeatureInteractor', () => {
     await interactor.execute(inputData);
     expect(mockPresenter.showSuccessView).not.toHaveBeenCalled();
     expect(mockPresenter.showFailView).toHaveBeenCalledWith(
-      'The input usecase already exists.'
+      'The input usecase already exists. Please choose a different name.'
     );
   });
 
