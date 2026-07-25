@@ -127,7 +127,6 @@ export class GraphVerificationInteractor implements GraphVerificationInputBounda
     let allEdges: string[][] = [];
     // map use case graph names to graphs
     let useCaseGraphNamesToGraph = new Map<string, useCaseGraph>();
-
     let useCaseIndex = 0;
     for (const graph of this.useCaseGraphList) {
       this.crossUseCaseEdges.push([]);
@@ -151,11 +150,6 @@ export class GraphVerificationInteractor implements GraphVerificationInputBounda
           if (toNode) {
             let importFileName = importPath.split('/').at(-1) ?? '';
             importFileName = importFileName.split('.').at(0) ?? '';
-
-            const modifiedImportPath =
-              importPath.length > 0 && importPath.at(-1) === ';'
-                ? importPath.slice(0, -1)
-                : importPath;
             //Check if the imported file is an external file path
             if (
               !useCaseFiles.includes(importFileName) &&
@@ -165,16 +159,23 @@ export class GraphVerificationInteractor implements GraphVerificationInputBounda
               this.crossUseCaseFiles.add(filePath);
             } else {
               graph.setNodeNeighbour(fromNode, toNode);
-              if (this.externalFilePaths.has(modifiedImportPath)) {
-                graph.addFile(
-                  modifiedImportPath,
-                  this.externalFilePaths.get(modifiedImportPath) as string
-                );
+              // A problem we are having is the extensions between js and ts
+              // To get around that, we find the externalFileName (has extension) that has the importFileName (no extension)
+              const externalFileNamePath = [...this.externalFilePaths].find(
+                ([externalFileName, _]) =>
+                  externalFileName.includes(importFileName)
+              );
+              // Making the assumption that no two files are ever named the same
+              // this.externalFilePaths maps the name of the file to its filePath
+              // importFileName only contains the name of the file
+
+              if (externalFileNamePath) {
+                graph.addFile(externalFileNamePath[0], externalFileNamePath[1]);
                 // Gets the external file path from the modified import path and adds the use case graph name
                 // to the set of use case graphs that the external file belongs to
                 // Nothing to optimize.
                 externalFilesToUseCaseGraphs
-                  .get(this.externalFilePaths.get(modifiedImportPath) as string)
+                  .get(externalFileNamePath[1])
                   ?.add(graph.getName());
               }
             }
@@ -195,6 +196,8 @@ export class GraphVerificationInteractor implements GraphVerificationInputBounda
       // There is probably room to optimize since we iterate #graphs * #imports * #internal_files
       this.useCaseGraphList.map((graph) => {
         useCaseGraphNamesToGraph.set(graph.getName(), graph);
+        // Want to add all external files to all use case graphs
+        graph.addFile(fileName, filePath);
         imports.map((importPath) =>
           [...graph.getFiles().keys()].map((targetFileName) => {
             const base = targetFileName.toLowerCase().replace(/\.[^.]+$/, '');
@@ -227,10 +230,12 @@ export class GraphVerificationInteractor implements GraphVerificationInputBounda
         if (this.resolveImportToFileName(this.internalFilePaths, importPath)) {
           return;
         }
+
         const targetFileName = this.resolveImportToFileName(
           this.externalFilePaths,
           importPath
         );
+
         if (!targetFileName) return;
 
         const toFilePath = this.externalFilePaths.get(targetFileName) as string;
@@ -243,7 +248,6 @@ export class GraphVerificationInteractor implements GraphVerificationInputBounda
         );
       });
     }
-
     allEdges.map(([fromNodePath, toNodePath]) => {
       if (
         toNodePath &&
@@ -358,7 +362,8 @@ export class GraphVerificationInteractor implements GraphVerificationInputBounda
     if (importPath.includes('viewmodel')) return 'viewModel'; // must be verified before 'view'
     if (importPath.includes('view')) return 'view';
     if (importPath.includes('database')) return 'database';
-    if (importPath.includes('entity')) return 'entities';
+    if (importPath.includes('entity') || importPath.includes('entities'))
+      return 'entities';
     if (importPath.includes('accessinterface')) return 'dataAccessInterface'; // must be verified before 'dataAccess'
     if (importPath.includes('access')) return 'dataAccess';
     if (importPath.includes('controller')) return 'controller';
@@ -589,7 +594,6 @@ export class GraphVerificationInteractor implements GraphVerificationInputBounda
       );
 
       const neighbourMap = uc.getNeighbourMap();
-
       for (const [fromNode, neighbours] of Object.entries(neighbourMap) as [
         cleanNode,
         cleanNode[],
