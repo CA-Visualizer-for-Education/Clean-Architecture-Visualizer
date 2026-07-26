@@ -238,3 +238,33 @@ describe('getUseCases functionality', () => {
     expect(result).toEqual([]);
   });
 });
+
+describe('getFileSnippet functionality', () => {
+  const fileAccess = new FileAccess();
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('successfully retrieves file snippet from file', async () => {
+    mockReadFile.mockResolvedValueOnce(
+      'not a line\nimport ../usecase1InputBoundary.py;'
+    );
+    const res = await fileAccess.getFileSnippet('/src', 'inputBoundary');
+    expect(res).toBe('import ../usecase1InputBoundary.py;');
+  });
+
+  it('successfully retrieves file snippet from file when target is entity', async () => {
+    mockReadFile.mockResolvedValueOnce('import ../entities/entity1.py;');
+    const res = await fileAccess.getFileSnippet('/src', 'entity');
+    expect(res).toBe('import ../entities/entity1.py;');
+  });
+
+  it('successfully retrieves file snippet from file when target is use case interactor', async () => {
+    mockReadFile.mockResolvedValueOnce(
+      'import ../use_case/usecase1Interactor.py;'
+    );
+    const res = await fileAccess.getFileSnippet('/src', 'useCaseInteractor');
+    expect(res).toBe('import ../use_case/usecase1Interactor.py;');
+  });
+});
