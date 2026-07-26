@@ -29,10 +29,11 @@ describe('CreateFeatureInteractor', () => {
     );
   });
 
-  it('Successfully creates files in specified directories in specified use case in specified feature.', async () => {
+  it('Successfully creates files in specified directories in specified use case in specified feature in java.', async () => {
     mockFileAccess.getCurrentPath.mockResolvedValue('/root');
-    // bfsFindDir runs twice and will need two different implementations
-    // The first will find the features directory and the second will find the specific feature
+    mockFileAccess.bfsFindDir
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce('/root/src/java');
     mockFileAccess.bfsFindDir
       .mockImplementationOnce(async (_, dirName) => `/root/src/${dirName}`)
       .mockImplementationOnce(
@@ -68,10 +69,133 @@ describe('CreateFeatureInteractor', () => {
     expect(mockPresenter.showFailView).not.toHaveBeenCalled();
   });
 
+  it('Successfully creates files in specified directories in specified use case in specified feature in python.', async () => {
+    mockFileAccess.getCurrentPath.mockResolvedValue('/root');
+    mockFileAccess.bfsFindDir.mockResolvedValueOnce('/root/src/python');
+    mockFileAccess.bfsFindDir
+      .mockImplementationOnce(async (_, dirName) => `/root/src/${dirName}`)
+      .mockImplementationOnce(
+        async (_, dirName) => `/root/src/features/${dirName}`
+      )
+      .mockImplementationOnce(async (_, dirName) => null);
+    const inputData = new CreateModuleUseCaseInputData(
+      'newFeature',
+      'newUseCase'
+    );
+    await interactor.execute(inputData);
+
+    expect(mockFileAccess.createDirectory).toHaveBeenCalledWith(
+      '/root/src/features/newFeature/newUseCase/interface_adapter'
+    );
+    expect(mockFileAccess.createDirectory).toHaveBeenCalledWith(
+      '/root/src/features/newFeature/newUseCase/use_case'
+    );
+    expect(mockFileAccess.createFile).toHaveBeenCalledWith(
+      expect.stringContaining('newUseCaseInputBoundary.py')
+    );
+    expect(mockFileAccess.createFile).toHaveBeenCalledWith(
+      expect.stringContaining('newUseCaseUseCaseInteractor.py')
+    );
+    expect(mockFileAccess.createFile).toHaveBeenCalledWith(
+      expect.stringContaining('newUseCaseController.py')
+    );
+    expect(mockFileAccess.createFile).toHaveBeenCalledTimes(7);
+
+    expect(mockPresenter.showSuccessView).toHaveBeenCalledWith(
+      new CreateModuleUseCaseOutputData('newFeature', 'newUseCase')
+    );
+    expect(mockPresenter.showFailView).not.toHaveBeenCalled();
+  });
+
+  it('Successfully creates files in specified directories in specified use case in specified feature in javascript.', async () => {
+    mockFileAccess.getCurrentPath.mockResolvedValue('/root');
+    mockFileAccess.bfsFindDir
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce('/root/src/javascript');
+    mockFileAccess.bfsFindDir
+      .mockImplementationOnce(async (_, dirName) => `/root/src/${dirName}`)
+      .mockImplementationOnce(
+        async (_, dirName) => `/root/src/features/${dirName}`
+      )
+      .mockImplementationOnce(async (_, dirName) => null);
+    const inputData = new CreateModuleUseCaseInputData(
+      'newFeature',
+      'newUseCase'
+    );
+    await interactor.execute(inputData);
+
+    expect(mockFileAccess.createDirectory).toHaveBeenCalledWith(
+      '/root/src/features/newFeature/newUseCase/interface_adapter'
+    );
+    expect(mockFileAccess.createDirectory).toHaveBeenCalledWith(
+      '/root/src/features/newFeature/newUseCase/use_case'
+    );
+    expect(mockFileAccess.createFile).toHaveBeenCalledWith(
+      expect.stringContaining('newUseCaseInputBoundary.js')
+    );
+    expect(mockFileAccess.createFile).toHaveBeenCalledWith(
+      expect.stringContaining('newUseCaseUseCaseInteractor.js')
+    );
+    expect(mockFileAccess.createFile).toHaveBeenCalledWith(
+      expect.stringContaining('newUseCaseController.js')
+    );
+    expect(mockFileAccess.createFile).toHaveBeenCalledTimes(7);
+
+    expect(mockPresenter.showSuccessView).toHaveBeenCalledWith(
+      new CreateModuleUseCaseOutputData('newFeature', 'newUseCase')
+    );
+    expect(mockPresenter.showFailView).not.toHaveBeenCalled();
+  });
+
+  it('Successfully creates files in specified directories in specified use case in specified feature in typescript.', async () => {
+    mockFileAccess.getCurrentPath.mockResolvedValue('/root');
+    mockFileAccess.bfsFindDir
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce('/root/src/typescript');
+    mockFileAccess.bfsFindDir
+      .mockImplementationOnce(async (_, dirName) => `/root/src/${dirName}`)
+      .mockImplementationOnce(
+        async (_, dirName) => `/root/src/features/${dirName}`
+      )
+      .mockImplementationOnce(async (_, dirName) => null);
+    const inputData = new CreateModuleUseCaseInputData(
+      'newFeature',
+      'newUseCase'
+    );
+    await interactor.execute(inputData);
+
+    expect(mockFileAccess.createDirectory).toHaveBeenCalledWith(
+      '/root/src/features/newFeature/newUseCase/interface_adapter'
+    );
+    expect(mockFileAccess.createDirectory).toHaveBeenCalledWith(
+      '/root/src/features/newFeature/newUseCase/use_case'
+    );
+    expect(mockFileAccess.createFile).toHaveBeenCalledWith(
+      expect.stringContaining('newUseCaseInputBoundary.ts')
+    );
+    expect(mockFileAccess.createFile).toHaveBeenCalledWith(
+      expect.stringContaining('newUseCaseUseCaseInteractor.ts')
+    );
+    expect(mockFileAccess.createFile).toHaveBeenCalledWith(
+      expect.stringContaining('newUseCaseController.ts')
+    );
+    expect(mockFileAccess.createFile).toHaveBeenCalledTimes(7);
+
+    expect(mockPresenter.showSuccessView).toHaveBeenCalledWith(
+      new CreateModuleUseCaseOutputData('newFeature', 'newUseCase')
+    );
+    expect(mockPresenter.showFailView).not.toHaveBeenCalled();
+  });
+
   it('Fails to create files because features directory does not exist.', async () => {
     mockFileAccess.getCurrentPath.mockResolvedValue('/root');
     // bfsFindDir will only run once when trying to find features
-    mockFileAccess.bfsFindDir.mockResolvedValue(null);
+    mockFileAccess.bfsFindDir
+      .mockResolvedValueOnce('/root/src/python')
+      .mockResolvedValueOnce(null);
     const inputData = new CreateModuleUseCaseInputData(
       'newFeature',
       'newUseCase'
@@ -86,6 +210,12 @@ describe('CreateFeatureInteractor', () => {
   it('Fails to create files because input feature does not exist.', async () => {
     mockFileAccess.getCurrentPath.mockResolvedValue('/root');
     mockFileAccess.bfsFindDir
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce('root/src/typescript');
+
+    mockFileAccess.bfsFindDir
       .mockImplementationOnce(async (_, dirName) => `/root/src/${dirName}`)
       .mockImplementationOnce(async (_, dirName) => null);
     const inputData = new CreateModuleUseCaseInputData(
@@ -95,12 +225,13 @@ describe('CreateFeatureInteractor', () => {
     await interactor.execute(inputData);
     expect(mockPresenter.showSuccessView).not.toHaveBeenCalled();
     expect(mockPresenter.showFailView).toHaveBeenCalledWith(
-      'The input feature does not exist in the features directory.'
+      'The input feature does not exist in the features directory. Please choose a feature that does exist or create this feature.'
     );
   });
 
   it('Fails to create files because use case already exists.', async () => {
     mockFileAccess.getCurrentPath.mockResolvedValue('/root');
+    mockFileAccess.bfsFindDir.mockResolvedValueOnce('/root/src/python');
     mockFileAccess.bfsFindDir
       .mockImplementationOnce(async (_, dirName) => `/root/src/${dirName}`)
       .mockImplementationOnce(
@@ -116,11 +247,12 @@ describe('CreateFeatureInteractor', () => {
     await interactor.execute(inputData);
     expect(mockPresenter.showSuccessView).not.toHaveBeenCalled();
     expect(mockPresenter.showFailView).toHaveBeenCalledWith(
-      'The input usecase already exists.'
+      'The input usecase already exists. Please choose a different name.'
     );
   });
   it('Fails to create files because use case already exists in another directory.', async () => {
     mockFileAccess.getCurrentPath.mockResolvedValue('/root');
+    mockFileAccess.bfsFindDir.mockResolvedValueOnce('/root/src/python');
     mockFileAccess.bfsFindDir
       .mockImplementationOnce(async (_, dirName) => `/root/src/${dirName}`)
       .mockImplementationOnce(
@@ -136,13 +268,14 @@ describe('CreateFeatureInteractor', () => {
     await interactor.execute(inputData);
     expect(mockPresenter.showSuccessView).not.toHaveBeenCalled();
     expect(mockPresenter.showFailView).toHaveBeenCalledWith(
-      'The input usecase already exists.'
+      'The input usecase already exists. Please choose a different name.'
     );
   });
 
   it('Fails if an unexpected error occurs during directory creation.', async () => {
     // Arrange
     mockFileAccess.getCurrentPath.mockResolvedValue('/root');
+    mockFileAccess.bfsFindDir.mockResolvedValueOnce('/root/src/python');
     mockFileAccess.bfsFindDir
       .mockImplementationOnce(async (_, dirName) => `/root/src/${dirName}`)
       .mockImplementationOnce(
@@ -160,6 +293,7 @@ describe('CreateFeatureInteractor', () => {
   it('Fails if an unexpected error occurs during file creation.', async () => {
     // Arrange
     mockFileAccess.getCurrentPath.mockResolvedValue('/root');
+    mockFileAccess.bfsFindDir.mockResolvedValueOnce('/root/src/python');
     mockFileAccess.bfsFindDir
       .mockImplementationOnce(async (_, dirName) => `/root/src/${dirName}`)
       .mockImplementationOnce(
@@ -169,6 +303,21 @@ describe('CreateFeatureInteractor', () => {
     mockFileAccess.createFile.mockRejectedValue(
       new Error('Failed to create directory.')
     );
+    await interactor.execute(
+      new CreateModuleUseCaseInputData('newFeature', 'newUseCase')
+    );
+    expect(mockPresenter.showSuccessView).not.toHaveBeenCalled();
+    expect(mockPresenter.showFailView).toHaveBeenCalled();
+  });
+
+  it('Fails if there is no specified language.', async () => {
+    // Arrange
+    mockFileAccess.getCurrentPath.mockResolvedValue('/root');
+    mockFileAccess.bfsFindDir
+      .mockResolvedValue(null)
+      .mockResolvedValue(null)
+      .mockResolvedValue(null)
+      .mockResolvedValue(null);
     await interactor.execute(
       new CreateModuleUseCaseInputData('newFeature', 'newUseCase')
     );

@@ -1,3 +1,5 @@
+import { InitProjectInputData } from './initProjectInputData.js';
+
 export interface InitProjectInputBoundary {
-  execute(): Promise<void>;
+  execute(initProjectInputData: InitProjectInputData): Promise<void>;
 }

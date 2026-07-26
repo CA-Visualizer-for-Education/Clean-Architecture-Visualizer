@@ -19,6 +19,28 @@ export class CreateUseCaseInteractor implements CreateUseCaseInputBoundary {
         .join('');
       const currPath = await this.fileAccess.getCurrentPath();
 
+      // Find the language directory -- makes assumption only one directory is named after language
+      let extension: string | undefined = undefined;
+      const languageToExtension = new Map<string, string>([
+        ['python', 'py'],
+        ['java', 'java'],
+        ['javascript', 'js'],
+        ['typescript', 'ts'],
+      ]);
+      for (const [language, ext] of languageToExtension) {
+        if (await this.fileAccess.bfsFindDir(currPath, language)) {
+          extension = ext;
+          break;
+        }
+      }
+
+      if (extension === undefined) {
+        this.presenter.showFailView(
+          'Your project does not have a specified programming language. You must create a directory that has the name: java, python, typescript, or javascript.'
+        );
+        return;
+      }
+
       // Find base directories
       const useCaseDir = await this.fileAccess.bfsFindDir(currPath, 'use_case');
       const interfaceAdapterDir = await this.fileAccess.bfsFindDir(
@@ -40,7 +62,9 @@ export class CreateUseCaseInteractor implements CreateUseCaseInputBoundary {
       const useCaseExists = await this.fileAccess.exists(targetUseCasePath);
       const interfaceExists = await this.fileAccess.exists(targetInterfacePath);
       if (useCaseExists || interfaceExists) {
-        this.presenter.showFailView(`Usecase ${useCaseName} already exists.`);
+        this.presenter.showFailView(
+          `Usecase ${useCaseName} already exists. Please choose a different name.`
+        );
         return;
       }
 
@@ -48,22 +72,22 @@ export class CreateUseCaseInteractor implements CreateUseCaseInputBoundary {
       await this.fileAccess.createDirectory(targetUseCasePath);
       await this.fileAccess.createDirectory(targetInterfacePath);
 
-      const createJavaFile = async (dir: string, suffix: string) => {
-        const fileName = `${useCaseName}${suffix}.java`;
+      const createFile = async (dir: string, suffix: string) => {
+        const fileName = `${useCaseName}${suffix}.${extension}`;
         const fullPath = path.join(dir, fileName);
         return await this.fileAccess.createFile(fullPath);
       };
 
       // Use Case Layer Files
-      await createJavaFile(targetUseCasePath, 'InputBoundary');
-      await createJavaFile(targetUseCasePath, 'InputData');
-      await createJavaFile(targetUseCasePath, 'UseCaseInteractor');
-      await createJavaFile(targetUseCasePath, 'OutputData');
-      await createJavaFile(targetUseCasePath, 'OutputBoundary');
+      await createFile(targetUseCasePath, 'InputBoundary');
+      await createFile(targetUseCasePath, 'InputData');
+      await createFile(targetUseCasePath, 'UseCaseInteractor');
+      await createFile(targetUseCasePath, 'OutputData');
+      await createFile(targetUseCasePath, 'OutputBoundary');
 
       // Interface Adapter Layer Files
-      await createJavaFile(targetInterfacePath, 'Controller');
-      await createJavaFile(targetInterfacePath, 'Presenter');
+      await createFile(targetInterfacePath, 'Controller');
+      await createFile(targetInterfacePath, 'Presenter');
 
       const createUseCaseOutputData = new CreateUseCaseOutputData(useCaseName);
       this.presenter.showSuccessView(createUseCaseOutputData);
