@@ -251,8 +251,15 @@ export class FileAccess implements FileAccessInterface {
       return importLines.length > 0 ? importLines.join('\n') : undefined;
     }
 
-    const match = importLines.find((line) =>
-      line.toLowerCase().includes(target.toLowerCase())
+    // The getFileSnippet function is only called by the getViolationsInteractor which only ever passes in cleanNode
+    // If the cleanNode is "entities", we will also allow for "entity"
+    const match = importLines.find(
+      (line) =>
+        line.toLowerCase().includes(target.toLowerCase()) ||
+        (target.toLowerCase() === 'entities' &&
+          line.toLowerCase().includes('entity')) ||
+        (target.toLowerCase() === 'usecaseinteractor' &&
+          line.toLowerCase().includes('interactor'))
     );
 
     return match?.trim() ?? undefined;
@@ -274,11 +281,17 @@ export class FileAccess implements FileAccessInterface {
 
     const lines = content.split('\n');
 
+    // The getLineNumber function is only called by the getViolationsInteractor which only ever passes in cleanNode
+    // If the cleanNode is "entities", we will also allow for "entity"
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
       if (
         line.trimStart().startsWith('import ') &&
-        line.toLowerCase().includes(target.toLowerCase())
+        (line.toLowerCase().includes(target.toLowerCase()) ||
+          (target.toLowerCase() === 'entities' &&
+            line.toLowerCase().includes('entity')) ||
+          (target.toLowerCase() === 'usecaseinteractor' &&
+            line.toLowerCase().includes('interactor')))
       ) {
         return i + 1; // 1-based line number
       }
