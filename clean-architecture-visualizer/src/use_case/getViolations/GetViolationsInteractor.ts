@@ -108,10 +108,10 @@ export class GetViolationsInteractor implements GetViolationsInputBoundary {
     useCaseName: string
   ): Promise<FileContext | undefined> {
     const fileKeySet = new Set(fileKeys);
-
-    const matchingNode = this.db
+    // It is possible for multiple files to have the desired clean node and have the same file structure
+    const matchingNodes = this.db
       .getAllNodes()
-      .find(
+      .filter(
         (n) =>
           n.type === from &&
           n.filePath !== undefined &&
@@ -122,19 +122,26 @@ export class GetViolationsInteractor implements GetViolationsInputBoundary {
             (fileKeySet.has(n.filePath) &&
               this.findNodeContainsUseCase(n.id, useCaseName)))
       );
-    if (!matchingNode?.filePath) return undefined;
-    const fileName = matchingNode.filePath.split('/').at(-1);
-    if (!fileName) return undefined;
-    const [snippet, line_number] = await Promise.all([
-      this.fileAccess.getFileSnippet(matchingNode.filePath, to),
-      this.fileAccess.getLineNumber(matchingNode.filePath, to),
-    ]);
 
-    return {
-      file: fileName,
-      ...(snippet && { snippet }),
-      ...(line_number && { line_number }),
-    };
+    if (!matchingNodes) return undefined;
+    for (const matchingNode of matchingNodes) {
+      const fileName = matchingNode.filePath?.split('/').at(-1);
+      if (!fileName) return undefined;
+      const [snippet, line_number] = await Promise.all([
+        this.fileAccess.getFileSnippet(matchingNode.filePath as string, to),
+        this.fileAccess.getLineNumber(matchingNode.filePath as string, to),
+      ]);
+
+      if (snippet && line_number) {
+        return {
+          file: fileName,
+          ...(snippet && { snippet }),
+          ...(line_number && { line_number }),
+        };
+      }
+    }
+    // This SHOULD never run
+    return undefined;
   }
 
   /*
