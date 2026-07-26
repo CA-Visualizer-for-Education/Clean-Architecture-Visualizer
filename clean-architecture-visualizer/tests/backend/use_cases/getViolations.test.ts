@@ -67,11 +67,22 @@ describe('GetViolationsInteractor', () => {
         status: 'VALID',
       });
 
+      genericDBAccess.upsertNode({
+        id: 'src/interface_adapters/uc-1/User2Controller.java-Process User',
+        type: fromNode,
+        layer: 'interfaceAdapters',
+        filePath: 'src/interface_adapters/uc-1/User2Controller.java',
+        status: 'VALID',
+      });
+
       // Setup the use case with a violation edge
       const mockUseCase = {
         id: 'uc-1',
         name: 'Process User',
-        fileKeys: [filePath],
+        fileKeys: [
+          filePath,
+          'src/interface_adapters/uc-1/User2Controller.java',
+        ],
         violationEdges: [[fromNode, toNode]] as [string, string][],
       };
       (genericDBAccess as any).upsertUseCase(mockUseCase);
@@ -118,6 +129,42 @@ describe('GetViolationsInteractor', () => {
 
       const context = outputData.result[0].file_context;
       expect(context.file).toBe('UserController.java');
+      expect(context.snippet).toBe(mockSnippet);
+      expect(context.line_number).toBe(mockLine);
+    });
+
+    it('populates file context with snippets and line numbers from FileAccess when first node is invalid', async () => {
+      const mockSnippet = 'import entity1.java;';
+      const mockLine = 5;
+
+      jest
+        .spyOn(genericFileAccess, 'getFileSnippet')
+        .mockImplementation(async (filePath, _) => {
+          if (filePath.includes('UserController.java')) {
+            return undefined;
+          }
+          return mockSnippet;
+        });
+      jest
+        .spyOn(genericFileAccess, 'getLineNumber')
+        .mockImplementation(async (filePath, _) => {
+          if (filePath.includes('UserController.java')) {
+            return undefined;
+          }
+          return mockLine;
+        });
+
+      const outputData = makeOutputData();
+      const interactor = new GetViolationsInteractor(
+        genericDBAccess,
+        genericFileAccess,
+        makeInputData('uc-1'),
+        outputData
+      );
+
+      await interactor.execute();
+      const context = outputData.result[0].file_context;
+      expect(context.file).toBe('User2Controller.java');
       expect(context.snippet).toBe(mockSnippet);
       expect(context.line_number).toBe(mockLine);
     });
