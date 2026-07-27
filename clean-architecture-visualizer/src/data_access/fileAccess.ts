@@ -183,10 +183,12 @@ export class FileAccess implements FileAccessInterface {
       let packageSet: Set<string> | null = null;
       for (const line of fileLines) {
         const trimmed_line = line.trim();
-        if (trimmed_line === '') 
-          continue;
+        if (trimmed_line === '') continue;
         if (trimmed_line.startsWith('package ')) {
-          const packageDir = filePath.substring(0, filePath.lastIndexOf('/') + 1); // package dir is always one dir above filepath
+          const packageDir = filePath.substring(
+            0,
+            filePath.lastIndexOf('/') + 1
+          ); // package dir is always one dir above filepath
           const files = await fs.readdir(packageDir);
           packageSet = new Set<string>();
           const currentFileName = filePath.split('/').at(-1) ?? '';
@@ -227,11 +229,18 @@ export class FileAccess implements FileAccessInterface {
    * @param packageSet set of class names (without extension) in the same package.
    * @returns list of class names from the package that are used in the file.
    */
-  private getPackageImports(fileLines: string[], packageSet: Set<string>): string[] {
+  private getPackageImports(
+    fileLines: string[],
+    packageSet: Set<string>
+  ): string[] {
     const found = new Set<string>();
     for (const line of fileLines) {
       const trimmed_line = line.trim();
-      if (trimmed_line.startsWith('import ') || trimmed_line.startsWith('package ') || trimmed_line === '') {
+      if (
+        trimmed_line.startsWith('import ') ||
+        trimmed_line.startsWith('package ') ||
+        trimmed_line === ''
+      ) {
         continue;
       }
       for (const className of packageSet) {
@@ -243,7 +252,6 @@ export class FileAccess implements FileAccessInterface {
     }
     return [...found];
   }
-  
 
   /**
    * Get the project name, this is either the directory BEFORE "src", or if the
