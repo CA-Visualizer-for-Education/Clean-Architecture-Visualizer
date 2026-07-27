@@ -167,6 +167,7 @@ export class FileAccess implements FileAccessInterface {
 
   /**
    * Read the imports of the file that path points to and return a list of module names.
+   * Collects normal imports first before collecting package imports.
    * @param filePath is a path to a valid file.
    */
   async getFileImports(filePath: string): Promise<string[]> {
@@ -211,7 +212,7 @@ export class FileAccess implements FileAccessInterface {
       // If package detected, with files other than the current file, then iterate through entire file
       if (packageSet) {
         const packageImports = this.getPackageImports(fileLines, packageSet);
-        result.push(...packageImports);
+        result.push(...packageImports); // pushed depenedency files are stripped of extra details, pushes LoginInputData not '"LoginInputData";'
       }
     } catch {
       console.log('The file: ' + filePath + ' could not be found');
