@@ -124,6 +124,33 @@ describe('getFileImports functionality', () => {
     expect(result).toEqual(['"fs/promises";', '"path";']);
   });
 
+  it('returns package imports not specified at by an import command', async () => {
+    mockReaddir.mockResolvedValueOnce([
+      'LoginInputBoundary.java',
+      'LoginInputData.java',
+    ] as any);
+    mockReadFile.mockResolvedValueOnce(
+      'package use_case.login;\nfinal int x = 5\nLoginInputData output = new LoginOutputData()'
+    );
+    const result = await fileAccess.getFileImports('/project/index.ts');
+    expect(result).toEqual(['LoginInputData']);
+  });
+
+  it('returns both package imports and normal imports', async () => {
+    mockReaddir.mockResolvedValueOnce([
+      'LoginInputBoundary.java',
+      'LoginInputData.java',
+      'LoginInteractor.java',
+    ] as any);
+    mockReadFile.mockResolvedValueOnce(
+      'package use_case.login;\nimport entity.User;\npublic class LoginInteractor implements LoginInputBoundary{}'
+    );
+    const result = await fileAccess.getFileImports(
+      '/project/LoginInteractor.java'
+    );
+    expect(result).toEqual(['entity.User;', 'LoginInputBoundary']);
+  });
+
   it('returns an empty array and logs when the file is not found', async () => {
     mockReadFile.mockRejectedValueOnce(new Error('File not found') as any);
     const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});

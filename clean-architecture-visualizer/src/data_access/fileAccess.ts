@@ -167,33 +167,90 @@ export class FileAccess implements FileAccessInterface {
 
   /**
    * Read the imports of the file that path points to and return a list of module names.
+   * Collects normal imports first before collecting package imports.
    * @param filePath is a path to a valid file.
    */
   async getFileImports(filePath: string): Promise<string[]> {
-    let result: string[] = [];
+    const result: string[] = [];
 
     try {
       const fileContent: string = await fs.readFile(filePath, {
         encoding: 'utf-8',
       });
       const fileLines = fileContent.split('\n');
-      fileLines.forEach((line) => {
+
+      // package is always the first non-empty line (Package Imports in Java only)
+      let packageSet: Set<string> | null = null;
+      for (const line of fileLines) {
+        const trimmed_line = line.trim();
+        if (trimmed_line === '') continue;
+        if (trimmed_line.startsWith('package ')) {
+          const packageDir = filePath.substring(
+            0,
+            filePath.lastIndexOf('/') + 1
+          ); // package dir is always one dir above filepath
+          const files = await fs.readdir(packageDir);
+          packageSet = new Set<string>();
+          const currentFileName = filePath.split('/').at(-1) ?? '';
+          for (const file of files) {
+            if (file !== currentFileName) {
+              packageSet.add(file.replace(/\.[^.]+$/, '')); // replaces everything after the dot so fileAccess.ts -> fileAccess
+            }
+          }
+        }
+        break;
+      }
+      for (const line of fileLines) {
         if (
           line.startsWith('import ') ||
           line.startsWith('from ') ||
           line.startsWith('import{')
         ) {
-          line = line.trim();
-          const lastSpace = line.lastIndexOf(' ');
-          result.push(line.substring(lastSpace + 1));
+          const trimmed_line = line.trim();
+          const lastSpace = trimmed_line.lastIndexOf(' ');
+          result.push(trimmed_line.substring(lastSpace + 1));
         }
-      });
+      }
+      // If package detected, with files other than the current file, then iterate through entire file
+      if (packageSet) {
+        const packageImports = this.getPackageImports(fileLines, packageSet);
+        result.push(...packageImports); // pushed depenedency files are stripped of extra details, pushes LoginInputData not '"LoginInputData";'
+      }
     } catch {
       console.log('The file: ' + filePath + ' could not be found');
       return [];
     }
-
     return result;
+  }
+
+  /**
+   * Scan file lines for usages of sibling class names from the same package.
+   * @param fileLines the lines of the file to scan.
+   * @param packageSet set of class names (without extension) in the same package.
+   * @returns list of class names from the package that are used in the file.
+   */
+  private getPackageImports(
+    fileLines: string[],
+    packageSet: Set<string>
+  ): string[] {
+    const found = new Set<string>();
+    for (const line of fileLines) {
+      const trimmed_line = line.trim();
+      if (
+        trimmed_line.startsWith('import ') ||
+        trimmed_line.startsWith('package ') ||
+        trimmed_line === ''
+      ) {
+        continue;
+      }
+      for (const className of packageSet) {
+        if (!found.has(className) && trimmed_line.includes(className)) {
+          found.add(className);
+        }
+      }
+      if (found.size === packageSet.size) break;
+    }
+    return [...found];
   }
 
   /**
