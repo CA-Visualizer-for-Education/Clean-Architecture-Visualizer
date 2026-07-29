@@ -2,6 +2,7 @@ import fs from 'fs/promises';
 import path from 'path';
 
 import type { FileAccessInterface } from './fileAccessInterface.js';
+import type { Relationship, RelationshipType } from '../entity/relationship.js';
 
 export class FileAccess implements FileAccessInterface {
   /**
@@ -164,14 +165,13 @@ export class FileAccess implements FileAccessInterface {
 
     return null;
   }
-
   /**
    * Read the imports of the file that path points to and return a list of module names.
    * Collects normal imports first before collecting package imports.
    * @param filePath is a path to a valid file.
    */
-  async getFileImports(filePath: string): Promise<string[]> {
-    const result: string[] = [];
+  async getFileImports(filePath: string): Promise<Relationship[]> {
+    const result: Relationship[] = [];
 
     try {
       const fileContent: string = await fs.readFile(filePath, {
@@ -201,20 +201,27 @@ export class FileAccess implements FileAccessInterface {
         break;
       }
       for (const line of fileLines) {
+        const trimmed_line = line.trim();
         if (
           line.startsWith('import ') ||
           line.startsWith('from ') ||
           line.startsWith('import{')
         ) {
-          const trimmed_line = line.trim();
           const lastSpace = trimmed_line.lastIndexOf(' ');
-          result.push(trimmed_line.substring(lastSpace + 1));
+          const name = trimmed_line.substring(lastSpace + 1);
+          let type: RelationshipType = 'dependency';
+          if (trimmed_line.includes('implements')) {
+            type = 'implements';
+          } else if (trimmed_line.includes('extends')) {
+            type = 'extends';
+          }
+          result.push({ fileName: name, relationshipType: type });
         }
       }
       // If package detected, with files other than the current file, then iterate through entire file
       if (packageSet) {
         const packageImports = this.getPackageImports(fileLines, packageSet);
-        result.push(...packageImports); // pushed depenedency files are stripped of extra details, pushes LoginInputData not '"LoginInputData";'
+        result.push(...packageImports);
       }
     } catch {
       console.log('The file: ' + filePath + ' could not be found');
@@ -227,13 +234,13 @@ export class FileAccess implements FileAccessInterface {
    * Scan file lines for usages of sibling class names from the same package.
    * @param fileLines the lines of the file to scan.
    * @param packageSet set of class names (without extension) in the same package.
-   * @returns list of class names from the package that are used in the file.
+   * @returns list of Relationships from the package that are used in the file.
    */
   private getPackageImports(
     fileLines: string[],
     packageSet: Set<string>
-  ): string[] {
-    const found = new Set<string>();
+  ): Relationship[] {
+    const found = new Map<string, RelationshipType>();
     for (const line of fileLines) {
       const trimmed_line = line.trim();
       if (
@@ -245,12 +252,21 @@ export class FileAccess implements FileAccessInterface {
       }
       for (const className of packageSet) {
         if (!found.has(className) && trimmed_line.includes(className)) {
-          found.add(className);
+          let type: RelationshipType = 'dependency';
+          if (trimmed_line.includes('implements') && trimmed_line.includes(className)) {
+            type = 'implements';
+          } else if (trimmed_line.includes('extends') && trimmed_line.includes(className)) {
+            type = 'extends';
+          }
+          found.set(className, type);
         }
       }
       if (found.size === packageSet.size) break;
     }
-    return [...found];
+    return [...found.entries()].map(([name, type]) => ({
+      fileName: name,
+      relationshipType: type,
+    }));
   }
 
   /**
