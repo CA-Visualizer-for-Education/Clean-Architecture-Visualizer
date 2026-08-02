@@ -4,12 +4,13 @@ import type { CreateModuleUseCaseOutputData } from '../../use_case/createModuleU
 
 export class CreateModuleUseCasePresenter implements CreateModuleUseCaseOutputBoundary {
   private error: string | null = null;
-  showSuccessView(
-    createModuleUseCaseOutputData: CreateModuleUseCaseOutputData
-  ): void {
+
+  constructor(private readonly outputData: CreateModuleUseCaseOutputData) {}
+
+  showSuccessView(): void {
     console.log(
       chalk.green(
-        `Usecase ${createModuleUseCaseOutputData.getUseCase()} in feature ${createModuleUseCaseOutputData.getFeature()} has been created.`
+        `Usecase ${this.outputData.getUseCase()} in feature ${this.outputData.getFeature()} has been created.`
       )
     );
   }

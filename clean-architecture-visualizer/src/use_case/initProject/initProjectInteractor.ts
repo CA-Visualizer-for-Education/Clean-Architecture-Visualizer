@@ -1,24 +1,28 @@
 import type { FileAccessInterface } from '../../data_access/fileAccessInterface.js';
 import type { InitProjectInputBoundary } from './initProjectInputBoundary.js';
-import { InitProjectInputData } from './initProjectInputData.js';
+import type { InitProjectInputData } from './initProjectInputData.js';
 import { InitProjectOutputData } from './initProjectOutputData.js';
 import path from 'path';
 
 export class InitProjectInteractor implements InitProjectInputBoundary {
   private readonly fileAccess: FileAccessInterface;
   private readonly outputData: InitProjectOutputData;
+  private readonly inputData: InitProjectInputData;
 
   constructor(
     fileAccess: FileAccessInterface,
+    inputData: InitProjectInputData,
     outputData: InitProjectOutputData = new InitProjectOutputData()
   ) {
-    ((this.fileAccess = fileAccess), (this.outputData = outputData));
+    this.fileAccess = fileAccess;
+    this.outputData = outputData;
+    this.inputData = inputData;
   }
 
-  async execute(initProjectInputData: InitProjectInputData): Promise<void> {
+  async execute(): Promise<void> {
     try {
       const acceptedLanguage = ['typescript', 'javascript', 'java', 'python'];
-      let language = initProjectInputData.getLanguage().trim();
+      let language = this.inputData.getLanguage().trim();
       if (!acceptedLanguage.includes(language.toLowerCase())) {
         throw new Error(
           'You must enter a valid programming language of: java, python, typescript, or javascript. Blank defaults to Java.'

@@ -11,7 +11,7 @@ import type {
 } from '../../types/sessionData.js';
 import type { cleanLayer } from '../../types/cleanLayer.js';
 import { GraphVerificationOutputData } from './graphVerificationOutputData.js';
-import type { GraphVerificationInputData } from './graphVerificationInputData.js';
+import { GraphVerificationInputData } from './graphVerificationInputData.js';
 import type { GraphVerificationOutputBoundary } from './graphVerificationOutputBoundary.js';
 
 export class GraphVerificationInteractor implements GraphVerificationInputBoundary {
@@ -40,15 +40,18 @@ export class GraphVerificationInteractor implements GraphVerificationInputBounda
     private readonly db: SessionDBAccessInterface,
     private readonly presenter: GraphVerificationOutputBoundary,
     private readonly useCaseGraphList: useCaseGraph[] = [],
-    outputData: GraphVerificationOutputData = new GraphVerificationOutputData()
+    outputData: GraphVerificationOutputData = new GraphVerificationOutputData(),
+    private readonly inputData: GraphVerificationInputData = new GraphVerificationInputData(
+      false
+    )
   ) {
     this.outputData = outputData;
   }
 
-  async execute(inputData: GraphVerificationInputData): Promise<void> {
+  async execute(): Promise<void> {
     // restart db
     this.db.resetDB();
-    const formatForCLI = inputData.isToCommandLine();
+    const formatForCLI = this.inputData.isToCommandLine();
 
     // main use case logic
     await this.buildFilePaths();
@@ -60,7 +63,7 @@ export class GraphVerificationInteractor implements GraphVerificationInputBounda
     // Paths are defined as <File Name, File Path>
     if (formatForCLI) {
       this.prepareOutput();
-      this.presenter.prepareSuccessView(this.outputData);
+      this.presenter.prepareSuccessView();
     }
   }
 

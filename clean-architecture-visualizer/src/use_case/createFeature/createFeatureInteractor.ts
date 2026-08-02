@@ -3,18 +3,20 @@ import type { FileAccessInterface } from '../../data_access/fileAccessInterface.
 import type { CreateFeatureInputBoundary } from './createFeatureInputBoundary.js';
 import type { CreateFeatureInputData } from './createFeatureInputData.js';
 import type { CreateFeatureOutputBoundary } from './createFeatureOutputBoundary.js';
-import { CreateFeatureOutputData } from './createFeatureOutputData.js';
+import type { CreateFeatureOutputData } from './createFeatureOutputData.js';
 
 export class CreateFeatureInteractor implements CreateFeatureInputBoundary {
   constructor(
     private readonly fileAccess: FileAccessInterface,
-    private readonly presenter: CreateFeatureOutputBoundary
+    private readonly presenter: CreateFeatureOutputBoundary,
+    private readonly inputData: CreateFeatureInputData,
+    private readonly outputData: CreateFeatureOutputData
   ) {}
 
-  async execute(inputData: CreateFeatureInputData) {
+  async execute(): Promise<void> {
     try {
       // Want to remove all spaces from the name of the feature
-      const feature = inputData.getFeatureName().split(' ').join('');
+      const feature = this.inputData.getFeatureName().split(' ').join('');
       const currPath = await this.fileAccess.getCurrentPath();
       // If "features" the directory doesn't exist, abort
       const featuresDirectory = await this.fileAccess.bfsFindDir(
@@ -35,8 +37,8 @@ export class CreateFeatureInteractor implements CreateFeatureInputBoundary {
       }
 
       await this.fileAccess.createDirectory(targetFeaturePath);
-      const createFeatureOutputData = new CreateFeatureOutputData(feature);
-      this.presenter.showSuccessView(createFeatureOutputData);
+      this.outputData.setFeature(feature);
+      this.presenter.showSuccessView();
     } catch (error) {
       if (error instanceof Error) {
         this.presenter.showFailView(error.message);

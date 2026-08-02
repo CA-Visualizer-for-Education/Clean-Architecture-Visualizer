@@ -8,10 +8,9 @@ import type { CreateUseCaseOutputBoundary } from '../../../src/use_case/createUs
 describe('CreateUseCaseInteractor', () => {
   let mockFileAccess: jest.Mocked<FileAccessInterface>;
   let mockPresenter: jest.Mocked<CreateUseCaseOutputBoundary>;
-  let interactor: CreateUseCaseInteractor;
+  let outputData: CreateUseCaseOutputData;
 
   beforeEach(() => {
-    // Setup Mocks
     mockFileAccess = {
       getCurrentPath: jest.fn<any>(),
       bfsFindDir: jest.fn<any>(),
@@ -25,8 +24,17 @@ describe('CreateUseCaseInteractor', () => {
       showFailView: jest.fn<any>(),
     } as any;
 
-    interactor = new CreateUseCaseInteractor(mockFileAccess, mockPresenter);
+    outputData = new CreateUseCaseOutputData();
   });
+
+  function makeInteractor(name: string) {
+    return new CreateUseCaseInteractor(
+      mockFileAccess,
+      mockPresenter,
+      new CreateUseCaseInputData(name),
+      outputData
+    );
+  }
 
   // TODO: Add a separate test case checking if use case names with spaces wer properly sanitized
 
@@ -41,8 +49,7 @@ describe('CreateUseCaseInteractor', () => {
     );
 
     // Act
-    const inputData = new CreateUseCaseInputData('LoginUser');
-    await interactor.execute(inputData);
+    await makeInteractor('LoginUser').execute();
 
     // Assert
     // Verify directory creation
@@ -65,9 +72,8 @@ describe('CreateUseCaseInteractor', () => {
     );
 
     // Verify success signal
-    expect(mockPresenter.showSuccessView).toHaveBeenCalledWith(
-      new CreateUseCaseOutputData('LoginUser')
-    );
+    expect(outputData.getUseCase()).toBe('LoginUser');
+    expect(mockPresenter.showSuccessView).toHaveBeenCalled();
     expect(mockPresenter.showFailView).not.toHaveBeenCalled();
   });
 
@@ -80,8 +86,7 @@ describe('CreateUseCaseInteractor', () => {
     );
 
     // Act
-    const inputData = new CreateUseCaseInputData('LoginUser');
-    await interactor.execute(inputData);
+    await makeInteractor('LoginUser').execute();
 
     // Assert
     // Verify directory creation
@@ -104,9 +109,8 @@ describe('CreateUseCaseInteractor', () => {
     );
 
     // Verify success signal
-    expect(mockPresenter.showSuccessView).toHaveBeenCalledWith(
-      new CreateUseCaseOutputData('LoginUser')
-    );
+    expect(outputData.getUseCase()).toBe('LoginUser');
+    expect(mockPresenter.showSuccessView).toHaveBeenCalled();
     expect(mockPresenter.showFailView).not.toHaveBeenCalled();
   });
 
@@ -122,8 +126,7 @@ describe('CreateUseCaseInteractor', () => {
     );
 
     // Act
-    const inputData = new CreateUseCaseInputData('LoginUser');
-    await interactor.execute(inputData);
+    await makeInteractor('LoginUser').execute();
 
     // Assert
     // Verify directory creation
@@ -146,9 +149,8 @@ describe('CreateUseCaseInteractor', () => {
     );
 
     // Verify success signal
-    expect(mockPresenter.showSuccessView).toHaveBeenCalledWith(
-      new CreateUseCaseOutputData('LoginUser')
-    );
+    expect(outputData.getUseCase()).toBe('LoginUser');
+    expect(mockPresenter.showSuccessView).toHaveBeenCalled();
     expect(mockPresenter.showFailView).not.toHaveBeenCalled();
   });
 
@@ -165,8 +167,7 @@ describe('CreateUseCaseInteractor', () => {
     );
 
     // Act
-    const inputData = new CreateUseCaseInputData('LoginUser');
-    await interactor.execute(inputData);
+    await makeInteractor('LoginUser').execute();
 
     // Assert
     // Verify directory creation
@@ -189,9 +190,8 @@ describe('CreateUseCaseInteractor', () => {
     );
 
     // Verify success signal
-    expect(mockPresenter.showSuccessView).toHaveBeenCalledWith(
-      new CreateUseCaseOutputData('LoginUser')
-    );
+    expect(outputData.getUseCase()).toBe('LoginUser');
+    expect(mockPresenter.showSuccessView).toHaveBeenCalled();
     expect(mockPresenter.showFailView).not.toHaveBeenCalled();
   });
 
@@ -203,7 +203,7 @@ describe('CreateUseCaseInteractor', () => {
     mockFileAccess.bfsFindDir.mockResolvedValue(null);
 
     // Act
-    await interactor.execute(new CreateUseCaseInputData('Test'));
+    await makeInteractor('Test').execute();
 
     // Assert
     expect(mockPresenter.showSuccessView).not.toHaveBeenCalled();
@@ -225,7 +225,7 @@ describe('CreateUseCaseInteractor', () => {
     mockFileAccess.exists.mockResolvedValue(true);
 
     // Act
-    await interactor.execute(new CreateUseCaseInputData('Test'));
+    await makeInteractor('Test').execute();
 
     // Assert
     expect(mockPresenter.showSuccessView).not.toHaveBeenCalled();
@@ -246,7 +246,7 @@ describe('CreateUseCaseInteractor', () => {
     mockFileAccess.createFile.mockRejectedValue(new Error('Disk Full'));
 
     // Act
-    await interactor.execute(new CreateUseCaseInputData('Test'));
+    await makeInteractor('Test').execute();
 
     // Assert
     expect(mockPresenter.showSuccessView).not.toHaveBeenCalled();
@@ -263,7 +263,7 @@ describe('CreateUseCaseInteractor', () => {
       .mockResolvedValueOnce(null);
 
     // Act
-    await interactor.execute(new CreateUseCaseInputData('Test'));
+    await makeInteractor('Test').execute();
 
     // Assert
     expect(mockPresenter.showSuccessView).not.toHaveBeenCalled();

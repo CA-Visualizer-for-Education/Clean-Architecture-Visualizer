@@ -3,20 +3,19 @@ import type { FileAccessInterface } from '../../data_access/fileAccessInterface.
 import type { CreateUseCaseInputBoundary } from './createUseCaseInputBoundary.js';
 import type { CreateUseCaseInputData } from './createUseCaseInputData.js';
 import type { CreateUseCaseOutputBoundary } from './createUseCaseOutputBoundary.js';
-import { CreateUseCaseOutputData } from './createUseCaseOutputData.js';
+import type { CreateUseCaseOutputData } from './createUseCaseOutputData.js';
 
 export class CreateUseCaseInteractor implements CreateUseCaseInputBoundary {
   constructor(
     private readonly fileAccess: FileAccessInterface,
-    private readonly presenter: CreateUseCaseOutputBoundary
+    private readonly presenter: CreateUseCaseOutputBoundary,
+    private readonly inputData: CreateUseCaseInputData,
+    private readonly outputData: CreateUseCaseOutputData
   ) {}
 
-  async execute(createUseCaseInputData: CreateUseCaseInputData): Promise<void> {
+  async execute(): Promise<void> {
     try {
-      const useCaseName = createUseCaseInputData
-        .getUseCaseName()
-        .split(' ')
-        .join('');
+      const useCaseName = this.inputData.getUseCaseName().split(' ').join('');
       const currPath = await this.fileAccess.getCurrentPath();
 
       // Find the language directory -- makes assumption only one directory is named after language
@@ -89,8 +88,8 @@ export class CreateUseCaseInteractor implements CreateUseCaseInputBoundary {
       await createFile(targetInterfacePath, 'Controller');
       await createFile(targetInterfacePath, 'Presenter');
 
-      const createUseCaseOutputData = new CreateUseCaseOutputData(useCaseName);
-      this.presenter.showSuccessView(createUseCaseOutputData);
+      this.outputData.setUseCase(useCaseName);
+      this.presenter.showSuccessView();
     } catch (error) {
       if (error instanceof Error) {
         this.presenter.showFailView(error.message);

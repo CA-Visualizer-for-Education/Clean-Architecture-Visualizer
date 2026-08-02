@@ -1,8 +1,14 @@
 export class CreateModuleUseCaseOutputData {
-  constructor(
-    private readonly feature: string,
-    private readonly usecase: string
-  ) {}
+  private feature = '';
+  private usecase = '';
+
+  setFeature(feature: string): void {
+    this.feature = feature;
+  }
+
+  setUseCase(usecase: string): void {
+    this.usecase = usecase;
+  }
 
   getFeature(): string {
     return this.feature;
