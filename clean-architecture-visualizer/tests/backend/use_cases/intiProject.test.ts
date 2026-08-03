@@ -24,7 +24,6 @@ describe('InitProjectInteractor', () => {
     mockOutputData = {
       setOutputData: jest.fn<any>(),
     } as any;
-
   });
 
   function makeInteractor(language: string) {

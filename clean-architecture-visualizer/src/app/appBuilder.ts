@@ -56,7 +56,9 @@ export class AppBuilder {
 
   private requireDeps() {
     if (!this.fileAccess || !this.cleanArchAccess || !this.db) {
-      throw new Error('FileAccess, CleanArchAccess, and SessionDBAccess must be set');
+      throw new Error(
+        'FileAccess, CleanArchAccess, and SessionDBAccess must be set'
+      );
     }
     return {
       fileAccess: this.fileAccess,
@@ -71,7 +73,13 @@ export class AppBuilder {
     const outputData = new GraphVerificationOutputData();
     const presenter = new GraphVerificationPresenter(outputData);
     const interactor = new GraphVerificationInteractor(
-      fileAccess, cleanArchAccess, db, presenter, [], outputData, inputData
+      fileAccess,
+      cleanArchAccess,
+      db,
+      presenter,
+      [],
+      outputData,
+      inputData
     );
     await new GraphVerificationController(interactor).execute();
   }
@@ -82,7 +90,13 @@ export class AppBuilder {
     const outputData = new GraphVerificationOutputData();
     const presenter = new GraphVerificationPresenter(outputData);
     const interactor = new GraphVerificationInteractor(
-      fileAccess, cleanArchAccess, db, presenter, [], outputData, inputData
+      fileAccess,
+      cleanArchAccess,
+      db,
+      presenter,
+      [],
+      outputData,
+      inputData
     );
     await new GraphVerificationController(interactor).execute();
   }
@@ -90,26 +104,44 @@ export class AppBuilder {
   async runInitProject(language: string): Promise<void> {
     const inputData = new InitProjectInputData(language);
     const outputData = new InitProjectOutputData();
-    const interactor = new InitProjectInteractor(this.fileAccess!, inputData, outputData);
+    const interactor = new InitProjectInteractor(
+      this.fileAccess!,
+      inputData,
+      outputData
+    );
     await new InitProjectController(interactor).execute();
 
     if (outputData.getOutputData()) {
       console.log(chalk.green('Your project has been initialized.'));
     } else {
-      console.log(chalk.red('An error occurred and your project has not been initialized.'));
+      console.log(
+        chalk.red(
+          'An error occurred and your project has not been initialized.'
+        )
+      );
     }
   }
 
   async runInitModuleProject(language: string): Promise<void> {
     const inputData = new InitModuleProjectInputData(language);
     const outputData = new InitModuleProjectOutputData();
-    const interactor = new InitModuleProjectInteractor(this.fileAccess!, inputData, outputData);
+    const interactor = new InitModuleProjectInteractor(
+      this.fileAccess!,
+      inputData,
+      outputData
+    );
     await new InitModuleProjectController(interactor).execute();
 
     if (outputData.getOutputData()) {
-      console.log(chalk.green('Your project packaged by module has been initialized.'));
+      console.log(
+        chalk.green('Your project packaged by module has been initialized.')
+      );
     } else {
-      console.log(chalk.red('An error occurred and your project packaged by module has not been initialized.'));
+      console.log(
+        chalk.red(
+          'An error occurred and your project packaged by module has not been initialized.'
+        )
+      );
     }
   }
 
@@ -117,7 +149,12 @@ export class AppBuilder {
     const inputData = new CreateUseCaseInputData(name);
     const outputData = new CreateUseCaseOutputData();
     const presenter = new CreateUseCasePresenter(outputData);
-    const interactor = new CreateUseCaseInteractor(this.fileAccess!, presenter, inputData, outputData);
+    const interactor = new CreateUseCaseInteractor(
+      this.fileAccess!,
+      presenter,
+      inputData,
+      outputData
+    );
     await new CreateUseCaseController(interactor).execute();
   }
 
@@ -125,7 +162,12 @@ export class AppBuilder {
     const inputData = new CreateFeatureInputData(feature);
     const outputData = new CreateFeatureOutputData();
     const presenter = new CreateFeaturePresenter(outputData);
-    const interactor = new CreateFeatureInteractor(this.fileAccess!, presenter, inputData, outputData);
+    const interactor = new CreateFeatureInteractor(
+      this.fileAccess!,
+      presenter,
+      inputData,
+      outputData
+    );
     await new CreateFeatureController(interactor).execute();
   }
 
@@ -133,7 +175,12 @@ export class AppBuilder {
     const inputData = new CreateModuleUseCaseInputData(feature, name);
     const outputData = new CreateModuleUseCaseOutputData();
     const presenter = new CreateModuleUseCasePresenter(outputData);
-    const interactor = new CreateModuleUseCaseInteractor(this.fileAccess!, presenter, inputData, outputData);
+    const interactor = new CreateModuleUseCaseInteractor(
+      this.fileAccess!,
+      presenter,
+      inputData,
+      outputData
+    );
     await new CreateModuleUseCaseController(interactor).execute();
   }
 

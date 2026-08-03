@@ -32,7 +32,11 @@ const fileAccess = new FileAccess();
 router.post('/template/generate/:language', async (req, res) => {
   const inputData = new InitProjectInputData(req.params.language);
   const outputData = new InitProjectOutputData();
-  const interactor = new InitProjectInteractor(fileAccess, inputData, outputData);
+  const interactor = new InitProjectInteractor(
+    fileAccess,
+    inputData,
+    outputData
+  );
   const controller = new InitProjectController(interactor);
   const presenter = new InitProjectPresenter(outputData);
 
@@ -50,7 +54,11 @@ router.post('/template/generate/:language', async (req, res) => {
 router.post('/template/module_generate/:language', async (req, res) => {
   const inputData = new InitModuleProjectInputData(req.params.language);
   const outputData = new InitModuleProjectOutputData();
-  const interactor = new InitModuleProjectInteractor(fileAccess, inputData, outputData);
+  const interactor = new InitModuleProjectInteractor(
+    fileAccess,
+    inputData,
+    outputData
+  );
   const controller = new InitModuleProjectController(interactor);
   const presenter = new InitModuleProjectPresenter(outputData);
 
@@ -69,58 +77,87 @@ router.post('/template/add/:useCaseName', async (req, res) => {
   const inputData = new CreateUseCaseInputData(req.params.useCaseName);
   const outputData = new CreateUseCaseOutputData();
   const presenter = new CreateUseCasePresenter(outputData);
-  const interactor = new CreateUseCaseInteractor(fileAccess, presenter, inputData, outputData);
+  const interactor = new CreateUseCaseInteractor(
+    fileAccess,
+    presenter,
+    inputData,
+    outputData
+  );
   const controller = new CreateUseCaseController(interactor);
 
   await controller.execute();
   const result = presenter.getError();
 
   if (result) {
-    res.status(404).json({ error: `Could not make use case '${req.params.useCaseName}'` });
+    res
+      .status(404)
+      .json({ error: `Could not make use case '${req.params.useCaseName}'` });
     return;
   }
 
-  res.status(201).json({ message: `Use case '${req.params.useCaseName}' created successfully` });
+  res.status(201).json({
+    message: `Use case '${req.params.useCaseName}' created successfully`,
+  });
 });
 
 router.post('/template/module_add/:featureName', async (req, res) => {
   const inputData = new CreateFeatureInputData(req.params.featureName);
   const outputData = new CreateFeatureOutputData();
   const presenter = new CreateFeaturePresenter(outputData);
-  const interactor = new CreateFeatureInteractor(fileAccess, presenter, inputData, outputData);
+  const interactor = new CreateFeatureInteractor(
+    fileAccess,
+    presenter,
+    inputData,
+    outputData
+  );
   const controller = new CreateFeatureController(interactor);
 
   await controller.execute();
   const result = presenter.getError();
 
   if (result) {
-    res.status(404).json({ error: `Could not make feature '${req.params.featureName}'` });
-    return;
-  }
-
-  res.status(201).json({ message: `Feature '${req.params.featureName}' created successfully` });
-});
-
-router.post('/template/module_add/:featureName/:useCaseName', async (req, res) => {
-  const inputData = new CreateModuleUseCaseInputData(req.params.featureName, req.params.useCaseName);
-  const outputData = new CreateModuleUseCaseOutputData();
-  const presenter = new CreateModuleUseCasePresenter(outputData);
-  const interactor = new CreateModuleUseCaseInteractor(fileAccess, presenter, inputData, outputData);
-  const controller = new CreateModuleUseCaseController(interactor);
-
-  await controller.execute();
-  const result = presenter.getError();
-
-  if (result) {
-    res.status(404).json({
-      error: `Could not make use case '${req.params.useCaseName}' in feature '${req.params.featureName}'`,
-    });
+    res
+      .status(404)
+      .json({ error: `Could not make feature '${req.params.featureName}'` });
     return;
   }
 
   res.status(201).json({
-    message: `Use case '${req.params.useCaseName}' created successfully in feature '${req.params.featureName}'`,
+    message: `Feature '${req.params.featureName}' created successfully`,
   });
 });
+
+router.post(
+  '/template/module_add/:featureName/:useCaseName',
+  async (req, res) => {
+    const inputData = new CreateModuleUseCaseInputData(
+      req.params.featureName,
+      req.params.useCaseName
+    );
+    const outputData = new CreateModuleUseCaseOutputData();
+    const presenter = new CreateModuleUseCasePresenter(outputData);
+    const interactor = new CreateModuleUseCaseInteractor(
+      fileAccess,
+      presenter,
+      inputData,
+      outputData
+    );
+    const controller = new CreateModuleUseCaseController(interactor);
+
+    await controller.execute();
+    const result = presenter.getError();
+
+    if (result) {
+      res.status(404).json({
+        error: `Could not make use case '${req.params.useCaseName}' in feature '${req.params.featureName}'`,
+      });
+      return;
+    }
+
+    res.status(201).json({
+      message: `Use case '${req.params.useCaseName}' created successfully in feature '${req.params.featureName}'`,
+    });
+  }
+);
 
 export default router;

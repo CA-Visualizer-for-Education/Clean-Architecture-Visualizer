@@ -50,7 +50,9 @@ program
 
 program
   .command('module_init [language]')
-  .description('Create the template for a new CSC207 project, packaged by module.')
+  .description(
+    'Create the template for a new CSC207 project, packaged by module.'
+  )
   .action(async (language: string = 'java') => {
     await app.runInitModuleProject(language);
   });
