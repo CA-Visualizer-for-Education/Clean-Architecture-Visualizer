@@ -1,5 +1,9 @@
 export class CreateUseCaseOutputData {
-  constructor(private readonly useCase: string) {}
+  private useCase = '';
+
+  setUseCase(useCase: string): void {
+    this.useCase = useCase;
+  }
 
   getUseCase(): string {
     return this.useCase;

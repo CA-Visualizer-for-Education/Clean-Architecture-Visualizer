@@ -5,11 +5,11 @@ import type { CreateUseCaseOutputData } from '../../use_case/createUseCase/creat
 export class CreateUseCasePresenter implements CreateUseCaseOutputBoundary {
   private error: string | null = null;
 
-  showSuccessView(createUseCaseOutputData: CreateUseCaseOutputData) {
+  constructor(private readonly outputData: CreateUseCaseOutputData) {}
+
+  showSuccessView() {
     console.log(
-      chalk.green(
-        `Usecase ${createUseCaseOutputData.getUseCase()} has been created.`
-      )
+      chalk.green(`Usecase ${this.outputData.getUseCase()} has been created.`)
     );
   }
 

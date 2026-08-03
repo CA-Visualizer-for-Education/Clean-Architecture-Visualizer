@@ -8,7 +8,7 @@ import type { CreateFeatureOutputBoundary } from '../../../src/use_case/createFe
 describe('CreateFeatureInteractor', () => {
   let mockFileAccess: jest.Mocked<FileAccessInterface>;
   let mockPresenter: jest.Mocked<CreateFeatureOutputBoundary>;
-  let interactor: CreateFeatureInteractor;
+  let outputData: CreateFeatureOutputData;
 
   beforeEach(() => {
     mockFileAccess = {
@@ -23,23 +23,30 @@ describe('CreateFeatureInteractor', () => {
       showFailView: jest.fn<any>(),
     } as any;
 
-    interactor = new CreateFeatureInteractor(mockFileAccess, mockPresenter);
+    outputData = new CreateFeatureOutputData();
   });
+
+  function makeInteractor(name: string) {
+    return new CreateFeatureInteractor(
+      mockFileAccess,
+      mockPresenter,
+      new CreateFeatureInputData(name),
+      outputData
+    );
+  }
 
   it('Successfully adds feature to features directory.', async () => {
     mockFileAccess.getCurrentPath.mockResolvedValue('/root/src');
     mockFileAccess.bfsFindDir.mockResolvedValue('/root/src/features');
     mockFileAccess.exists.mockResolvedValue(false);
-    const inputData = new CreateFeatureInputData('new_feature');
-    await interactor.execute(inputData);
+    await makeInteractor('new_feature').execute();
 
     expect(mockFileAccess.createDirectory).toHaveBeenCalledWith(
       '/root/src/features/new_feature'
     );
 
-    expect(mockPresenter.showSuccessView).toHaveBeenCalledWith(
-      new CreateFeatureOutputData('new_feature')
-    );
+    expect(outputData.getFeature()).toBe('new_feature');
+    expect(mockPresenter.showSuccessView).toHaveBeenCalled();
     expect(mockPresenter.showFailView).not.toHaveBeenCalled();
   });
 
@@ -47,23 +54,21 @@ describe('CreateFeatureInteractor', () => {
     mockFileAccess.getCurrentPath.mockResolvedValue('/root/src');
     mockFileAccess.bfsFindDir.mockResolvedValue('/root/src/features');
     mockFileAccess.exists.mockResolvedValue(false);
-    const inputData = new CreateFeatureInputData('new feature with spaces');
-    await interactor.execute(inputData);
+    await makeInteractor('new feature with spaces').execute();
 
     expect(mockFileAccess.createDirectory).toHaveBeenCalledWith(
       '/root/src/features/newfeaturewithspaces'
     );
 
-    expect(mockPresenter.showSuccessView).toHaveBeenCalledWith(
-      new CreateFeatureOutputData('newfeaturewithspaces')
-    );
+    expect(outputData.getFeature()).toBe('newfeaturewithspaces');
+    expect(mockPresenter.showSuccessView).toHaveBeenCalled();
     expect(mockPresenter.showFailView).not.toHaveBeenCalled();
   });
 
   it('Fails to add feature because features directory does not exist.', async () => {
     mockFileAccess.getCurrentPath.mockResolvedValue('/root/src');
     mockFileAccess.bfsFindDir.mockResolvedValue(null);
-    await interactor.execute(new CreateFeatureInputData('blah'));
+    await makeInteractor('blah').execute();
     expect(mockPresenter.showSuccessView).not.toHaveBeenCalled();
     expect(mockPresenter.showFailView).toHaveBeenCalled();
   });
@@ -72,8 +77,7 @@ describe('CreateFeatureInteractor', () => {
     mockFileAccess.getCurrentPath.mockResolvedValue('/root/src');
     mockFileAccess.bfsFindDir.mockResolvedValue('/root/src/features');
     mockFileAccess.exists.mockResolvedValue(true);
-    const inputData = new CreateFeatureInputData('new_feature');
-    await interactor.execute(inputData);
+    await makeInteractor('new_feature').execute();
     expect(mockPresenter.showSuccessView).not.toHaveBeenCalled();
     expect(mockPresenter.showFailView).toHaveBeenCalled();
   });
@@ -85,8 +89,7 @@ describe('CreateFeatureInteractor', () => {
     mockFileAccess.createDirectory.mockRejectedValue(
       new Error('Failed to create directory.')
     );
-    const inputData = new CreateFeatureInputData('new_feature');
-    await interactor.execute(inputData);
+    await makeInteractor('new_feature').execute();
     expect(mockPresenter.showSuccessView).not.toHaveBeenCalled();
     expect(mockPresenter.showFailView).toHaveBeenCalled();
   });
