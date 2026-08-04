@@ -178,9 +178,9 @@ export class FileAccess implements FileAccessInterface {
         encoding: 'utf-8',
       });
       const fileLines = fileContent.split('\n');
+      const importSet = new Set<string>();
 
-      // package is always the first non-empty line (Package Imports in Java only)
-      let packageSet: Set<string> | null = null;
+      // Package imports can only occur on the first non-empty line
       for (const line of fileLines) {
         const trimmed_line = line.trim();
         if (trimmed_line === '') continue;
@@ -188,85 +188,63 @@ export class FileAccess implements FileAccessInterface {
           const packageDir = filePath.substring(
             0,
             filePath.lastIndexOf('/') + 1
-          ); // package dir is always one dir above filepath
+          );
           const files = await fs.readdir(packageDir);
-          packageSet = new Set<string>();
           const currentFileName = filePath.split('/').at(-1) ?? '';
           for (const file of files) {
             if (file !== currentFileName) {
-              packageSet.add(file.replace(/\.[^.]+$/, '')); // replaces everything after the dot so fileAccess.ts -> fileAccess
+              importSet.add(file.replace(/\.[^.]+$/, '')); // Strips everything after .
             }
           }
+          break;
         }
         break;
       }
+
+      // Add imports to importSet if starting with import, if not check for relationships
+      const found = new Map<string, RelationshipType>();
       for (const line of fileLines) {
         const trimmed_line = line.trim();
+        if (trimmed_line.startsWith('package ') || trimmed_line === '') {
+          continue;
+        }
         if (
-          line.startsWith('import ') ||
-          line.startsWith('from ') ||
-          line.startsWith('import{')
+          trimmed_line.startsWith('import ') ||
+          trimmed_line.startsWith('from ') ||
+          trimmed_line.startsWith('import{')
         ) {
           const lastSpace = trimmed_line.lastIndexOf(' ');
-          const name = trimmed_line.substring(lastSpace + 1);
+          const name = trimmed_line
+            .substring(lastSpace + 1)
+            .replace(/;$/, '');
+          importSet.add(name);
+          found.set(name, 'dependency');
+          continue;
+        }
+        // Seperates line
+        const words: string[] = trimmed_line.match(/[A-Za-z_$][\w$]*/g) ?? [];
+        const extendsIdx = words.indexOf('extends');
+        const implementsIdx = words.indexOf('implements');
+        for (let i = 0; i < words.length; i++) {
+          const word = words[i];
+          if (!importSet.has(word) || found.has(word)) continue;
           let type: RelationshipType = 'dependency';
-          if (trimmed_line.includes('implements')) {
+          if (implementsIdx !== -1 && i > implementsIdx) {
             type = 'implements';
-          } else if (trimmed_line.includes('extends')) {
+          } else if (extendsIdx !== -1 && i > extendsIdx) {
             type = 'extends';
           }
-          result.push({ fileName: name, relationshipType: type });
+          found.set(word, type);
         }
       }
-      // If package detected, with files other than the current file, then iterate through entire file
-      if (packageSet) {
-        const packageImports = this.getPackageImports(fileLines, packageSet);
-        result.push(...packageImports);
+      for (const [name, type] of found) {
+        result.push({ fileName: name, relationshipType: type });
       }
     } catch {
       console.log('The file: ' + filePath + ' could not be found');
       return [];
     }
     return result;
-  }
-
-  /**
-   * Scan file lines for usages of sibling class names from the same package.
-   * @param fileLines the lines of the file to scan.
-   * @param packageSet set of class names (without extension) in the same package.
-   * @returns list of Relationships from the package that are used in the file.
-   */
-  private getPackageImports(
-    fileLines: string[],
-    packageSet: Set<string>
-  ): Relationship[] {
-    const found = new Map<string, RelationshipType>();
-    for (const line of fileLines) {
-      const trimmed_line = line.trim();
-      if (
-        trimmed_line.startsWith('import ') ||
-        trimmed_line.startsWith('package ') ||
-        trimmed_line === ''
-      ) {
-        continue;
-      }
-      for (const className of packageSet) {
-        if (!found.has(className) && trimmed_line.includes(className)) {
-          let type: RelationshipType = 'dependency';
-          if (trimmed_line.includes('implements') && trimmed_line.includes(className)) {
-            type = 'implements';
-          } else if (trimmed_line.includes('extends') && trimmed_line.includes(className)) {
-            type = 'extends';
-          }
-          found.set(className, type);
-        }
-      }
-      if (found.size === packageSet.size) break;
-    }
-    return [...found.entries()].map(([name, type]) => ({
-      fileName: name,
-      relationshipType: type,
-    }));
   }
 
   /**

@@ -112,7 +112,7 @@ describe('getFileImports functionality', () => {
     mockReadFile.mockResolvedValueOnce('import fs from "fs/promises";' as any);
 
     const result = await fileAccess.getFileImports('/project/index.ts');
-    expect(result).toEqual([{ fileName: '"fs/promises";', relationshipType: 'dependency' }]);
+    expect(result).toEqual([{ fileName: '"fs/promises"', relationshipType: 'dependency' }]);
   });
 
   it('returns multiple imports', async () => {
@@ -122,8 +122,8 @@ describe('getFileImports functionality', () => {
 
     const result = await fileAccess.getFileImports('/project/index.ts');
     expect(result).toEqual([
-      { fileName: '"fs/promises";', relationshipType: 'dependency' },
-      { fileName: '"path";', relationshipType: 'dependency' },
+      { fileName: '"fs/promises"', relationshipType: 'dependency' },
+      { fileName: '"path"', relationshipType: 'dependency' },
     ]);
   });
 
@@ -152,7 +152,7 @@ describe('getFileImports functionality', () => {
       '/project/LoginInteractor.java'
     );
     expect(result).toEqual([
-      { fileName: 'entity.User;', relationshipType: 'dependency' },
+      { fileName: 'entity.User', relationshipType: 'dependency' },
       { fileName: 'LoginInputBoundary', relationshipType: 'implements' },
     ]);
   });
@@ -174,7 +174,7 @@ describe('getFileImports functionality', () => {
     );
 
     const result = await fileAccess.getFileImports('/project/index.ts');
-    expect(result).toEqual([{ fileName: '"real";', relationshipType: 'dependency' }]);
+    expect(result).toEqual([{ fileName: '"real"', relationshipType: 'dependency' }]);
   });
 
   it('detects extends relationship type from package imports', async () => {
