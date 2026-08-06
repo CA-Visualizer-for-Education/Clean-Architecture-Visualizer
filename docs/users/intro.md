@@ -23,7 +23,7 @@ Initializes your CSC207 project with a sample clean architecture directory struc
 cave init <language>
 ```
 
-The created structure should like like:
+The created structure should look like:
 
 ```
 src/
@@ -51,7 +51,7 @@ Initializes your CSC207 project with a sample clean architecture directory struc
 cave module_init <language>
 ```
 
-The created structure should like like:
+The created structure should look like:
 
 ```
 src/
