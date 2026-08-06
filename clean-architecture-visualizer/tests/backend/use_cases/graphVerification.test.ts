@@ -8,6 +8,7 @@ import {
 } from '@jest/globals';
 import { GraphVerificationInteractor } from '../../../src/use_case/graphVerification/graphVerificationInteractor.js';
 import { GraphVerificationPresenter } from '../../../src/interface_adapter/graphVerification/graphVerificationPresenter.js';
+import { GraphVerificationOutputData } from '../../../src/use_case/graphVerification/graphVerificationOutputData.js';
 import { FileAccess } from '../../../src/data_access/fileAccess.js';
 import type { FileAccessInterface } from '../../../src/data_access/fileAccessInterface.js';
 import { CleanArchAccess } from '../../../src/data_access/cleanArchInfoAccess.js';
@@ -19,7 +20,9 @@ import type { cleanNode } from '../../../src/types/cleanNode.ts';
 const genericFileAccess = new FileAccess();
 const genericNeighbourAccess = new CleanArchAccess();
 const genericDBAccess = new SessionDBAccess();
-const presenter = new GraphVerificationPresenter();
+const presenter = new GraphVerificationPresenter(
+  new GraphVerificationOutputData()
+);
 
 function makeUseCaseGraphs(types: string[]): useCaseGraph[] {
   let useCaseGraphs: useCaseGraph[] = [];
@@ -534,7 +537,9 @@ describe('Imports across use cases are caught and seperate from normal violation
   it.each(testCases)('%s', async (_, useCaseGraphList, expectedViolations) => {
     const mockFileAccess = new MockFileAccess(fileMockContents, fileMockPaths);
     const dbAccess = new SessionDBAccess();
-    const presenter = new GraphVerificationPresenter();
+    const presenter = new GraphVerificationPresenter(
+      new GraphVerificationOutputData()
+    );
     const interactor = new GraphVerificationInteractor(
       mockFileAccess,
       genericNeighbourAccess,

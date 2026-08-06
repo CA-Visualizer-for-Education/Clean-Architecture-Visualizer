@@ -7,7 +7,6 @@ import { InitProjectInputData } from '../../../src/use_case/initProject/initProj
 describe('InitProjectInteractor', () => {
   let mockFileAccess: jest.Mocked<FileAccessInterface>;
   let mockOutputData: jest.Mocked<InitProjectOutputData>;
-  let interactor: InitProjectInteractor;
 
   const ROOT_PATH = '/project/root';
 
@@ -25,9 +24,15 @@ describe('InitProjectInteractor', () => {
     mockOutputData = {
       setOutputData: jest.fn<any>(),
     } as any;
-
-    interactor = new InitProjectInteractor(mockFileAccess, mockOutputData);
   });
+
+  function makeInteractor(language: string) {
+    return new InitProjectInteractor(
+      mockFileAccess,
+      new InitProjectInputData(language),
+      mockOutputData
+    );
+  }
 
   it('successfully creates the entire Clean Architecture directory structure in java', async () => {
     // Arrange
@@ -35,7 +40,7 @@ describe('InitProjectInteractor', () => {
     mockFileAccess.exists.mockResolvedValue(true);
 
     // Act
-    await interactor.execute(new InitProjectInputData('java'));
+    await makeInteractor('java').execute();
 
     // Assert
     const expectedDirs = [
@@ -70,7 +75,7 @@ describe('InitProjectInteractor', () => {
     mockFileAccess.exists.mockResolvedValue(true);
 
     // Act
-    await interactor.execute(new InitProjectInputData('python'));
+    await makeInteractor('python').execute();
 
     // Assert
     const expectedDirs = [
@@ -105,7 +110,7 @@ describe('InitProjectInteractor', () => {
     mockFileAccess.exists.mockResolvedValue(true);
 
     // Act
-    await interactor.execute(new InitProjectInputData('Javascript'));
+    await makeInteractor('Javascript').execute();
 
     // Assert
     const expectedDirs = [
@@ -140,7 +145,7 @@ describe('InitProjectInteractor', () => {
     mockFileAccess.exists.mockResolvedValue(true);
 
     // Act
-    await interactor.execute(new InitProjectInputData('typescript'));
+    await makeInteractor('typescript').execute();
 
     // Assert
     const expectedDirs = [
@@ -178,7 +183,7 @@ describe('InitProjectInteractor', () => {
     );
 
     // Act
-    await interactor.execute(new InitProjectInputData('java'));
+    await makeInteractor('java').execute();
 
     // Assert
     expect(mockOutputData.setOutputData).toHaveBeenCalledWith(false);
@@ -189,7 +194,7 @@ describe('InitProjectInteractor', () => {
     mockFileAccess.getCurrentPath.mockRejectedValue(new Error('Path unknown'));
 
     // Act
-    await interactor.execute(new InitProjectInputData('java'));
+    await makeInteractor('java').execute();
 
     // Assert
     expect(mockOutputData.setOutputData).toHaveBeenCalledWith(false);
@@ -203,7 +208,7 @@ describe('InitProjectInteractor', () => {
     mockFileAccess.bfsFindDir.mockResolvedValue(`${ROOT_PATH}/src/main`);
 
     // Act
-    await interactor.execute(new InitProjectInputData('java'));
+    await makeInteractor('java').execute();
 
     // Assert
     expect(mockOutputData.setOutputData).toHaveBeenCalledWith(false);
@@ -213,12 +218,12 @@ describe('InitProjectInteractor', () => {
   it('Error occurs because src directory does not exist.', async () => {
     mockFileAccess.getCurrentPath.mockResolvedValue(ROOT_PATH);
     mockFileAccess.exists.mockResolvedValue(false);
-    await interactor.execute(new InitProjectInputData('java'));
+    await makeInteractor('java').execute();
     expect(mockOutputData.setOutputData).toHaveBeenCalledWith(false);
   });
 
   it('Error occurs because programming language is invalid..', async () => {
-    await interactor.execute(new InitProjectInputData('blah blah blah'));
+    await makeInteractor('blah blah blah').execute();
     expect(mockOutputData.setOutputData).toHaveBeenCalledWith(false);
   });
 });

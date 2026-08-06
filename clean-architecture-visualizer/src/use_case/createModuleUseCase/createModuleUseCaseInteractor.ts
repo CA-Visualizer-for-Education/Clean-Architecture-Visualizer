@@ -3,19 +3,21 @@ import type { FileAccessInterface } from '../../data_access/fileAccessInterface.
 import type { CreateModuleUseCaseInputBoundary } from './createModuleUseCaseInputBoundary.js';
 import type { CreateModuleUseCaseInputData } from './createModuleUseCaseInputData.js';
 import type { CreateModuleUseCaseOutputBoundary } from './createModuleUseCaseOutputBoundary.js';
-import { CreateModuleUseCaseOutputData } from './createModuleUseCaseOutputData.js';
+import type { CreateModuleUseCaseOutputData } from './createModuleUseCaseOutputData.js';
 
 export class CreateModuleUseCaseInteractor implements CreateModuleUseCaseInputBoundary {
   constructor(
     private readonly fileAccess: FileAccessInterface,
-    private readonly presenter: CreateModuleUseCaseOutputBoundary
+    private readonly presenter: CreateModuleUseCaseOutputBoundary,
+    private readonly inputData: CreateModuleUseCaseInputData,
+    private readonly outputData: CreateModuleUseCaseOutputData
   ) {}
 
-  async execute(inputData: CreateModuleUseCaseInputData) {
+  async execute(): Promise<void> {
     try {
       // remove all spaces from use case name and feature name
-      const feature = inputData.getFeatureName().split(' ').join('');
-      const usecase = inputData.getUseCaseName().split(' ').join('');
+      const feature = this.inputData.getFeatureName().split(' ').join('');
+      const usecase = this.inputData.getUseCaseName().split(' ').join('');
       const currPath = await this.fileAccess.getCurrentPath();
       // Find the language directory -- makes assumption only one directory is named after language
       let extension: string | undefined = undefined;
@@ -102,8 +104,9 @@ export class CreateModuleUseCaseInteractor implements CreateModuleUseCaseInputBo
       await createFile(iaPath, 'Controller');
       await createFile(iaPath, 'Presenter');
 
-      const outputData = new CreateModuleUseCaseOutputData(feature, usecase);
-      this.presenter.showSuccessView(outputData);
+      this.outputData.setFeature(feature);
+      this.outputData.setUseCase(usecase);
+      this.presenter.showSuccessView();
     } catch (error) {
       if (error instanceof Error) {
         this.presenter.showFailView(error.message);
