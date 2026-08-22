@@ -1,11 +1,13 @@
 import type { cleanNode } from '../types/cleanNode.js';
 import type { neighbourMap } from '../types/neighbourMap.js';
+import type { RelationshipType } from '../types/relationship.js';
 
 export class useCaseGraph {
   private readonly name: string;
   private readonly outNeighbours: neighbourMap;
   private violationEdges: Array<[cleanNode, cleanNode]> = [];
   private readonly files = new Map<string, string>();
+  private readonly edgeTypes = new Map<string, RelationshipType>();
 
   constructor(name: string) {
     this.name = name;
@@ -98,6 +100,18 @@ export class useCaseGraph {
 
   getNeighbourMap(): neighbourMap {
     return this.outNeighbours;
+  }
+
+  setEdgeType(from: cleanNode, to: cleanNode, type: RelationshipType): void {
+    this.edgeTypes.set(`${from}->${to}`, type);
+  }
+
+  getEdgeType(from: cleanNode, to: cleanNode): RelationshipType {
+    return this.edgeTypes.get(`${from}->${to}`) ?? 'dependency';
+  }
+
+  getEdgeTypes(): Map<string, RelationshipType> {
+    return this.edgeTypes;
   }
 
   /**

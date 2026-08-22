@@ -2,6 +2,7 @@ import fs from 'fs/promises';
 import path from 'path';
 
 import type { FileAccessInterface } from './fileAccessInterface.js';
+import type { Relationship, RelationshipType } from '../types/relationship.js';
 
 export class FileAccess implements FileAccessInterface {
   /**
@@ -164,23 +165,22 @@ export class FileAccess implements FileAccessInterface {
 
     return null;
   }
-
   /**
    * Read the imports of the file that path points to and return a list of module names.
    * Collects normal imports first before collecting package imports.
    * @param filePath is a path to a valid file.
    */
-  async getFileImports(filePath: string): Promise<string[]> {
-    const result: string[] = [];
+  async getFileImports(filePath: string): Promise<Relationship[]> {
+    const result: Relationship[] = []; // format is {filename: 'filename', relationshipType: 'type'} no semicolons
 
     try {
       const fileContent: string = await fs.readFile(filePath, {
         encoding: 'utf-8',
       });
       const fileLines = fileContent.split('\n');
+      const importSet = new Set<string>();
 
-      // package is always the first non-empty line (Package Imports in Java only)
-      let packageSet: Set<string> | null = null;
+      // Package imports can only occur on the first non-empty line
       for (const line of fileLines) {
         const trimmed_line = line.trim();
         if (trimmed_line === '') continue;
@@ -188,33 +188,70 @@ export class FileAccess implements FileAccessInterface {
           const packageDir = filePath.substring(
             0,
             filePath.lastIndexOf('/') + 1
-          ); // package dir is always one dir above filepath
+          );
           const files = await fs.readdir(packageDir);
-          packageSet = new Set<string>();
           const currentFileName = filePath.split('/').at(-1) ?? '';
           for (const file of files) {
             if (file !== currentFileName) {
-              packageSet.add(file.replace(/\.[^.]+$/, '')); // replaces everything after the dot so fileAccess.ts -> fileAccess
+              importSet.add(file.replace(/\.[^.]+$/, '')); // Strips everything after .
             }
           }
+          break;
         }
         break;
       }
+
+      // Add imports to importSet if starting with import, if not check for relationships
+      const found = new Map<string, RelationshipType>();
       for (const line of fileLines) {
+        const trimmed_line = line.trim();
+        if (trimmed_line.startsWith('package ') || trimmed_line === '') {
+          continue;
+        }
         if (
-          line.startsWith('import ') ||
-          line.startsWith('from ') ||
-          line.startsWith('import{')
+          trimmed_line.startsWith('import ') ||
+          trimmed_line.startsWith('from ') ||
+          trimmed_line.startsWith('import{')
         ) {
-          const trimmed_line = line.trim();
           const lastSpace = trimmed_line.lastIndexOf(' ');
-          result.push(trimmed_line.substring(lastSpace + 1));
+          const name = trimmed_line.substring(lastSpace + 1).replace(/;$/, '');
+          importSet.add(name);
+          found.set(name, 'dependency');
+
+          // For TypeScript-style imports (e.g. import { Foo, Bar } from './module.js')
+          const braceOpen = trimmed_line.indexOf('{');
+          const braceClose = trimmed_line.indexOf('}');
+          if (braceOpen !== -1 && braceClose !== -1 && braceClose > braceOpen) {
+            const namedImports = trimmed_line
+              .substring(braceOpen + 1, braceClose)
+              .split(',')
+              .map((s) => s.trim())
+              .filter((s) => s.length > 0);
+            for (const namedImport of namedImports) {
+              importSet.add(namedImport);
+            }
+          }
+          continue;
+        }
+        // Seperates line into list where each element is a word in the line
+        const words: string[] = trimmed_line.match(/[A-Za-z0-9_$]*/g) ?? []; // strips punctuation
+        const extendsIdx = words.indexOf('extends');
+        const implementsIdx = words.indexOf('implements');
+        // Class extends ... implements ...
+        for (let i = 0; i < words.length; i++) {
+          const word = words[i];
+          if (!importSet.has(word) || found.has(word)) continue;
+          let type: RelationshipType = 'dependency';
+          if (implementsIdx !== -1 && i > implementsIdx) {
+            type = 'implements';
+          } else if (extendsIdx !== -1 && i > extendsIdx) {
+            type = 'extends';
+          }
+          found.set(word, type);
         }
       }
-      // If package detected, with files other than the current file, then iterate through entire file
-      if (packageSet) {
-        const packageImports = this.getPackageImports(fileLines, packageSet);
-        result.push(...packageImports); // pushed depenedency files are stripped of extra details, pushes LoginInputData not '"LoginInputData";'
+      for (const [name, type] of found) {
+        result.push({ fileName: name, relationshipType: type });
       }
     } catch {
       console.log('The file: ' + filePath + ' could not be found');

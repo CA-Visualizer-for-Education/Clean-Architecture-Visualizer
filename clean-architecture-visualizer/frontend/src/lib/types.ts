@@ -27,7 +27,7 @@ export type CAComponentType = (typeof COMPONENT_TYPES)[number];
 export const NODE_STATUSES = ['VALID', 'MISSING', 'VIOLATION'] as const;
 export type CANodeStatus = (typeof NODE_STATUSES)[number];
 
-export const EDGE_TYPES = ['DEPENDENCY', 'ASSOCIATION', 'INHERITANCE'] as const;
+export const EDGE_TYPES = ['DEPENDENCY', 'ASSOCIATION', 'IMPLEMENTS'] as const;
 export type CAEdgeType = (typeof EDGE_TYPES)[number];
 
 export const EDGE_STATUSES = [

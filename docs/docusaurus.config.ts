@@ -54,8 +54,8 @@ const config: Config = {
       '@docusaurus/plugin-content-docs',
       {
         id: 'api',
-        path: 'api',                 
-        routeBasePath: 'api',        
+        path: 'api',
+        routeBasePath: 'api',
         sidebarPath: './sidebarsAPI.ts',
       },
     ],
@@ -89,8 +89,8 @@ const config: Config = {
         },
         {
           type: 'docSidebar',
-          sidebarId: 'apiSidebar',   
-          docsPluginId: 'api',      
+          sidebarId: 'apiSidebar',
+          docsPluginId: 'api',
           label: 'API',
           position: 'left',
         },

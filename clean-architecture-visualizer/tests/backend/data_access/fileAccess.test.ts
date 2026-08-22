@@ -112,7 +112,9 @@ describe('getFileImports functionality', () => {
     mockReadFile.mockResolvedValueOnce('import fs from "fs/promises";' as any);
 
     const result = await fileAccess.getFileImports('/project/index.ts');
-    expect(result).toEqual(['"fs/promises";']);
+    expect(result).toEqual([
+      { fileName: '"fs/promises"', relationshipType: 'dependency' },
+    ]);
   });
 
   it('returns multiple imports', async () => {
@@ -121,7 +123,10 @@ describe('getFileImports functionality', () => {
     );
 
     const result = await fileAccess.getFileImports('/project/index.ts');
-    expect(result).toEqual(['"fs/promises";', '"path";']);
+    expect(result).toEqual([
+      { fileName: '"fs/promises"', relationshipType: 'dependency' },
+      { fileName: '"path"', relationshipType: 'dependency' },
+    ]);
   });
 
   it('returns package imports not specified at by an import command', async () => {
@@ -133,7 +138,9 @@ describe('getFileImports functionality', () => {
       'package use_case.login;\nfinal int x = 5\nLoginInputData output = new LoginOutputData()'
     );
     const result = await fileAccess.getFileImports('/project/index.ts');
-    expect(result).toEqual(['LoginInputData']);
+    expect(result).toEqual([
+      { fileName: 'LoginInputData', relationshipType: 'dependency' },
+    ]);
   });
 
   it('returns both package imports and normal imports', async () => {
@@ -148,7 +155,10 @@ describe('getFileImports functionality', () => {
     const result = await fileAccess.getFileImports(
       '/project/LoginInteractor.java'
     );
-    expect(result).toEqual(['entity.User;', 'LoginInputBoundary']);
+    expect(result).toEqual([
+      { fileName: 'entity.User', relationshipType: 'dependency' },
+      { fileName: 'LoginInputBoundary', relationshipType: 'implements' },
+    ]);
   });
 
   it('returns an empty array and logs when the file is not found', async () => {
@@ -168,7 +178,41 @@ describe('getFileImports functionality', () => {
     );
 
     const result = await fileAccess.getFileImports('/project/index.ts');
-    expect(result).toEqual(['"real";']);
+    expect(result).toEqual([
+      { fileName: '"real"', relationshipType: 'dependency' },
+    ]);
+  });
+
+  it('detects extends relationship type from package imports', async () => {
+    mockReaddir.mockResolvedValueOnce([
+      'BaseController.java',
+      'LoginController.java',
+    ] as any);
+    mockReadFile.mockResolvedValueOnce(
+      'package interface_adapter.login;\npublic class LoginController extends BaseController {}'
+    );
+    const result = await fileAccess.getFileImports(
+      '/project/LoginController.java'
+    );
+    expect(result).toEqual([
+      { fileName: 'BaseController', relationshipType: 'extends' },
+    ]);
+  });
+
+  it('detects implements relationship type from package imports', async () => {
+    mockReaddir.mockResolvedValueOnce([
+      'LoginInputBoundary.java',
+      'LoginInteractor.java',
+    ] as any);
+    mockReadFile.mockResolvedValueOnce(
+      'package use_case.login;\npublic class LoginInteractor implements LoginInputBoundary {}'
+    );
+    const result = await fileAccess.getFileImports(
+      '/project/LoginInteractor.java'
+    );
+    expect(result).toEqual([
+      { fileName: 'LoginInputBoundary', relationshipType: 'implements' },
+    ]);
   });
 });
 
