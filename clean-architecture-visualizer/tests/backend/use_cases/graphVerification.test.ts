@@ -17,7 +17,6 @@ import { useCaseGraph } from '../../../src/entity/useCaseGraph.js';
 import type { cleanNode } from '../../../src/types/cleanNode.js';
 import type { Relationship } from '../../../src/types/relationship.js';
 
-
 const genericFileAccess = new FileAccess();
 const genericNeighbourAccess = new CleanArchAccess();
 const genericDBAccess = new SessionDBAccess();
@@ -462,11 +461,20 @@ describe('Imports across use cases are caught and seperate from normal violation
   externalInOrder.push(secondUseCase);
 
   fileMockContents.set('/mock/path/firstInteractor.ts', [
-    { fileName: '/mock/path/firstOutputData.ts', relationshipType: 'dependency' },
+    {
+      fileName: '/mock/path/firstOutputData.ts',
+      relationshipType: 'dependency',
+    },
   ]);
   fileMockContents.set('/mock/path/secondInteractor.ts', [
-    { fileName: '/mock/path/secondOutputData.ts', relationshipType: 'dependency' },
-    { fileName: '/mock/path/firstOutputData.ts', relationshipType: 'dependency' },
+    {
+      fileName: '/mock/path/secondOutputData.ts',
+      relationshipType: 'dependency',
+    },
+    {
+      fileName: '/mock/path/firstOutputData.ts',
+      relationshipType: 'dependency',
+    },
   ]);
 
   //This implementation needs to use distinct use case names for the MockFileAccess contents to not overlap
@@ -484,13 +492,22 @@ describe('Imports across use cases are caught and seperate from normal violation
   externalOutOfOrder.push(fourthUseCase);
 
   fileMockContents.set('/mock/path/thirdInteractor.ts', [
-    { fileName: '/mock/path/thirdOutputData.ts', relationshipType: 'dependency' },
+    {
+      fileName: '/mock/path/thirdOutputData.ts',
+      relationshipType: 'dependency',
+    },
   ]);
   fileMockContents.set('/mock/path/fourthInteractor.ts', [
-    { fileName: '/mock/path/fourthOutputData.ts', relationshipType: 'dependency' },
+    {
+      fileName: '/mock/path/fourthOutputData.ts',
+      relationshipType: 'dependency',
+    },
   ]);
   fileMockContents.set('/mock/path/fourthOutputData.ts', [
-    { fileName: '/mock/path/thirdInteractor.ts', relationshipType: 'dependency' },
+    {
+      fileName: '/mock/path/thirdInteractor.ts',
+      relationshipType: 'dependency',
+    },
   ]);
 
   const normalViolation: useCaseGraph[] = [];
@@ -500,7 +517,10 @@ describe('Imports across use cases are caught and seperate from normal violation
   normalViolation.push(normalUseCase);
 
   fileMockContents.set('/mock/path/normalOutputData.ts', [
-    { fileName: '/mock/path/normalInteractor.ts', relationshipType: 'dependency' },
+    {
+      fileName: '/mock/path/normalInteractor.ts',
+      relationshipType: 'dependency',
+    },
   ]);
 
   const testCaseGraphs = [externalInOrder, externalOutOfOrder, normalViolation];
@@ -784,12 +804,27 @@ describe('Ensures developOutNeighbours maps the files to all of the use cases th
 
     mockFileAccess.getFileImports
       .mockImplementationOnce(async (_) => [])
-      .mockImplementationOnce(async (_) => [{ fileName: 'entity1.java;', relationshipType: 'dependency' }])
-      .mockImplementationOnce(async (_) => [{ fileName: 'usecase1InputData.java;', relationshipType: 'dependency' }])
-      .mockImplementationOnce(async (_) => [{ fileName: 'dataAccess1.java;', relationshipType: 'dependency' }])
-      .mockImplementationOnce(async (_) => [{ fileName: 'dataAccessInterface1.java;', relationshipType: 'dependency' }])
-      .mockImplementationOnce(async (_) => [{ fileName: 'view1.java;', relationshipType: 'dependency' }])
-      .mockImplementationOnce(async (_) => [{ fileName: 'viewModel1.java;', relationshipType: 'dependency' }]);
+      .mockImplementationOnce(async (_) => [
+        { fileName: 'entity1.java;', relationshipType: 'dependency' },
+      ])
+      .mockImplementationOnce(async (_) => [
+        { fileName: 'usecase1InputData.java;', relationshipType: 'dependency' },
+      ])
+      .mockImplementationOnce(async (_) => [
+        { fileName: 'dataAccess1.java;', relationshipType: 'dependency' },
+      ])
+      .mockImplementationOnce(async (_) => [
+        {
+          fileName: 'dataAccessInterface1.java;',
+          relationshipType: 'dependency',
+        },
+      ])
+      .mockImplementationOnce(async (_) => [
+        { fileName: 'view1.java;', relationshipType: 'dependency' },
+      ])
+      .mockImplementationOnce(async (_) => [
+        { fileName: 'viewModel1.java;', relationshipType: 'dependency' },
+      ]);
 
     await (interactor as any).developOutNeighbours();
     const expectedFiles = [
@@ -890,12 +925,27 @@ describe('Ensures developOutNeighbours maps the files to all of the use cases th
 
     mockFileAccess.getFileImports
       .mockImplementationOnce(async (_) => [])
-      .mockImplementationOnce(async (_) => [{ fileName: 'entity1.java;', relationshipType: 'dependency' }])
-      .mockImplementationOnce(async (_) => [{ fileName: 'usecase1InputData.java;', relationshipType: 'dependency' }])
-      .mockImplementationOnce(async (_) => [{ fileName: 'dataAccess1.java;', relationshipType: 'dependency' }])
-      .mockImplementationOnce(async (_) => [{ fileName: 'dataAccessInterface1.java;', relationshipType: 'dependency' }])
-      .mockImplementationOnce(async (_) => [{ fileName: 'view1.java;', relationshipType: 'dependency' }])
-      .mockImplementationOnce(async (_) => [{ fileName: 'viewModel1.java;', relationshipType: 'dependency' }]);
+      .mockImplementationOnce(async (_) => [
+        { fileName: 'entity1.java;', relationshipType: 'dependency' },
+      ])
+      .mockImplementationOnce(async (_) => [
+        { fileName: 'usecase1InputData.java;', relationshipType: 'dependency' },
+      ])
+      .mockImplementationOnce(async (_) => [
+        { fileName: 'dataAccess1.java;', relationshipType: 'dependency' },
+      ])
+      .mockImplementationOnce(async (_) => [
+        {
+          fileName: 'dataAccessInterface1.java;',
+          relationshipType: 'dependency',
+        },
+      ])
+      .mockImplementationOnce(async (_) => [
+        { fileName: 'view1.java;', relationshipType: 'dependency' },
+      ])
+      .mockImplementationOnce(async (_) => [
+        { fileName: 'viewModel1.java;', relationshipType: 'dependency' },
+      ]);
 
     await (interactor as any).developOutNeighbours();
     const expectedFiles = [
@@ -987,7 +1037,9 @@ describe('Ensures developOutNeighbours maps the files to all of the use cases th
 
     mockFileAccess.getFileImports
       .mockImplementationOnce(async (_) => [])
-      .mockImplementationOnce(async (_) => [{ fileName: 'usecase1InputData.java', relationshipType: 'dependency' }]);
+      .mockImplementationOnce(async (_) => [
+        { fileName: 'usecase1InputData.java', relationshipType: 'dependency' },
+      ]);
 
     await (interactor as any).developOutNeighbours();
     expect(
@@ -1102,7 +1154,9 @@ describe('Ensures developOutNeighbours maps the files to all of the use cases th
 
     mockFileAccess.getFileImports
       .mockImplementationOnce(async (_) => [])
-      .mockImplementationOnce(async (_) => [{ fileName: 'usecase1InputData.java', relationshipType: 'dependency' }]);
+      .mockImplementationOnce(async (_) => [
+        { fileName: 'usecase1InputData.java', relationshipType: 'dependency' },
+      ]);
 
     await (interactor as any).developOutNeighbours();
     expect(
@@ -1225,13 +1279,28 @@ describe('Ensures developOutNeighbours maps the files to all of the use cases th
     );
 
     mockFileAccess.getFileImports
-      .mockImplementationOnce(async (_) => [{ fileName: 'entity1.java', relationshipType: 'dependency' }])
-      .mockImplementationOnce(async (_) => [{ fileName: 'entity1.java;', relationshipType: 'dependency' }])
+      .mockImplementationOnce(async (_) => [
+        { fileName: 'entity1.java', relationshipType: 'dependency' },
+      ])
+      .mockImplementationOnce(async (_) => [
+        { fileName: 'entity1.java;', relationshipType: 'dependency' },
+      ])
       .mockImplementationOnce(async (_) => [])
-      .mockImplementationOnce(async (_) => [{ fileName: 'dataAccess1.java;', relationshipType: 'dependency' }])
-      .mockImplementationOnce(async (_) => [{ fileName: 'dataAccessInterface1.java;', relationshipType: 'dependency' }])
-      .mockImplementationOnce(async (_) => [{ fileName: 'view1.java;', relationshipType: 'dependency' }])
-      .mockImplementationOnce(async (_) => [{ fileName: 'viewModel1.java;', relationshipType: 'dependency' }]);
+      .mockImplementationOnce(async (_) => [
+        { fileName: 'dataAccess1.java;', relationshipType: 'dependency' },
+      ])
+      .mockImplementationOnce(async (_) => [
+        {
+          fileName: 'dataAccessInterface1.java;',
+          relationshipType: 'dependency',
+        },
+      ])
+      .mockImplementationOnce(async (_) => [
+        { fileName: 'view1.java;', relationshipType: 'dependency' },
+      ])
+      .mockImplementationOnce(async (_) => [
+        { fileName: 'viewModel1.java;', relationshipType: 'dependency' },
+      ]);
 
     await (interactor as any).developOutNeighbours();
     const expectedFiles = [
@@ -1331,13 +1400,28 @@ describe('Ensures developOutNeighbours maps the files to all of the use cases th
     );
 
     mockFileAccess.getFileImports
-      .mockImplementationOnce(async (_) => [{ fileName: 'entity1.java', relationshipType: 'dependency' }])
-      .mockImplementationOnce(async (_) => [{ fileName: 'entity1.java;', relationshipType: 'dependency' }])
+      .mockImplementationOnce(async (_) => [
+        { fileName: 'entity1.java', relationshipType: 'dependency' },
+      ])
+      .mockImplementationOnce(async (_) => [
+        { fileName: 'entity1.java;', relationshipType: 'dependency' },
+      ])
       .mockImplementationOnce(async (_) => [])
-      .mockImplementationOnce(async (_) => [{ fileName: 'dataAccess1.java;', relationshipType: 'dependency' }])
-      .mockImplementationOnce(async (_) => [{ fileName: 'dataAccessInterface1.java;', relationshipType: 'dependency' }])
-      .mockImplementationOnce(async (_) => [{ fileName: 'view1.java;', relationshipType: 'dependency' }])
-      .mockImplementationOnce(async (_) => [{ fileName: 'viewModel1.java;', relationshipType: 'dependency' }]);
+      .mockImplementationOnce(async (_) => [
+        { fileName: 'dataAccess1.java;', relationshipType: 'dependency' },
+      ])
+      .mockImplementationOnce(async (_) => [
+        {
+          fileName: 'dataAccessInterface1.java;',
+          relationshipType: 'dependency',
+        },
+      ])
+      .mockImplementationOnce(async (_) => [
+        { fileName: 'view1.java;', relationshipType: 'dependency' },
+      ])
+      .mockImplementationOnce(async (_) => [
+        { fileName: 'viewModel1.java;', relationshipType: 'dependency' },
+      ]);
 
     await (interactor as any).developOutNeighbours();
     const expectedFiles = [
@@ -1462,12 +1546,21 @@ describe('Ensures developOutNeighbours maps the files to all of the use cases th
 
     mockFileAccess.getFileImports
       .mockImplementationOnce(async (_) => [
-        { fileName: 'usecase1InputBoundary.java;', relationshipType: 'dependency' },
+        {
+          fileName: 'usecase1InputBoundary.java;',
+          relationshipType: 'dependency',
+        },
         { fileName: 'usecase1InputData.java;', relationshipType: 'dependency' },
       ])
       .mockImplementationOnce(async (_) => [
-        { fileName: 'usecase1OutputBoundary.java;', relationshipType: 'dependency' },
-        { fileName: 'usecase1OutputData.java;', relationshipType: 'dependency' },
+        {
+          fileName: 'usecase1OutputBoundary.java;',
+          relationshipType: 'dependency',
+        },
+        {
+          fileName: 'usecase1OutputData.java;',
+          relationshipType: 'dependency',
+        },
         { fileName: 'viewModel1.java;', relationshipType: 'dependency' },
       ])
       .mockImplementationOnce(async (_) => [])
@@ -1475,15 +1568,30 @@ describe('Ensures developOutNeighbours maps the files to all of the use cases th
       .mockImplementationOnce(async (_) => [])
       .mockImplementationOnce(async (_) => [])
       .mockImplementationOnce(async (_) => [
-        { fileName: 'usecase1InputBoundary.java;', relationshipType: 'dependency' },
+        {
+          fileName: 'usecase1InputBoundary.java;',
+          relationshipType: 'dependency',
+        },
         { fileName: 'usecase1InputData.java;', relationshipType: 'dependency' },
-        { fileName: 'usecase1OutputBoundary.java;', relationshipType: 'dependency' },
-        { fileName: 'usecase1OutputData.java;', relationshipType: 'dependency' },
-        { fileName: 'dataAccessInterface1.java;', relationshipType: 'dependency' },
+        {
+          fileName: 'usecase1OutputBoundary.java;',
+          relationshipType: 'dependency',
+        },
+        {
+          fileName: 'usecase1OutputData.java;',
+          relationshipType: 'dependency',
+        },
+        {
+          fileName: 'dataAccessInterface1.java;',
+          relationshipType: 'dependency',
+        },
         { fileName: 'entity1.java;', relationshipType: 'dependency' },
       ])
       .mockImplementationOnce(async (_) => [
-        { fileName: 'dataAccessInterface1.java', relationshipType: 'dependency' },
+        {
+          fileName: 'dataAccessInterface1.java',
+          relationshipType: 'dependency',
+        },
         { fileName: 'database1.java', relationshipType: 'dependency' },
         { fileName: 'entity1.java;', relationshipType: 'dependency' },
       ])
@@ -1622,12 +1730,21 @@ describe('Ensures developOutNeighbours maps the files to all of the use cases th
 
     mockFileAccess.getFileImports
       .mockImplementationOnce(async (_) => [
-        { fileName: 'usecase1InputBoundary.java;', relationshipType: 'dependency' },
+        {
+          fileName: 'usecase1InputBoundary.java;',
+          relationshipType: 'dependency',
+        },
         { fileName: 'usecase1InputData.java;', relationshipType: 'dependency' },
       ])
       .mockImplementationOnce(async (_) => [
-        { fileName: 'usecase1OutputBoundary.java;', relationshipType: 'dependency' },
-        { fileName: 'usecase1OutputData.java;', relationshipType: 'dependency' },
+        {
+          fileName: 'usecase1OutputBoundary.java;',
+          relationshipType: 'dependency',
+        },
+        {
+          fileName: 'usecase1OutputData.java;',
+          relationshipType: 'dependency',
+        },
         { fileName: 'viewModel1.java;', relationshipType: 'dependency' },
       ])
       .mockImplementationOnce(async (_) => [])
@@ -1635,15 +1752,30 @@ describe('Ensures developOutNeighbours maps the files to all of the use cases th
       .mockImplementationOnce(async (_) => [])
       .mockImplementationOnce(async (_) => [])
       .mockImplementationOnce(async (_) => [
-        { fileName: 'usecase1InputBoundary.java;', relationshipType: 'dependency' },
+        {
+          fileName: 'usecase1InputBoundary.java;',
+          relationshipType: 'dependency',
+        },
         { fileName: 'usecase1InputData.java;', relationshipType: 'dependency' },
-        { fileName: 'usecase1OutputBoundary.java;', relationshipType: 'dependency' },
-        { fileName: 'usecase1OutputData.java;', relationshipType: 'dependency' },
-        { fileName: 'dataAccessInterface1.java;', relationshipType: 'dependency' },
+        {
+          fileName: 'usecase1OutputBoundary.java;',
+          relationshipType: 'dependency',
+        },
+        {
+          fileName: 'usecase1OutputData.java;',
+          relationshipType: 'dependency',
+        },
+        {
+          fileName: 'dataAccessInterface1.java;',
+          relationshipType: 'dependency',
+        },
         { fileName: 'entity1.java;', relationshipType: 'dependency' },
       ])
       .mockImplementationOnce(async (_) => [
-        { fileName: 'dataAccessInterface1.java', relationshipType: 'dependency' },
+        {
+          fileName: 'dataAccessInterface1.java',
+          relationshipType: 'dependency',
+        },
         { fileName: 'database1.java', relationshipType: 'dependency' },
         { fileName: 'entity1.java;', relationshipType: 'dependency' },
       ])
@@ -1731,10 +1863,16 @@ describe('Relationship types are passed through to edge storage', () => {
     uc.addFile('testInputBoundary.ts', '/mock/path/testInputBoundary.ts');
 
     fileMockPaths.set('testInteractor.ts', '/mock/path/testInteractor.ts');
-    fileMockPaths.set('testInputBoundary.ts', '/mock/path/testInputBoundary.ts');
+    fileMockPaths.set(
+      'testInputBoundary.ts',
+      '/mock/path/testInputBoundary.ts'
+    );
 
     fileMockContents.set('/mock/path/testInteractor.ts', [
-      { fileName: '/mock/path/testInputBoundary.ts', relationshipType: 'implements' },
+      {
+        fileName: '/mock/path/testInputBoundary.ts',
+        relationshipType: 'implements',
+      },
     ]);
     fileMockContents.set('/mock/path/testInputBoundary.ts', []);
 
@@ -1746,7 +1884,7 @@ describe('Relationship types are passed through to edge storage', () => {
       genericNeighbourAccess,
       dbAccess,
       presenter,
-      [uc],
+      [uc]
     );
 
     await (interactor as any).buildFilePaths();
@@ -1771,7 +1909,10 @@ describe('Relationship types are passed through to edge storage', () => {
     fileMockPaths.set('test2OutputData.ts', '/mock/path/test2OutputData.ts');
 
     fileMockContents.set('/mock/path/test2Interactor.ts', [
-      { fileName: '/mock/path/test2OutputData.ts', relationshipType: 'dependency' },
+      {
+        fileName: '/mock/path/test2OutputData.ts',
+        relationshipType: 'dependency',
+      },
     ]);
     fileMockContents.set('/mock/path/test2OutputData.ts', []);
 
@@ -1783,7 +1924,7 @@ describe('Relationship types are passed through to edge storage', () => {
       genericNeighbourAccess,
       dbAccess,
       presenter,
-      [uc],
+      [uc]
     );
 
     await (interactor as any).buildFilePaths();

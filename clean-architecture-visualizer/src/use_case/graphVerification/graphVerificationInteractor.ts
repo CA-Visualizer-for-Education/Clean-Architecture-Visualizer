@@ -112,8 +112,8 @@ export class GraphVerificationInteractor implements GraphVerificationInputBounda
    * paths.
    */
   private async developOutNeighbours(): Promise<void> {
-    const externalFileNames = [...this.externalFilePaths.keys()].map(
-      (name) => (name.split('.').at(0) ?? '').toLowerCase()
+    const externalFileNames = [...this.externalFilePaths.keys()].map((name) =>
+      (name.split('.').at(0) ?? '').toLowerCase()
     );
 
     // Maps external files to the names of the use case graphs they belong to
@@ -133,8 +133,8 @@ export class GraphVerificationInteractor implements GraphVerificationInputBounda
     for (const graph of this.useCaseGraphList) {
       this.crossUseCaseEdges.push([]);
       // Get a list of formatted file names in this use case (lowercased for case-insensitive matching).
-      const useCaseFiles = [...graph.getFiles().keys()].map(
-        (name) => (name.split('.').at(0) ?? '').toLowerCase()
+      const useCaseFiles = [...graph.getFiles().keys()].map((name) =>
+        (name.split('.').at(0) ?? '').toLowerCase()
       );
       // We use a shallow copy to prevent looking at external files that import external files
       // We only want to look at internal files that import external files
@@ -214,7 +214,11 @@ export class GraphVerificationInteractor implements GraphVerificationInputBounda
                   fromNode,
                   this.resolveNode(importPath.fileName) as cleanNode
                 );
-                graph.setEdgeType(fromNode, this.resolveNode(importPath.fileName) as cleanNode, importPath.relationshipType);
+                graph.setEdgeType(
+                  fromNode,
+                  this.resolveNode(importPath.fileName) as cleanNode,
+                  importPath.relationshipType
+                );
                 graph.addFile(fileName, filePath);
                 externalFilesToUseCaseGraphs
                   .get(filePath)
@@ -229,7 +233,12 @@ export class GraphVerificationInteractor implements GraphVerificationInputBounda
       // internal file in CA and unite them.
       imports.map((importPath) => {
         if (!this.resolveNode(importPath.fileName)) return;
-        if (this.resolveImportToFileName(this.internalFilePaths, importPath.fileName)) {
+        if (
+          this.resolveImportToFileName(
+            this.internalFilePaths,
+            importPath.fileName
+          )
+        ) {
           return;
         }
         const targetFileName = this.resolveImportToFileName(
@@ -270,7 +279,11 @@ export class GraphVerificationInteractor implements GraphVerificationInputBounda
         currGraph?.addFile(fromNodePath.split('/').at(-1) ?? '', fromNodePath);
         currGraph?.addFile(toNodePath.split('/').at(-1) ?? '', toNodePath);
         currGraph?.setNodeNeighbour(fromNode as cleanNode, toNode as cleanNode);
-        currGraph?.setEdgeType(fromNode as cleanNode, toNode as cleanNode, 'dependency');
+        currGraph?.setEdgeType(
+          fromNode as cleanNode,
+          toNode as cleanNode,
+          'dependency'
+        );
       });
     });
   }

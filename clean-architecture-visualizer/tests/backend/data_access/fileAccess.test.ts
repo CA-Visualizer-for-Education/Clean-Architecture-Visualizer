@@ -112,7 +112,9 @@ describe('getFileImports functionality', () => {
     mockReadFile.mockResolvedValueOnce('import fs from "fs/promises";' as any);
 
     const result = await fileAccess.getFileImports('/project/index.ts');
-    expect(result).toEqual([{ fileName: '"fs/promises"', relationshipType: 'dependency' }]);
+    expect(result).toEqual([
+      { fileName: '"fs/promises"', relationshipType: 'dependency' },
+    ]);
   });
 
   it('returns multiple imports', async () => {
@@ -136,7 +138,9 @@ describe('getFileImports functionality', () => {
       'package use_case.login;\nfinal int x = 5\nLoginInputData output = new LoginOutputData()'
     );
     const result = await fileAccess.getFileImports('/project/index.ts');
-    expect(result).toEqual([{ fileName: 'LoginInputData', relationshipType: 'dependency' }]);
+    expect(result).toEqual([
+      { fileName: 'LoginInputData', relationshipType: 'dependency' },
+    ]);
   });
 
   it('returns both package imports and normal imports', async () => {
@@ -174,7 +178,9 @@ describe('getFileImports functionality', () => {
     );
 
     const result = await fileAccess.getFileImports('/project/index.ts');
-    expect(result).toEqual([{ fileName: '"real"', relationshipType: 'dependency' }]);
+    expect(result).toEqual([
+      { fileName: '"real"', relationshipType: 'dependency' },
+    ]);
   });
 
   it('detects extends relationship type from package imports', async () => {

@@ -214,9 +214,7 @@ export class FileAccess implements FileAccessInterface {
           trimmed_line.startsWith('import{')
         ) {
           const lastSpace = trimmed_line.lastIndexOf(' ');
-          const name = trimmed_line
-            .substring(lastSpace + 1)
-            .replace(/;$/, '');
+          const name = trimmed_line.substring(lastSpace + 1).replace(/;$/, '');
           importSet.add(name);
           found.set(name, 'dependency');
 
@@ -271,7 +269,7 @@ export class FileAccess implements FileAccessInterface {
   async getProjectName(): Promise<string> {
     const currPath = process.cwd();
     const parts = currPath.split(path.sep);
-    const srcIndex = parts.indexOf('src');8
+    const srcIndex = parts.indexOf('src');
     if (srcIndex === -1) return parts[parts.length - 1]; // current dir
     return parts[srcIndex - 1];
   }
