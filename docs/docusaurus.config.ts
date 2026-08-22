@@ -50,6 +50,15 @@ const config: Config = {
         sidebarPath: './sidebarsDevelopers.ts',
       },
     ],
+    [
+      '@docusaurus/plugin-content-docs',
+      {
+        id: 'api',
+        path: 'api',                 
+        routeBasePath: 'api',        
+        sidebarPath: './sidebarsAPI.ts',
+      },
+    ],
   ],
 
   themeConfig: {
@@ -77,6 +86,13 @@ const config: Config = {
           docsPluginId: 'developers',
           position: 'left',
           label: 'Developers',
+        },
+        {
+          type: 'docSidebar',
+          sidebarId: 'apiSidebar',   
+          docsPluginId: 'api',      
+          label: 'API',
+          position: 'left',
         },
       ],
     },

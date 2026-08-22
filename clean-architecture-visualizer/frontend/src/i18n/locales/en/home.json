@@ -8,15 +8,21 @@
   "cards": {
     "checker": {
       "title": "Checker",
-      "description": "Verify clean architecture consistency in your codebase"
+      "description": "Verify clean architecture consistency in your codebase.",
+      "badge": "CHECKER",
+      "cta": "Check now"
     },
     "learn": {
       "title": "Learn",
-      "description": "Learn core concepts of clean architecture with our interactive visualizer"
+      "description": "Learn core concepts of clean architecture with our interactive visualizer.",
+      "badge": "LEARN",
+      "cta": "Start exploring"
     },
     "starter": {
       "title": "Project Starter",
-      "description": "Download clean architecture starter file to get started on your project!"
+      "description": "Download clean architecture starter file to get started on your project!",
+      "badge": "PROJECT STARTER",
+      "cta": "Start now"
     }
   }
 }

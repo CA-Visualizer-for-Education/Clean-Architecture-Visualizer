@@ -3,7 +3,7 @@ import type { InitModuleProjectInputBoundary } from '../../use_case/initModulePr
 export class InitModuleProjectController {
   constructor(private readonly inputBoundary: InitModuleProjectInputBoundary) {}
 
-  async execute() {
+  async execute(): Promise<void> {
     await this.inputBoundary.execute();
   }
 }

@@ -1,27 +1,40 @@
 import type { FileAccessInterface } from '../../data_access/fileAccessInterface.js';
 import type { InitModuleProjectInputBoundary } from './initModuleProjectInputBoundary.js';
 import { InitModuleProjectOutputData } from './initModuleProjectOutputData.js';
+import type { InitModuleProjectInputData } from './initModuleProjectInputData.js';
 import path from 'path';
 
 export class InitModuleProjectInteractor implements InitModuleProjectInputBoundary {
   private readonly fileAccess: FileAccessInterface;
   private readonly outputData: InitModuleProjectOutputData;
+  private readonly inputData: InitModuleProjectInputData;
+
   constructor(
     fileAccess: FileAccessInterface,
+    inputData: InitModuleProjectInputData,
     outputData: InitModuleProjectOutputData = new InitModuleProjectOutputData()
   ) {
     this.fileAccess = fileAccess;
     this.outputData = outputData;
+    this.inputData = inputData;
   }
 
   async execute(): Promise<void> {
     try {
+      const acceptedLanguage = ['typescript', 'javascript', 'java', 'python'];
+      let language = this.inputData.getLanguage().trim();
+      if (!acceptedLanguage.includes(language.toLowerCase())) {
+        throw new Error(
+          'You must enter a valid programming language of: java, python, typescript, or javascript. Blank defaults to Java.'
+        );
+      }
+
       let currPath = await this.fileAccess.getCurrentPath();
       currPath = path.join(currPath, 'src');
       // Create the src directory if it does not exist.
       const res = await this.fileAccess.exists(currPath);
       if (!res) {
-        await this.fileAccess.createDirectory(currPath);
+        throw new Error('You need to create the src directory first.');
       }
       // If main or test already exist, there is a chance the project has already been initialized
       if (
@@ -31,10 +44,14 @@ export class InitModuleProjectInteractor implements InitModuleProjectInputBounda
         throw new Error('project already initialized.');
       }
 
-      // The project does support TS, JS, Python, and Java, but will do Java for now for consistency
-      const javaPath = path.join(currPath, 'main', 'java');
-      const testPath = path.join(currPath, 'test', 'java');
-      await this.fileAccess.createDirectory(javaPath);
+      // The project does support TS, JS, Python, and Java
+      const programmingPath = path.join(
+        currPath,
+        'main',
+        language.toLowerCase()
+      );
+      const testPath = path.join(currPath, 'test', language.toLowerCase());
+      await this.fileAccess.createDirectory(programmingPath);
       await this.fileAccess.createDirectory(testPath);
 
       // Create code structure for packaging by module.
@@ -44,10 +61,11 @@ export class InitModuleProjectInteractor implements InitModuleProjectInputBounda
         'entity',
         'app',
         'views',
+        'database',
       ];
       for (const directoryName of subDirectories) {
         await this.fileAccess.createDirectory(
-          path.join(javaPath, directoryName)
+          path.join(programmingPath, directoryName)
         );
       }
 

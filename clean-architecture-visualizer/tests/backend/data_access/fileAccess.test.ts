@@ -161,6 +161,33 @@ describe('getFileImports functionality', () => {
     ]);
   });
 
+  it('returns package imports not specified at by an import command', async () => {
+    mockReaddir.mockResolvedValueOnce([
+      'LoginInputBoundary.java',
+      'LoginInputData.java',
+    ] as any);
+    mockReadFile.mockResolvedValueOnce(
+      'package use_case.login;\nfinal int x = 5\nLoginInputData output = new LoginOutputData()'
+    );
+    const result = await fileAccess.getFileImports('/project/index.ts');
+    expect(result).toEqual(['LoginInputData']);
+  });
+
+  it('returns both package imports and normal imports', async () => {
+    mockReaddir.mockResolvedValueOnce([
+      'LoginInputBoundary.java',
+      'LoginInputData.java',
+      'LoginInteractor.java',
+    ] as any);
+    mockReadFile.mockResolvedValueOnce(
+      'package use_case.login;\nimport entity.User;\npublic class LoginInteractor implements LoginInputBoundary{}'
+    );
+    const result = await fileAccess.getFileImports(
+      '/project/LoginInteractor.java'
+    );
+    expect(result).toEqual(['entity.User;', 'LoginInputBoundary']);
+  });
+
   it('returns an empty array and logs when the file is not found', async () => {
     mockReadFile.mockRejectedValueOnce(new Error('File not found') as any);
     const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
@@ -307,5 +334,35 @@ describe('getUseCases functionality', () => {
 
     const result = await fileAccess.getUseCases();
     expect(result).toEqual([]);
+  });
+});
+
+describe('getFileSnippet functionality', () => {
+  const fileAccess = new FileAccess();
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('successfully retrieves file snippet from file', async () => {
+    mockReadFile.mockResolvedValueOnce(
+      'not a line\nimport ../usecase1InputBoundary.py;'
+    );
+    const res = await fileAccess.getFileSnippet('/src', 'inputBoundary');
+    expect(res).toBe('import ../usecase1InputBoundary.py;');
+  });
+
+  it('successfully retrieves file snippet from file when target is entity', async () => {
+    mockReadFile.mockResolvedValueOnce('import ../entities/entity1.py;');
+    const res = await fileAccess.getFileSnippet('/src', 'entity');
+    expect(res).toBe('import ../entities/entity1.py;');
+  });
+
+  it('successfully retrieves file snippet from file when target is use case interactor', async () => {
+    mockReadFile.mockResolvedValueOnce(
+      'import ../use_case/usecase1Interactor.py;'
+    );
+    const res = await fileAccess.getFileSnippet('/src', 'useCaseInteractor');
+    expect(res).toBe('import ../use_case/usecase1Interactor.py;');
   });
 });

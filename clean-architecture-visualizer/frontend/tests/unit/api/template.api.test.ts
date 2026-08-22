@@ -10,30 +10,119 @@ import {
 } from '@/api/template.api';
 
 describe('Template API', () => {
-  it('generateProject posts to /template/generate and returns the response data', async () => {
+  it('generateProject posts to /template/generate/java and returns the response data', async () => {
     const mockData = { message: 'Project initiated successfully' };
-
     server.use(
-      http.post('*/api/template/generate', () =>
+      http.post(`*/api/template/generate/${encodeURIComponent('java')}`, () =>
         HttpResponse.json(mockData, { status: 201 })
       )
     );
 
-    const result = await generateProject();
+    const result = await generateProject('java');
 
     expect(result).toEqual(mockData);
   });
 
-  it('generateModuleProject posts to /template/module_generate and returns the response data', async () => {
+  it('generateProject posts to /template/generate/python and returns the response data', async () => {
     const mockData = { message: 'Project initiated successfully' };
 
     server.use(
-      http.post('*/api/template/module_generate', () =>
+      http.post(`*/api/template/generate/${encodeURIComponent('python')}`, () =>
         HttpResponse.json(mockData, { status: 201 })
       )
     );
 
-    const result = await generateModuleProject();
+    const result = await generateProject('python');
+
+    expect(result).toEqual(mockData);
+  });
+
+  it('generateProject posts to /template/generate/javascript and returns the response data', async () => {
+    const mockData = { message: 'Project initiated successfully' };
+
+    server.use(
+      http.post(
+        `*/api/template/generate/${encodeURIComponent('javascript')}`,
+        () => HttpResponse.json(mockData, { status: 201 })
+      )
+    );
+
+    const result = await generateProject('javascript');
+
+    expect(result).toEqual(mockData);
+  });
+
+  it('generateProject posts to /template/generate/typescript and returns the response data', async () => {
+    const mockData = { message: 'Project initiated successfully' };
+
+    server.use(
+      http.post(
+        `*/api/template/generate/${encodeURIComponent('typescript')}`,
+        () => HttpResponse.json(mockData, { status: 201 })
+      )
+    );
+
+    const result = await generateProject('typescript');
+
+    expect(result).toEqual(mockData);
+  });
+
+  it('generateModuleProject posts to /template/module_generate/java and returns the response data', async () => {
+    const mockData = { message: 'Project initiated successfully' };
+
+    server.use(
+      http.post(
+        `*/api/template/module_generate/${encodeURIComponent('java')}`,
+        () => HttpResponse.json(mockData, { status: 201 })
+      )
+    );
+
+    const result = await generateModuleProject('java');
+
+    expect(result).toEqual(mockData);
+  });
+
+  it('generateModuleProject posts to /template/module_generate/python and returns the response data', async () => {
+    const mockData = { message: 'Project initiated successfully' };
+
+    server.use(
+      http.post(
+        `*/api/template/module_generate/${encodeURIComponent('python')}`,
+        () => HttpResponse.json(mockData, { status: 201 })
+      )
+    );
+
+    const result = await generateModuleProject('python');
+
+    expect(result).toEqual(mockData);
+  });
+
+  it('generateModuleProject posts to /template/module_generate/javascript and returns the response data', async () => {
+    const mockData = { message: 'Project initiated successfully' };
+
+    server.use(
+      http.post(
+        `*/api/template/module_generate/${encodeURIComponent('javascript')}`,
+        () => HttpResponse.json(mockData, { status: 201 })
+      )
+    );
+
+    const result = await generateModuleProject('javascript');
+
+    expect(result).toEqual(mockData);
+  });
+
+  it('generateModuleProject posts to /template/module_generate/typescript and returns the response data', async () => {
+    const mockData = { message: 'Project initiated successfully' };
+
+    server.use(
+      http.post(
+        `*/api/template/module_generate/${encodeURIComponent('typescript')}`,
+        () => HttpResponse.json(mockData, { status: 201 })
+      )
+    );
+
+    const result = await generateModuleProject('typescript');
 
     expect(result).toEqual(mockData);
   });

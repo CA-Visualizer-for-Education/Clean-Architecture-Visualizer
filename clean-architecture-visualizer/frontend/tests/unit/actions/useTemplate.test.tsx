@@ -16,13 +16,13 @@ describe('Template Hooks', () => {
     vi.restoreAllMocks();
   });
 
-  it('useGenerateProject resolves the template response and invalidates file-tree queries', async () => {
+  it('useGenerateProject resolves the template response and invalidates file-tree queries for java', async () => {
     const invalidateSpy = vi
       .spyOn(QueryClient.prototype, 'invalidateQueries')
       .mockResolvedValue(undefined);
 
     server.use(
-      http.post('*/api/template/generate', () => {
+      http.post(`*/api/template/generate/${encodeURIComponent('java')}`, () => {
         return HttpResponse.json(
           { message: 'Project initiated successfully' },
           { status: 201 }
@@ -32,30 +32,189 @@ describe('Template Hooks', () => {
 
     const { result } = renderHook(() => useGenerateProject());
 
-    result.current.mutate();
+    result.current.mutate('java');
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(result.current.data?.message).toBe('Project initiated successfully');
     expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: ['file-tree'] });
   });
 
-  it('useGenerateModuleProject resolves the template response and invalidates file-tree queries', async () => {
+  it('useGenerateProject resolves the template response and invalidates file-tree queries for python', async () => {
     const invalidateSpy = vi
       .spyOn(QueryClient.prototype, 'invalidateQueries')
       .mockResolvedValue(undefined);
 
     server.use(
-      http.post('*/api/template/module_generate', () => {
-        return HttpResponse.json(
-          { message: 'Project initiated successfully' },
-          { status: 201 }
-        );
-      })
+      http.post(
+        `*/api/template/generate/${encodeURIComponent('python')}`,
+        () => {
+          return HttpResponse.json(
+            { message: 'Project initiated successfully' },
+            { status: 201 }
+          );
+        }
+      )
+    );
+
+    const { result } = renderHook(() => useGenerateProject());
+
+    result.current.mutate('python');
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(result.current.data?.message).toBe('Project initiated successfully');
+    expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: ['file-tree'] });
+  });
+
+  it('useGenerateProject resolves the template response and invalidates file-tree queries for javascript', async () => {
+    const invalidateSpy = vi
+      .spyOn(QueryClient.prototype, 'invalidateQueries')
+      .mockResolvedValue(undefined);
+
+    server.use(
+      http.post(
+        `*/api/template/generate/${encodeURIComponent('javascript')}`,
+        () => {
+          return HttpResponse.json(
+            { message: 'Project initiated successfully' },
+            { status: 201 }
+          );
+        }
+      )
+    );
+
+    const { result } = renderHook(() => useGenerateProject());
+
+    result.current.mutate('javascript');
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(result.current.data?.message).toBe('Project initiated successfully');
+    expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: ['file-tree'] });
+  });
+
+  it('useGenerateProject resolves the template response and invalidates file-tree queries for typescript', async () => {
+    const invalidateSpy = vi
+      .spyOn(QueryClient.prototype, 'invalidateQueries')
+      .mockResolvedValue(undefined);
+
+    server.use(
+      http.post(
+        `*/api/template/generate/${encodeURIComponent('typescript')}`,
+        () => {
+          return HttpResponse.json(
+            { message: 'Project initiated successfully' },
+            { status: 201 }
+          );
+        }
+      )
+    );
+
+    const { result } = renderHook(() => useGenerateProject());
+
+    result.current.mutate('typescript');
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(result.current.data?.message).toBe('Project initiated successfully');
+    expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: ['file-tree'] });
+  });
+
+  it('useGenerateModuleProject resolves the template response and invalidates file-tree queries for java', async () => {
+    const invalidateSpy = vi
+      .spyOn(QueryClient.prototype, 'invalidateQueries')
+      .mockResolvedValue(undefined);
+
+    server.use(
+      http.post(
+        `*/api/template/module_generate/${encodeURIComponent('java')}`,
+        () => {
+          return HttpResponse.json(
+            { message: 'Project initiated successfully' },
+            { status: 201 }
+          );
+        }
+      )
     );
 
     const { result } = renderHook(() => useGenerateModuleProject());
 
-    result.current.mutate();
+    result.current.mutate('java');
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(result.current.data?.message).toBe('Project initiated successfully');
+    expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: ['file-tree'] });
+  });
+
+  it('useGenerateModuleProject resolves the template response and invalidates file-tree queries for python', async () => {
+    const invalidateSpy = vi
+      .spyOn(QueryClient.prototype, 'invalidateQueries')
+      .mockResolvedValue(undefined);
+
+    server.use(
+      http.post(
+        `*/api/template/module_generate/${encodeURIComponent('python')}`,
+        () => {
+          return HttpResponse.json(
+            { message: 'Project initiated successfully' },
+            { status: 201 }
+          );
+        }
+      )
+    );
+
+    const { result } = renderHook(() => useGenerateModuleProject());
+
+    result.current.mutate('python');
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(result.current.data?.message).toBe('Project initiated successfully');
+    expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: ['file-tree'] });
+  });
+
+  it('useGenerateModuleProject resolves the template response and invalidates file-tree queries for javascript', async () => {
+    const invalidateSpy = vi
+      .spyOn(QueryClient.prototype, 'invalidateQueries')
+      .mockResolvedValue(undefined);
+
+    server.use(
+      http.post(
+        `*/api/template/module_generate/${encodeURIComponent('javascript')}`,
+        () => {
+          return HttpResponse.json(
+            { message: 'Project initiated successfully' },
+            { status: 201 }
+          );
+        }
+      )
+    );
+
+    const { result } = renderHook(() => useGenerateModuleProject());
+
+    result.current.mutate('javascript');
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(result.current.data?.message).toBe('Project initiated successfully');
+    expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: ['file-tree'] });
+  });
+
+  it('useGenerateModuleProject resolves the template response and invalidates file-tree queries for typescript', async () => {
+    const invalidateSpy = vi
+      .spyOn(QueryClient.prototype, 'invalidateQueries')
+      .mockResolvedValue(undefined);
+
+    server.use(
+      http.post(
+        `*/api/template/module_generate/${encodeURIComponent('typescript')}`,
+        () => {
+          return HttpResponse.json(
+            { message: 'Project initiated successfully' },
+            { status: 201 }
+          );
+        }
+      )
+    );
+
+    const { result } = renderHook(() => useGenerateModuleProject());
+
+    result.current.mutate('typescript');
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(result.current.data?.message).toBe('Project initiated successfully');

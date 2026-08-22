@@ -4,11 +4,12 @@ import type { CreateFeatureOutputData } from '../../use_case/createFeature/creat
 
 export class CreateFeaturePresenter implements CreateFeatureOutputBoundary {
   private error: string | null = null;
-  showSuccessView(createFeatureOutputData: CreateFeatureOutputData): void {
+
+  constructor(private readonly outputData: CreateFeatureOutputData) {}
+
+  showSuccessView(): void {
     console.log(
-      chalk.green(
-        `Feature ${createFeatureOutputData.getFeature()} has been created.`
-      )
+      chalk.green(`Feature ${this.outputData.getFeature()} has been created.`)
     );
   }
 

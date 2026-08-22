@@ -46,8 +46,9 @@ const ProjectStarter = () => {
 
   const handleCloseSnackbar = () => setSnackbar({ ...snackbar, open: false });
 
+  // The 'java' is temporary until an option to select programming language is added
   const handleCreateProject = () => {
-    triggerGenerate(undefined, {
+    triggerGenerate('java', {
       onSuccess: (data) => {
         setSnackbar({
           open: true,
