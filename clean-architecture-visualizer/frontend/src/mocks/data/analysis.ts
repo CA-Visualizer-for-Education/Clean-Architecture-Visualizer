@@ -170,7 +170,7 @@ export const mockInteractionDetails = {
       id: 'edge-3',
       source: 'UserSignOutInteractor',
       target: 'UserSignOutInputBoundary',
-      type: 'INHERITANCE',
+      type: 'IMPLEMENTS',
       status: 'VALID',
     },
     {
@@ -198,7 +198,7 @@ export const mockInteractionDetails = {
       id: 'edge-7',
       source: 'UserSignOutPresenter',
       target: 'UserSignOutOutputBoundary',
-      type: 'INHERITANCE',
+      type: 'IMPLEMENTS',
       status: 'VALID',
     },
     {

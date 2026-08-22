@@ -113,7 +113,7 @@ export class GraphVerificationInteractor implements GraphVerificationInputBounda
    */
   private async developOutNeighbours(): Promise<void> {
     const externalFileNames = [...this.externalFilePaths.keys()].map(
-      (name) => name.split('.').at(0) ?? ''
+      (name) => (name.split('.').at(0) ?? '').toLowerCase()
     );
 
     // Maps external files to the names of the use case graphs they belong to
@@ -132,9 +132,9 @@ export class GraphVerificationInteractor implements GraphVerificationInputBounda
     let useCaseIndex = 0;
     for (const graph of this.useCaseGraphList) {
       this.crossUseCaseEdges.push([]);
-      // Get a list of formatted file names in this use case.
+      // Get a list of formatted file names in this use case (lowercased for case-insensitive matching).
       const useCaseFiles = [...graph.getFiles().keys()].map(
-        (name) => name.split('.').at(0) ?? ''
+        (name) => (name.split('.').at(0) ?? '').toLowerCase()
       );
       // We use a shallow copy to prevent looking at external files that import external files
       // We only want to look at internal files that import external files
@@ -159,9 +159,10 @@ export class GraphVerificationInteractor implements GraphVerificationInputBounda
                 ? importPathName.slice(0, -1)
                 : importPathName;
             //Check if the imported file is an external file path
+            const importFileNameLower = importFileName.toLowerCase();
             if (
-              !useCaseFiles.includes(importFileName) &&
-              !externalFileNames.includes(importFileName)
+              !useCaseFiles.includes(importFileNameLower) &&
+              !externalFileNames.includes(importFileNameLower)
             ) {
               this.crossUseCaseEdges[useCaseIndex].push([fromNode, toNode]);
               this.crossUseCaseFiles.add(filePath);
@@ -581,11 +582,11 @@ export class GraphVerificationInteractor implements GraphVerificationInputBounda
   }
   private relationshipTypeToEdgeType(
     relationshipType: RelationshipType
-  ): 'DEPENDENCY' | 'INHERITANCE' {
+  ): 'DEPENDENCY' | 'IMPLEMENTS' {
     switch (relationshipType) {
       case 'implements':
       case 'extends':
-        return 'INHERITANCE';
+        return 'IMPLEMENTS';
       case 'dependency':
         return 'DEPENDENCY';
     }
