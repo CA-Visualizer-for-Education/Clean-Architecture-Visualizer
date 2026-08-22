@@ -220,9 +220,7 @@ export class FileAccess implements FileAccessInterface {
           importSet.add(name);
           found.set(name, 'dependency');
 
-          // For TypeScript-style imports (e.g. import { Foo, Bar } from './module.js'),
-          // also extract the named identifiers so they can be matched in
-          // implements/extends clauses.
+          // For TypeScript-style imports (e.g. import { Foo, Bar } from './module.js')
           const braceOpen = trimmed_line.indexOf('{');
           const braceClose = trimmed_line.indexOf('}');
           if (braceOpen !== -1 && braceClose !== -1 && braceClose > braceOpen) {
