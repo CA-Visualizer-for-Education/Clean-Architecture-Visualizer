@@ -1919,36 +1919,69 @@ describe('Ensures developOutNeighbours maps the files to all of the use cases th
 
     mockFileAccess.getFileImports
       .mockImplementationOnce(async (_) => [
-        '../usecase1InputBoundary.java;',
-        '../usecase1InputData.java;',
+        {
+          fileName: '../usecase1InputBoundary.java;',
+          relationshipType: 'dependency',
+        },
+        {
+          fileName: '../usecase1InputData.java;',
+          relationshipType: 'dependency',
+        },
       ])
       .mockImplementationOnce(async (_) => [
-        '../usecase1OutputBoundary.java;',
-        '../usecase1OutputData.java;',
-        '../viewModel1.java;',
-      ])
-      .mockImplementationOnce(async (_) => [])
-      .mockImplementationOnce(async (_) => [])
-      .mockImplementationOnce(async (_) => [])
-      .mockImplementationOnce(async (_) => [])
-      .mockImplementationOnce(async (_) => [
-        '../usecase1InputBoundary.java;',
-        '../usecase1InputData.java;',
-        '../usecase1OutputBoundary.java;',
-        '../usecase1OutputData.java;',
-        '../dataAccessInterface1.java;',
-        '../entity1.java;',
-      ])
-      .mockImplementationOnce(async (_) => [
-        '../dataAccessInterface1.java',
-        '../database1.java',
-        '../entity1.java;',
+        {
+          fileName: '../usecase1OutputBoundary.java;',
+          relationshipType: 'dependency',
+        },
+        {
+          fileName: '../usecase1OutputData.java;',
+          relationshipType: 'dependency',
+        },
+        { fileName: '../viewModel1.java;', relationshipType: 'dependency' },
       ])
       .mockImplementationOnce(async (_) => [])
       .mockImplementationOnce(async (_) => [])
+      .mockImplementationOnce(async (_) => [])
+      .mockImplementationOnce(async (_) => [])
       .mockImplementationOnce(async (_) => [
-        '../viewModel1.java',
-        '../usecase1Controller.java',
+        {
+          fileName: '../usecase1InputBoundary.java;',
+          relationshipType: 'dependency',
+        },
+        {
+          fileName: '../usecase1InputData.java;',
+          relationshipType: 'dependency',
+        },
+        {
+          fileName: '../usecase1OutputBoundary.java;',
+          relationshipType: 'dependency',
+        },
+        {
+          fileName: '../usecase1OutputData.java;',
+          relationshipType: 'dependency',
+        },
+        {
+          fileName: '../dataAccessInterface1.java;',
+          relationshipType: 'dependency',
+        },
+        { fileName: '../entity1.java;', relationshipType: 'dependency' },
+      ])
+      .mockImplementationOnce(async (_) => [
+        {
+          fileName: '../dataAccessInterface1.java',
+          relationshipType: 'dependency',
+        },
+        { fileName: '../database1.java', relationshipType: 'dependency' },
+        { fileName: '../entity1.java;', relationshipType: 'dependency' },
+      ])
+      .mockImplementationOnce(async (_) => [])
+      .mockImplementationOnce(async (_) => [])
+      .mockImplementationOnce(async (_) => [
+        { fileName: '../viewModel1.java', relationshipType: 'dependency' },
+        {
+          fileName: '../usecase1Controller.java',
+          relationshipType: 'dependency',
+        },
       ])
       .mockImplementationOnce(async (_) => [])
       .mockImplementationOnce(async (_) => []);

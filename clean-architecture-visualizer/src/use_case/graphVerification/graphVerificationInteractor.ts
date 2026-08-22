@@ -180,7 +180,7 @@ export class GraphVerificationInteractor implements GraphVerificationInputBounda
                 // to the set of use case graphs that the external file belongs to
                 // Nothing to optimize.
                 externalFilesToUseCaseGraphs
-                  .get(externalFileNamePath[1])
+                  .get(this.externalFilePaths.get(modifiedImportPath) as string)
                   ?.add(graph.getName());
               }
             }
