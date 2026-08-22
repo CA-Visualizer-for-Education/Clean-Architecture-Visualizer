@@ -26,7 +26,7 @@ type UseCaseEdgeResponse = {
   id: string;
   source: string;
   target: string;
-  type: 'DEPENDENCY';
+  type: 'DEPENDENCY' | 'INHERITANCE';
   status: 'VALID' | 'INCORRECT_DEPENDENCY';
 };
 

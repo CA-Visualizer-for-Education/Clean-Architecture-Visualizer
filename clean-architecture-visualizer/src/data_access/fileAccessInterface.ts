@@ -1,4 +1,4 @@
-import type { Relationship } from '../entity/relationship.js';
+import type { Relationship } from '../types/relationship.js';
 
 export interface FileAccessInterface {
   getUseCases(): Promise<string[]>;

@@ -2,7 +2,7 @@ import fs from 'fs/promises';
 import path from 'path';
 
 import type { FileAccessInterface } from './fileAccessInterface.js';
-import type { Relationship, RelationshipType } from '../entity/relationship.js';
+import type { Relationship, RelationshipType } from '../types/relationship.js';
 
 export class FileAccess implements FileAccessInterface {
   /**
@@ -171,7 +171,7 @@ export class FileAccess implements FileAccessInterface {
    * @param filePath is a path to a valid file.
    */
   async getFileImports(filePath: string): Promise<Relationship[]> {
-    const result: Relationship[] = [];
+    const result: Relationship[] = []; // format is {filename: 'filename', relationshipType: 'type'} no semicolons
 
     try {
       const fileContent: string = await fs.readFile(filePath, {
@@ -221,10 +221,11 @@ export class FileAccess implements FileAccessInterface {
           found.set(name, 'dependency');
           continue;
         }
-        // Seperates line
-        const words: string[] = trimmed_line.match(/[A-Za-z_$][\w$]*/g) ?? [];
+        // Seperates line into list where each element is a word in the line
+        const words: string[] = trimmed_line.match(/[A-Za-z0-9_$]*/g) ?? []; // strips punctuation
         const extendsIdx = words.indexOf('extends');
         const implementsIdx = words.indexOf('implements');
+        // Class extends ... implements ...
         for (let i = 0; i < words.length; i++) {
           const word = words[i];
           if (!importSet.has(word) || found.has(word)) continue;
@@ -256,7 +257,7 @@ export class FileAccess implements FileAccessInterface {
   async getProjectName(): Promise<string> {
     const currPath = process.cwd();
     const parts = currPath.split(path.sep);
-    const srcIndex = parts.indexOf('src');
+    const srcIndex = parts.indexOf('src');8
     if (srcIndex === -1) return parts[parts.length - 1]; // current dir
     return parts[srcIndex - 1];
   }

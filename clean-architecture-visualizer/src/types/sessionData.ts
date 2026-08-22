@@ -30,7 +30,7 @@ export type EdgeStorage = {
   id: string;
   source: string; // Node Name
   target: string; // Node Name
-  type: 'DEPENDENCY';
+  type: 'DEPENDENCY' | 'INHERITANCE';
   status: 'VALID' | 'INCORRECT_DEPENDENCY';
 };
 
