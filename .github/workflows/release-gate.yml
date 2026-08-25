@@ -1,0 +1,20 @@
+name: release-gate
+
+on:
+  # temporary, only for testing this release gate file
+  push:
+    branches: [ci/release-gate]
+    paths:
+      - 'clean-architecture-visualizer/**'
+      - '.github/workflows/release-gate.yml'
+  workflow_dispatch:
+
+jobs:
+  verify-samples:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Show workspace after checkout
+        run: ls -la
