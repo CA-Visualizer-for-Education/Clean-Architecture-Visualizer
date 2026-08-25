@@ -2,6 +2,7 @@ name: release-gate
 
 on:
   push:
+    # auto trigger when a new cave version is released
     tags: ['v*']
   workflow_dispatch:
 
