@@ -70,12 +70,12 @@ jobs:
           echo "$out"
 
           if ! grep -q 'EnrollStudent' <<< "$out"; then
-            echo "expect cave verify to report the use case EnrollStudent, but it didn't appear. cave probably didn't find a project here."
+            echo "expect cave verify to report the use case EnrollStudent, but it didn't appear. cave probably did not find a project here."
             exit 1
           fi
 
           if grep -E -q '[[:space:]]+entities.*controller' <<< "$out"; then
-            echo "don't expect a violation line with entities -> controller. clean-standard
+            echo "did not expect a violation line with entities -> controller. clean-standard
             has no entity depending on a controller, so cave has reported a false positive in dependency detection."
             exit 1
           fi
