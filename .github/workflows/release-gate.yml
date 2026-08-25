@@ -64,3 +64,24 @@ jobs:
           fi
 
           echo "contract holds: cave detected the illegal entities -> controller dependency"
+
+      # for good sample
+      - name: Assert clean-standard omits the entities to controller edge
+        working-directory: cave-test-repo/clean-standard
+        run: |
+          out=$(cave verify)
+          echo "$out"
+
+          if ! grep -q 'EnrollStudent' <<< "$out"; then
+            echo "expect cave verify to report the use case EnrollStudent, but it didn't appear. cave probably didn't find a project here."
+            exit 1
+          fi
+
+          if grep -E -q '[[:space:]]+entities.*controller' <<< "$out"; then
+            echo "don't expect a violation line with entities -> controller. clean-standard
+            has no entity depending on a controller, so cave has reported a false positive in dependency detection."
+            exit 1
+          fi
+
+          echo "contract holds: cave reported no entities -> controller dependency in the legal sample"
+
