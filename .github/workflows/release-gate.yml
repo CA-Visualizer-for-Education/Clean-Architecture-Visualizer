@@ -18,3 +18,18 @@ jobs:
 
       - name: Show workspace after checkout
         run: ls -la
+
+      - uses: ./.github/actions/setup-node-env
+        with:
+          working-directory: ./clean-architecture-visualizer
+
+      - name: Build the CLI and frontend
+        run: npm run build
+        working-directory:  ./clean-architecture-visualizer
+      
+      - name: pack then install package
+        run: npm pack && npm install -g ./*.tgz
+        working-directory: ./clean-architecture-visualizer
+
+      - name: check cave version
+        run: cave --version
