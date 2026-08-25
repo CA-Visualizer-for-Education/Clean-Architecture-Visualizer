@@ -1,12 +1,8 @@
 name: release-gate
 
 on:
-  # temporary, only for testing this release gate file
   push:
-    branches: [ci/release-gate]
-    paths:
-      - 'clean-architecture-visualizer/**'
-      - '.github/workflows/release-gate.yml'
+    tags: ['v*']
   workflow_dispatch:
 
 jobs:
