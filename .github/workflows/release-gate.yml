@@ -67,7 +67,7 @@ jobs:
 
       # for good sample
       - name: Assert clean-standard omits the entities to controller edge
-        working-directory: cave-test-repo/violation-bad-import
+        working-directory: cave-test-repo/clean-standard
         run: |
           out=$(cave verify)
           echo "$out"
