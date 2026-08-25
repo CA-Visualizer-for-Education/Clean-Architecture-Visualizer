@@ -25,11 +25,23 @@ jobs:
 
       - name: Build the CLI and frontend
         run: npm run build
-        working-directory:  ./clean-architecture-visualizer
-      
+        working-directory: ./clean-architecture-visualizer
+
       - name: pack then install package
         run: npm pack && npm install -g ./*.tgz
         working-directory: ./clean-architecture-visualizer
 
       - name: check cave version
         run: cave --version
+
+      - name: checkout samples
+        uses: actions/checkout@v4
+        with:
+          repository: hiuyear/cave-test-repo
+          path: cave-test-repo
+          ref: 7bc27be55ef296ebb55cf85d34380c4ca0afe765
+      
+      - name: Show workspace after checking out test repo
+        run: ls -la
+        working-directory: cave-test-repo
+
