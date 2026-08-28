@@ -8,6 +8,7 @@ import AppLayout from './layouts/AppLayout';
 import { ThemeProvider } from '@mui/material/styles';
 import { lightTheme } from './lib';
 import './i18n/config';
+import '@xyflow/react/dist/style.css';
 
 export default function App() {
   return (

@@ -11,9 +11,10 @@ export type NodeClickInfo = {
   filePath?: string;
 };
 
-type CANodeViewProps = CANode & {
+export type CANodeViewProps = CANode & {
   isInteractive?: boolean;
   onNodeClick?: (info: NodeClickInfo) => void;
+  [key: string]: unknown;
 };
 
 export function CANodeView({
