@@ -123,7 +123,7 @@ export function CADiagramView({
 
   const resolveArrowHeadType = (edgeType: CAEdge['type']) => {
     if (edgeType === 'ASSOCIATION') return 'none' as const;
-    if (edgeType === 'INHERITANCE') return 'hollowTriangle' as const;
+    if (edgeType === 'IMPLEMENTS') return 'hollowTriangle' as const;
     return 'filledTriangle' as const;
   };
 
