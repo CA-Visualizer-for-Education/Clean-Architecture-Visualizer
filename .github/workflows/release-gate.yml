@@ -34,7 +34,7 @@ jobs:
       - name: checkout samples
         uses: actions/checkout@v4
         with:
-          repository: hiuyear/cave-test-repo
+          repository: CA-Visualizer-for-Education/cave-test-repo
           path: cave-test-repo
           ref: 7bc27be55ef296ebb55cf85d34380c4ca0afe765
       
