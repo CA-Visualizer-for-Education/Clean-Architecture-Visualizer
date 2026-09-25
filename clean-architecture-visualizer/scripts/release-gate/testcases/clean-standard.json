@@ -1,0 +1,18 @@
+{
+  "name": "clean-standard",
+  "root": "clean-standard",
+  "args": ["verify"],
+  "mustMatch": [
+    {
+      "pattern": "EnrollStudent",
+      "message": "expect cave verify to report the use case EnrollStudent, but it didn't appear. cave probably didn't find a project here."
+    }
+  ],
+  "notMatch": [
+    {
+      "pattern": "\\s+entities.*controller",
+      "message": "did not expect a violation line with entities -> controller. clean-standard has no entity depending on a controller, so cave has reported a false positive in dependency detection."
+    }
+  ],
+  "success": "contract holds: cave reported no entities -> controller dependency in the legal sample"
+}

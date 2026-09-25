@@ -1,0 +1,16 @@
+{
+  "name": "violation-bad-import",
+  "root": "violation-bad-import",
+  "args": ["verify"],
+  "mustMatch": [
+    {
+      "pattern": "EnrollStudent",
+      "message": "expect cave verify to report the use case EnrollStudent, but it didn't appear. cave probably didn't find a project here."
+    },
+    {
+      "pattern": "\\s+entities.*controller",
+      "message": "expect a violation line with entities -> controller. entity/Student.java imports and calls EnrollStudentController, so cave must flag it, but did not"
+    }
+  ],
+  "success": "contract holds: cave detected the illegal entities -> controller dependency"
+}
