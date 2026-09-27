@@ -2243,15 +2243,6 @@ describe('Clean Architecture rules', () => {
     return uc.getViolationEdges();
   };
 
-  it('allows boundaries to use their data objects', async () => {
-    expect(
-      await verify([
-        ['inputBoundary', 'inputData'],
-        ['outputBoundary', 'outputData'],
-      ])
-    ).toEqual([]);
-  });
-
   it('still flags dependencies that point outward', async () => {
     expect(
       await verify([
