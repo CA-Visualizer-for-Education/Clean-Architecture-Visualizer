@@ -102,8 +102,18 @@ export class useCaseGraph {
     return this.outNeighbours;
   }
 
+  /**
+   * Record the relationship type of the edge from -> to. Several files can map
+   * onto the same pair of nodes, so an implements/extends relationship is never
+   * downgraded back to a plain dependency.
+   * @param from is of a cleanNode type.
+   * @param to is of a cleanNode type.
+   * @param type the relationship between the two nodes.
+   */
   setEdgeType(from: cleanNode, to: cleanNode, type: RelationshipType): void {
-    this.edgeTypes.set(`${from}->${to}`, type);
+    const key = `${from}->${to}`;
+    if (type === 'dependency' && this.edgeTypes.has(key)) return;
+    this.edgeTypes.set(key, type);
   }
 
   getEdgeType(from: cleanNode, to: cleanNode): RelationshipType {

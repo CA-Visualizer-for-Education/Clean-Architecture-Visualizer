@@ -7,6 +7,7 @@ import {
   jest,
 } from '@jest/globals';
 import type { Dirent } from 'fs';
+import path from 'path';
 
 type ReaddirFn = (
   path: string,
@@ -52,7 +53,7 @@ describe('bfsFindDir functionality', () => {
     ] as any);
 
     const result = await fileAccess.bfsFindDir('/project', 'src');
-    expect(result).toBe('/project/src');
+    expect(result).toBe(path.join('/project', 'src'));
   });
 
   it('finds src nested one level deep', async () => {
@@ -61,7 +62,7 @@ describe('bfsFindDir functionality', () => {
       .mockResolvedValueOnce([mockDir('src')] as any);
 
     const result = await fileAccess.bfsFindDir('/project', 'src');
-    expect(result).toBe('/project/packages/src');
+    expect(result).toBe(path.join('/project', 'packages', 'src'));
   });
 
   it('returns null when no src directory exists', async () => {
@@ -82,7 +83,7 @@ describe('bfsFindDir functionality', () => {
     ] as any);
 
     const result = await fileAccess.bfsFindDir('/project', 'src');
-    expect(result).toBe('/project/src');
+    expect(result).toBe(path.join('/project', 'src'));
   });
 
   it('returns null for an empty directory', async () => {
@@ -96,7 +97,7 @@ describe('bfsFindDir functionality', () => {
     mockReaddir.mockResolvedValueOnce([mockDir('src')] as any);
 
     const result = await fileAccess.bfsFindDir('/project', 'src');
-    expect(result).toBe('/project/src');
+    expect(result).toBe(path.join('/project', 'src'));
   });
 });
 
@@ -218,6 +219,85 @@ describe('getFileImports functionality', () => {
     );
     expect(result).toEqual([
       { fileName: 'LoginInputBoundary', relationshipType: 'implements' },
+    ]);
+  });
+
+  it('detects implements on a class imported from another package', async () => {
+    mockReaddir.mockResolvedValueOnce(['LoginPresenter.java'] as any);
+    mockReadFile.mockResolvedValueOnce(
+      'package interface_adapter.login;\n' +
+        'import use_case.login.LoginOutputBoundary;\n' +
+        'import use_case.login.LoginOutputData;\n' +
+        'public class LoginPresenter implements LoginOutputBoundary {\n' +
+        '  public void prepareSuccessView(LoginOutputData data) {}\n' +
+        '}'
+    );
+    const result = await fileAccess.getFileImports(
+      '/project/LoginPresenter.java'
+    );
+    expect(result).toEqual([
+      {
+        fileName: 'use_case.login.LoginOutputBoundary',
+        relationshipType: 'implements',
+      },
+      {
+        fileName: 'use_case.login.LoginOutputData',
+        relationshipType: 'dependency',
+      },
+    ]);
+  });
+
+  it('detects implements on a TypeScript named import', async () => {
+    mockReadFile.mockResolvedValueOnce(
+      "import type { LoginInputBoundary } from './loginInputBoundary.js';\n" +
+        'export class LoginInteractor implements LoginInputBoundary {}'
+    );
+    const result = await fileAccess.getFileImports(
+      '/project/loginInteractor.ts'
+    );
+    expect(result).toEqual([
+      {
+        fileName: "'./loginInputBoundary.js'",
+        relationshipType: 'dependency',
+      },
+      { fileName: 'LoginInputBoundary', relationshipType: 'implements' },
+    ]);
+  });
+
+  it('reads the package directory using platform path separators', async () => {
+    const filePath = path.join(
+      'project',
+      'use_case',
+      'login',
+      'LoginInteractor.java'
+    );
+    mockReaddir.mockResolvedValueOnce([
+      'LoginInputBoundary.java',
+      'LoginInteractor.java',
+    ] as any);
+    mockReadFile.mockResolvedValueOnce(
+      'package use_case.login;\npublic class LoginInteractor implements LoginInputBoundary {}'
+    );
+    const result = await fileAccess.getFileImports(filePath);
+    expect(mockReaddir).toHaveBeenCalledWith(path.dirname(filePath));
+    expect(result).toEqual([
+      { fileName: 'LoginInputBoundary', relationshipType: 'implements' },
+    ]);
+  });
+
+  it('finds the package declaration after a leading comment', async () => {
+    mockReaddir.mockResolvedValueOnce([
+      'LoginInputData.java',
+      'LoginInteractor.java',
+    ] as any);
+    mockReadFile.mockResolvedValueOnce(
+      '/*\n * Login use case.\n */\npackage use_case.login;\nLoginInputData data = null;'
+    );
+    const result = await fileAccess.getFileImports(
+      '/project/LoginInteractor.java'
+    );
+    expect(result).toEqual([
+      { fileName: 'LoginInputData', relationshipType: 'dependency' },
     ]);
   });
 });

@@ -4,6 +4,7 @@ import type { SessionDBAccessInterface } from '../../data_access/sessionDBAccess
 import { useCaseGraph } from '../../entity/useCaseGraph.js';
 import type { cleanLayer } from '../../types/cleanLayer.js';
 import type { cleanNode } from '../../types/cleanNode.js';
+import type { RelationshipType } from '../../types/relationship.js';
 import type {
   EdgeStorage,
   FileStorage,
@@ -12,7 +13,6 @@ import type {
 import type { GraphVerificationInputBoundary } from './graphVerificationInputBoundary.js';
 import { GraphVerificationInputData } from './graphVerificationInputData.js';
 import type { GraphVerificationOutputBoundary } from './graphVerificationOutputBoundary.js';
-import type { RelationshipType } from '../../types/relationship.js';
 import { GraphVerificationOutputData } from './graphVerificationOutputData.js';
 
 export class GraphVerificationInteractor
@@ -129,8 +129,8 @@ export class GraphVerificationInteractor
       externalFileRepresentative.set(filePath, filePath);
       externalFilesToUseCaseGraphs.set(filePath, new Set<string>());
     }
-    // allEdges will store all of the edges in the form of (fromNodePath, toNodePath)
-    const allEdges: string[][] = [];
+    // allEdges will store all of the edges in the form of (fromNodePath, toNodePath, relationshipType)
+    const allEdges: Array<[string, string, RelationshipType]> = [];
     // map use case graph names to graphs
     const useCaseGraphNamesToGraph = new Map<string, useCaseGraph>();
     let useCaseIndex = 0;
@@ -150,41 +150,33 @@ export class GraphVerificationInteractor
         // Stores the names of the files imported (does not store the actual path)
         const imports = await this.fileAccess.getFileImports(filePath);
         for (const importPath of imports) {
-          const importPathName = importPath.fileName;
-          const toNode =
-            this.resolveImportToNode(this.internalFilePaths, importPathName) ??
-            this.resolveImportToNode(this.externalFilePaths, importPathName);
-          if (toNode) {
-            let importFileName = importPathName.split('/').at(-1) ?? '';
-            importFileName = importFileName.split('.').at(0) ?? '';
+          const target = this.resolveImportTarget(importPath.fileName);
+          if (!target) continue;
+          const toNode = target.node;
 
-            const modifiedImportPath =
-              importPathName.length > 0 && importPathName.at(-1) === ';'
-                ? importPathName.slice(0, -1)
-                : importPathName;
-            //Check if the imported file is an external file path
-            const importFileNameLower = importFileName.toLowerCase();
-            if (
-              !useCaseFiles.includes(importFileNameLower) &&
-              !externalFileNames.includes(importFileNameLower)
-            ) {
-              this.crossUseCaseEdges[useCaseIndex].push([fromNode, toNode]);
-              this.crossUseCaseFiles.add(filePath);
-            } else {
-              graph.setNodeNeighbour(fromNode, toNode);
-              graph.setEdgeType(fromNode, toNode, importPath.relationshipType);
-              if (this.externalFilePaths.has(modifiedImportPath)) {
-                graph.addFile(
-                  modifiedImportPath,
-                  this.externalFilePaths.get(modifiedImportPath) as string
-                );
-                // Gets the external file path from the modified import path and adds the use case graph name
-                // to the set of use case graphs that the external file belongs to
-                // Nothing to optimize.
-                externalFilesToUseCaseGraphs
-                  .get(this.externalFilePaths.get(modifiedImportPath) as string)
-                  ?.add(graph.getName());
-              }
+          // Compare on the matched file's name rather than re-parsing the import string,
+          // which may be a relative path ('../foo.js') or a Java package path (a.b.Foo).
+          const importFileNameLower = target.fileName
+            .replace(/\.[^.]+$/, '')
+            .toLowerCase();
+          //Check if the imported file is an external file path
+          if (
+            !useCaseFiles.includes(importFileNameLower) &&
+            !externalFileNames.includes(importFileNameLower)
+          ) {
+            this.crossUseCaseEdges[useCaseIndex].push([fromNode, toNode]);
+            this.crossUseCaseFiles.add(filePath);
+          } else {
+            graph.setNodeNeighbour(fromNode, toNode);
+            graph.setEdgeType(fromNode, toNode, importPath.relationshipType);
+            // Only attach the external file when the import names it exactly (e.g. 'entity1.java;')
+            const modifiedImportPath = importPath.fileName.replace(/;$/, '');
+            if (this.externalFilePaths.has(modifiedImportPath)) {
+              graph.addFile(modifiedImportPath, target.filePath);
+              // Adds the use case graph name to the set of use case graphs that the external file belongs to
+              externalFilesToUseCaseGraphs
+                .get(target.filePath)
+                ?.add(graph.getName());
             }
           }
         }
@@ -210,19 +202,14 @@ export class GraphVerificationInteractor
             const base = targetFileName.toLowerCase().replace(/\.[^.]+$/, '');
             const res = importPath.fileName.toLowerCase().includes(base);
             if (res) {
-              if (
-                this.resolveNode(importPath.fileName) &&
-                this.internalFilePaths.has(targetFileName)
-              ) {
+              const importNode = this.resolveNode(importPath.fileName);
+              if (importNode && this.internalFilePaths.has(targetFileName)) {
                 // We need to set node neighbour and add file now
                 // When we do dsu, we only look at external->external edges
-                graph.setNodeNeighbour(
-                  fromNode,
-                  this.resolveNode(importPath.fileName) as cleanNode
-                );
+                graph.setNodeNeighbour(fromNode, importNode);
                 graph.setEdgeType(
                   fromNode,
-                  this.resolveNode(importPath.fileName) as cleanNode,
+                  importNode,
                   importPath.relationshipType
                 );
                 graph.addFile(fileName, filePath);
@@ -237,15 +224,15 @@ export class GraphVerificationInteractor
 
       // Add all edges to allEdges as long as it resolves to a node and the import is not an
       // internal file in CA and unite them.
-      imports.map((importPath) => {
-        if (!this.resolveNode(importPath.fileName)) return;
+      for (const importPath of imports) {
+        if (!this.resolveNode(importPath.fileName)) continue;
         if (
           this.resolveImportToFileName(
             this.internalFilePaths,
             importPath.fileName
           )
         ) {
-          return;
+          continue;
         }
 
         const targetFileName = this.resolveImportToFileName(
@@ -253,24 +240,19 @@ export class GraphVerificationInteractor
           importPath.fileName
         );
 
-        if (!targetFileName) return;
+        if (!targetFileName) continue;
 
         const toFilePath = this.externalFilePaths.get(targetFileName) as string;
-        allEdges.push([filePath, toFilePath]);
+        allEdges.push([filePath, toFilePath, importPath.relationshipType]);
         this.unite(
           filePath,
           toFilePath,
           externalFileRepresentative,
           externalFilesToUseCaseGraphs
         );
-      });
-    }
-    for (const [fromNodePath, toNodePath] of allEdges) {
-      if (
-        toNodePath &&
-        this.internalFilePaths.has(toNodePath.split('/').at(-1) ?? '')
-      ) {
       }
+    }
+    for (const [fromNodePath, toNodePath, relationshipType] of allEdges) {
       const fromNodePathRep = this.findRep(
         fromNodePath,
         externalFileRepresentative,
@@ -289,10 +271,10 @@ export class GraphVerificationInteractor
         currGraph?.setEdgeType(
           fromNode as cleanNode,
           toNode as cleanNode,
-          'dependency'
+          relationshipType
         );
-      });
-    });
+      }
+    }
   }
 
   /**
@@ -452,19 +434,23 @@ export class GraphVerificationInteractor
   }
 
   /**
-   * For each import of a file, determine its what node it belongs to.
-   * @param nodeType a map from file name to file path.
-   * @param importPath a file path
-   * @returns the node that an imported file belongs to.
+   * Find the file an import refers to (internal files first, then external) and
+   * the node that file belongs to.
+   * @param importPath a raw import path.
+   * @returns the matched file name, its path and its node, or null if the import
+   * does not refer to a file that resolves to a node.
    */
-  private resolveImportToNode(
-    nodeType: Map<string, string>,
+  private resolveImportTarget(
     importPath: string
-  ): cleanNode | null {
-    const fileName = this.resolveImportToFileName(nodeType, importPath);
-    if (!fileName) return null;
-    const filePath = nodeType.get(fileName) as string;
-    return this.resolveNode(filePath);
+  ): { fileName: string; filePath: string; node: cleanNode } | null {
+    for (const fileMap of [this.internalFilePaths, this.externalFilePaths]) {
+      const fileName = this.resolveImportToFileName(fileMap, importPath);
+      if (!fileName) continue;
+      const filePath = fileMap.get(fileName) as string;
+      const node = this.resolveNode(filePath);
+      if (node) return { fileName, filePath, node };
+    }
+    return null;
   }
 
   /**
@@ -620,7 +606,7 @@ export class GraphVerificationInteractor
    */
   private buildEdgeStorageList(): EdgeStorage[] {
     const result: EdgeStorage[] = [];
-    const seenIds = new Set<string>();
+    const seenEdges = new Map<string, EdgeStorage>();
 
     for (const uc of this.useCaseGraphList) {
       const violationSet = new Set<string>(
@@ -634,18 +620,28 @@ export class GraphVerificationInteractor
       ][]) {
         for (const toNode of neighbours) {
           const id = `${fromNode}->${toNode}`;
-          if (seenIds.has(id)) continue;
-          seenIds.add(id);
+          const type = this.relationshipTypeToEdgeType(
+            uc.getEdgeType(fromNode, toNode)
+          );
 
-          const relationshipType = uc.getEdgeType(fromNode, toNode);
+          // Edges are shared across use cases, so an implements relationship
+          // found in any use case should not be hidden by a plain dependency
+          // found in an earlier one.
+          const seen = seenEdges.get(id);
+          if (seen) {
+            if (type === 'IMPLEMENTS') seen.type = 'IMPLEMENTS';
+            continue;
+          }
 
-          result.push({
+          const edge: EdgeStorage = {
             id,
             source: fromNode,
             target: toNode,
-            type: this.relationshipTypeToEdgeType(relationshipType),
+            type,
             status: violationSet.has(id) ? 'INCORRECT_DEPENDENCY' : 'VALID',
-          });
+          };
+          seenEdges.set(id, edge);
+          result.push(edge);
         }
       }
     }

@@ -11,10 +11,9 @@ import { FileAccess } from '../../../src/data_access/fileAccess.js';
 import type { FileAccessInterface } from '../../../src/data_access/fileAccessInterface.js';
 import { SessionDBAccess } from '../../../src/data_access/sessionDBAccess.js';
 import { useCaseGraph } from '../../../src/entity/useCaseGraph.js';
+import { GraphVerificationPresenter } from '../../../src/interface_adapter/graphVerification/graphVerificationPresenter.js';
 import type { cleanNode } from '../../../src/types/cleanNode.js';
 import type { Relationship } from '../../../src/types/relationship.js';
-import { GraphVerificationPresenter } from '../../../src/interface_adapter/graphVerification/graphVerificationPresenter.js';
-import type { cleanNode } from '../../../src/types/cleanNode.ts';
 import { GraphVerificationInteractor } from '../../../src/use_case/graphVerification/graphVerificationInteractor.js';
 import { GraphVerificationOutputData } from '../../../src/use_case/graphVerification/graphVerificationOutputData.js';
 
@@ -2136,5 +2135,134 @@ describe('Relationship types are passed through to edge storage', () => {
     const edge = dbAccess.getEdgeById('useCaseInteractor->outputData');
     expect(edge).toBeDefined();
     expect(edge?.type).toBe('DEPENDENCY');
+  });
+
+  it('resolves Java package-path imports to files in the same use case', async () => {
+    const files: Array<[string, string]> = [
+      [
+        'LoginPresenter.java',
+        '/mock/interface_adapter/login/LoginPresenter.java',
+      ],
+      [
+        'LoginController.java',
+        '/mock/interface_adapter/login/LoginController.java',
+      ],
+      [
+        'LoginOutputBoundary.java',
+        '/mock/use_case/login/LoginOutputBoundary.java',
+      ],
+      [
+        'LoginInputBoundary.java',
+        '/mock/use_case/login/LoginInputBoundary.java',
+      ],
+    ];
+    const uc = new useCaseGraph('login');
+    const fileMockPaths = new Map<string, string>();
+    for (const [name, filePath] of files) {
+      uc.addFile(name, filePath);
+      fileMockPaths.set(name, filePath);
+    }
+
+    const fileMockContents = new Map<string, Relationship[]>();
+    fileMockContents.set('/mock/interface_adapter/login/LoginPresenter.java', [
+      {
+        fileName: 'use_case.login.LoginOutputBoundary',
+        relationshipType: 'implements',
+      },
+    ]);
+    fileMockContents.set('/mock/interface_adapter/login/LoginController.java', [
+      {
+        fileName: 'use_case.login.LoginInputBoundary',
+        relationshipType: 'dependency',
+      },
+    ]);
+
+    const dbAccess = new SessionDBAccess();
+    const interactor = new GraphVerificationInteractor(
+      new MockFileAccess(fileMockContents, fileMockPaths),
+      genericNeighbourAccess,
+      dbAccess,
+      new GraphVerificationPresenter(),
+      [uc]
+    );
+
+    await (interactor as any).buildFilePaths();
+    await (interactor as any).developOutNeighbours();
+    await (interactor as any).verifyOutNeighbours();
+    await (interactor as any).populateDatabase();
+
+    expect(interactor.getCrossUseCaseEdges()).toEqual([[]]);
+    expect(dbAccess.getEdgeById('presenter->outputBoundary')?.type).toBe(
+      'IMPLEMENTS'
+    );
+    expect(dbAccess.getEdgeById('controller->inputBoundary')?.type).toBe(
+      'DEPENDENCY'
+    );
+  });
+
+  it('keeps IMPLEMENTS when an earlier use case only has a dependency on the same nodes', () => {
+    const dependsOnly = new useCaseGraph('first');
+    dependsOnly.setNodeNeighbour('presenter', 'outputBoundary');
+    dependsOnly.setEdgeType('presenter', 'outputBoundary', 'dependency');
+
+    const implementsToo = new useCaseGraph('second');
+    implementsToo.setNodeNeighbour('presenter', 'outputBoundary');
+    implementsToo.setEdgeType('presenter', 'outputBoundary', 'implements');
+
+    const interactor = new GraphVerificationInteractor(
+      new MockFileAccess(new Map(), new Map()),
+      genericNeighbourAccess,
+      new SessionDBAccess(),
+      new GraphVerificationPresenter(),
+      [dependsOnly, implementsToo]
+    );
+
+    const edges = (interactor as any).buildEdgeStorageList();
+    const matching = edges.filter(
+      (e: { id: string }) => e.id === 'presenter->outputBoundary'
+    );
+    expect(matching).toHaveLength(1);
+    expect(matching[0].type).toBe('IMPLEMENTS');
+  });
+});
+
+describe('Clean Architecture rules', () => {
+  const verify = async (
+    edges: Array<[cleanNode, cleanNode]>
+  ): Promise<Array<[cleanNode, cleanNode]>> => {
+    const uc = new useCaseGraph('rules');
+    for (const [from, to] of edges) uc.setNodeNeighbour(from, to);
+    const interactor = new GraphVerificationInteractor(
+      new MockFileAccess(new Map(), new Map()),
+      genericNeighbourAccess,
+      new SessionDBAccess(),
+      new GraphVerificationPresenter(),
+      [uc]
+    );
+    await (interactor as any).verifyOutNeighbours();
+    return uc.getViolationEdges();
+  };
+
+  it('allows boundaries to use their data objects', async () => {
+    expect(
+      await verify([
+        ['inputBoundary', 'inputData'],
+        ['outputBoundary', 'outputData'],
+      ])
+    ).toEqual([]);
+  });
+
+  it('still flags dependencies that point outward', async () => {
+    expect(
+      await verify([
+        ['entities', 'controller'],
+        ['dataAccessInterface', 'dataAccess'],
+        ['inputBoundary', 'outputData'],
+      ])
+    ).toEqual([
+      ['entities', 'controller'],
+      ['inputBoundary', 'outputData'],
+      ['dataAccessInterface', 'dataAccess'],
+    ]);
   });
 });
