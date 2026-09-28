@@ -24,6 +24,7 @@ describe('AppBuilder runEndProject', () => {
     jest.resetModules();
 
     jest.unstable_mockModule(serverModulePath, () => ({
+      startServer: jest.fn(),
       stopServer: jest.fn(async () => undefined),
     }));
 
@@ -88,9 +89,10 @@ describe('Server lifecycle', () => {
     const { AppBuilder } = await import(appBuilderModulePath);
     const { SessionDBAccess } = await import(sessionDBAccessPath);
 
-    const server = await startServer(true);
+    const db = new SessionDBAccess();
+    const server = await startServer(true, db);
     const appBuilder = new AppBuilder();
-    (appBuilder as any).db = new SessionDBAccess();
+    (appBuilder as any).db = db;
 
     await appBuilder.runEndProject();
 
