@@ -13,6 +13,7 @@ import { GraphVerificationPresenter } from '../interface_adapter/graphVerificati
 import { InitModuleProjectController } from '../interface_adapter/initModuleProject/initModuleProjectController.js';
 import { InitProjectController } from '../interface_adapter/initProject/initProjectController.js';
 import { stopServer } from '../server/server.js';
+import { startCommand } from '../server/startCommand.js';
 import { CreateFeatureInputData } from '../use_case/createFeature/createFeatureInputData.js';
 import { CreateFeatureInteractor } from '../use_case/createFeature/createFeatureInteractor.js';
 import { CreateFeatureOutputData } from '../use_case/createFeature/createFeatureOutputData.js';
@@ -80,6 +81,16 @@ export class AppBuilder {
       inputData
     );
     await new GraphVerificationController(interactor).execute();
+  }
+
+  /**
+   * Analyse the project, then serve the results. The server reads from the
+   * same session DB that verification just populated.
+   */
+  async runStart(backendOnly: boolean): Promise<void> {
+    const { db } = this.requireDeps();
+    await this.runGraphVerification();
+    await startCommand({ backendOnly, db });
   }
 
   async runCLIGraphVerification(): Promise<void> {

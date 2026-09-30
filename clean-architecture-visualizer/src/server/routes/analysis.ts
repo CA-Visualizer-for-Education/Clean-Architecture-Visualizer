@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { FileAccess } from '../../data_access/fileAccess.js';
-import { SessionDBAccess } from '../../data_access/sessionDBAccess.js';
+import type { SessionDBAccessInterface } from '../../data_access/sessionDBAccessInterface.js';
 import { GetFilesWithViolationsController } from '../../interface_adapter/getFilesWithViolations/getFilesWithViolationsController.js';
 import { GetFilesWithViolationsPresenter } from '../../interface_adapter/getFilesWithViolations/getFilesWithViolationsPresenter.js';
 import { GetProjectSummaryController } from '../../interface_adapter/getProjectSummary/getProjectSummaryController.js';
@@ -20,88 +20,98 @@ import { GetViolationsInputData } from '../../use_case/getViolations/GetViolatio
 import { GetViolationsInteractor } from '../../use_case/getViolations/GetViolationsInteractor.js';
 import { GetViolationsOutputData } from '../../use_case/getViolations/GetViolationsOutputData.js';
 
-const router = Router();
+/**
+ * Builds the /analysis routes around the session DB that graph verification
+ * populated. The DB is injected so the routes read the same in-memory data
+ * instead of a copy loaded before verification ran.
+ */
+export function createAnalysisRouter(
+  dbAccess: SessionDBAccessInterface
+): Router {
+  const router = Router();
+  const fileAccess = new FileAccess();
 
-const dbAccess = new SessionDBAccess();
-const fileAccess = new FileAccess();
+  router.get('/analysis/summary', (_req, res) => {
+    const outputData = new GetProjectSummaryOutputData();
+    const interactor = new GetProjectSummaryInteractor(dbAccess, outputData);
+    const controller = new GetProjectSummaryController(interactor);
+    const presenter = new GetProjectSummaryPresenter(outputData);
 
-router.get('/analysis/summary', (_req, res) => {
-  const outputData = new GetProjectSummaryOutputData();
-  const interactor = new GetProjectSummaryInteractor(dbAccess, outputData);
-  const controller = new GetProjectSummaryController(interactor);
-  const presenter = new GetProjectSummaryPresenter(outputData);
+    controller.execute();
+    const result = presenter.getOutputData();
 
-  controller.execute();
-  const result = presenter.getOutputData();
+    if (!result) {
+      res
+        .status(404)
+        .json({ error: `Failure in collecting the Project Summary` });
+      return;
+    }
 
-  if (!result) {
-    res
-      .status(404)
-      .json({ error: `Failure in collecting the Project Summary` });
-    return;
-  }
+    res.json(result);
+  });
 
-  res.json(result);
-});
+  router.get('/analysis/interaction/:id', async (req, res) => {
+    const inputData = new GetUseCaseInfoInputData(req.params.id);
+    const outputData = new GetUseCaseInfoOutputData();
+    const interactor = new GetUseCaseInfoInteractor(
+      dbAccess,
+      inputData,
+      outputData
+    );
+    const controller = new GetUseCaseInfoController(interactor);
+    const presenter = new GetUseCaseInfoPresenter(outputData);
 
-router.get('/analysis/interaction/:id', async (req, res) => {
-  const inputData = new GetUseCaseInfoInputData(req.params.id);
-  const outputData = new GetUseCaseInfoOutputData();
-  const interactor = new GetUseCaseInfoInteractor(
-    dbAccess,
-    inputData,
-    outputData
-  );
-  const controller = new GetUseCaseInfoController(interactor);
-  const presenter = new GetUseCaseInfoPresenter(outputData);
+    await controller.execute();
+    const result = presenter.getOutputData();
 
-  await controller.execute();
-  const result = presenter.getOutputData();
+    if (!result) {
+      res
+        .status(404)
+        .json({ error: `Interaction '${req.params.id}' not found.` });
+      return;
+    }
 
-  if (!result) {
-    res
-      .status(404)
-      .json({ error: `Interaction '${req.params.id}' not found.` });
-    return;
-  }
+    res.json(result);
+  });
 
-  res.json(result);
-});
+  router.get('/analysis/violations/:interactionId', async (req, res) => {
+    const inputData = new GetViolationsInputData(req.params.interactionId);
+    const outputData = new GetViolationsOutputData();
+    const interactor = new GetViolationsInteractor(
+      dbAccess,
+      fileAccess,
+      inputData,
+      outputData
+    );
+    const controller = new GetViolationsController(interactor);
+    const presenter = new GetViolationsPresenter(outputData);
 
-router.get('/analysis/violations/:interactionId', async (req, res) => {
-  const inputData = new GetViolationsInputData(req.params.interactionId);
-  const outputData = new GetViolationsOutputData();
-  const interactor = new GetViolationsInteractor(
-    dbAccess,
-    fileAccess,
-    inputData,
-    outputData
-  );
-  const controller = new GetViolationsController(interactor);
-  const presenter = new GetViolationsPresenter(outputData);
+    await controller.execute();
+    const result = presenter.getOutputData();
+    if (!result) {
+      res.status(404).json({
+        error: `Interaction '${req.params.interactionId}' not found.`,
+      });
+      return;
+    }
 
-  await controller.execute();
-  const result = presenter.getOutputData();
-  if (!result) {
-    res
-      .status(404)
-      .json({ error: `Interaction '${req.params.interactionId}' not found.` });
-    return;
-  }
+    res.json(result);
+  });
 
-  res.json(result);
-});
+  router.get('/analysis/files-with-violations', (_req, res) => {
+    const outputData = new GetFilesWithViolationsOutputData();
+    const interactor = new GetFilesWithViolationsInteractor(
+      dbAccess,
+      outputData
+    );
+    const controller = new GetFilesWithViolationsController(interactor);
+    const presenter = new GetFilesWithViolationsPresenter(outputData);
 
-router.get('/analysis/files-with-violations', (_req, res) => {
-  const outputData = new GetFilesWithViolationsOutputData();
-  const interactor = new GetFilesWithViolationsInteractor(dbAccess, outputData);
-  const controller = new GetFilesWithViolationsController(interactor);
-  const presenter = new GetFilesWithViolationsPresenter(outputData);
+    controller.execute();
+    const result = presenter.getOutputData();
 
-  controller.execute();
-  const result = presenter.getOutputData();
+    res.json(result);
+  });
 
-  res.json(result);
-});
-
-export default router;
+  return router;
+}
