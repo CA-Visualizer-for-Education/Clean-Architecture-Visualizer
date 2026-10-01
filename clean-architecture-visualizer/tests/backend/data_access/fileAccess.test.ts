@@ -157,6 +157,18 @@ describe('getFileImports functionality', () => {
     expect(result).toEqual(['entity.User;', 'LoginInputBoundary']);
   });
 
+  // Test: a Java file that uses a full class name with no import line
+  it('returns fully qualified names used without an import', async () => {
+    // Pretend the file contains a class that uses entity.User
+    mockReadFile.mockResolvedValueOnce(
+      'public class A {\n  entity.User u = new entity.User();\n}'
+    );
+    // Run the function on that pretend file
+    const result = await fileAccess.getFileImports('/project/A.java');
+    // The answer should be a list with just entity.User in it
+    expect(result).toEqual(['entity.User']);
+  });
+
   it('returns an empty array and logs when the file is not found', async () => {
     mockReadFile.mockRejectedValueOnce(new Error('File not found') as any);
     const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
