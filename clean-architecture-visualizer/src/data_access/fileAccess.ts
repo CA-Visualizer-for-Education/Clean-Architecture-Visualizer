@@ -299,7 +299,8 @@ export class FileAccess implements FileAccessInterface {
     // one or more lowercase words followed by a dot.
     // then a word that starts with a capital letter
     // makes sure at least one lowercase letter so this.CONST will not be allowed.
-    const fqnPattern = /\b(?:[a-z_][a-z0-9_]*\.)+[A-Z][A-Za-z0-9_]*[a-z][A-Za-z0-9_]*/g;
+    const fqnPattern =
+      /\b(?:[a-z_][a-z0-9_]*\.)+[A-Z][A-Za-z0-9_]*[a-z][A-Za-z0-9_]*/g;
 
     for (const line of fileLines) {
       const trimmedLine = line.trim();

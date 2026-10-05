@@ -194,7 +194,7 @@ describe('getFileImports functionality', () => {
     expect(result).toEqual([]);
   });
 
-    // Test: a name inside a comment is not a real dependency
+  // Test: a name inside a comment is not a real dependency
   it('ignores fully qualified names in comments', async () => {
     mockReadFile.mockResolvedValueOnce(
       'public class A {\n  // entity.User is not used here\n}'
