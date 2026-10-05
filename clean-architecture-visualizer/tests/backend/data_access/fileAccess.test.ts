@@ -185,6 +185,24 @@ describe('getFileImports functionality', () => {
     ]);
   });
 
+  // Test: this.CONST is not a class name
+  it('ignores this.CONST style', async () => {
+    mockReadFile.mockResolvedValueOnce(
+      'public class A {\n  int x = this.CONST;\n}'
+    );
+    const result = await fileAccess.getFileImports('/project/A.java');
+    expect(result).toEqual([]);
+  });
+
+    // Test: a name inside a comment is not a real dependency
+  it('ignores fully qualified names in comments', async () => {
+    mockReadFile.mockResolvedValueOnce(
+      'public class A {\n  // entity.User is not used here\n}'
+    );
+    const result = await fileAccess.getFileImports('/project/A.java');
+    expect(result).toEqual([]);
+  });
+
   it('returns an empty array and logs when the file is not found', async () => {
     mockReadFile.mockRejectedValueOnce(new Error('File not found') as any);
     const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});

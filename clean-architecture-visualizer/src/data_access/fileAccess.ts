@@ -270,9 +270,9 @@ export class FileAccess implements FileAccessInterface {
       }
 
       // Only do this for Java files, since fully qualified names are a Java thing
-      //A fully qualified name is the class's full name. (Skipping import and writing full every time)
+      // A fully qualified name is the class's full name. (Skipping import and writing full every time)
       if (filePath.endsWith('.java')) {
-        for (const fqn of this.getFullyQualifiedImports(fileLines)) {
+        for (const fqn of this.getFullyQualifiedImportsJava(fileLines)) {
           if (!found.has(fqn)) {
             found.set(fqn, 'dependency');
           }
@@ -292,25 +292,28 @@ export class FileAccess implements FileAccessInterface {
    * Finds class names written in the code,
    * e.g. "entity.User", where there is no import line for them.
    */
-  private getFullyQualifiedImports(fileLines: string[]): string[] {
+  private getFullyQualifiedImportsJava(fileLines: string[]): string[] {
     const found = new Set<string>();
 
     // Pattern to spot a full class name in text. Ex: entity.User, use_case.login.LoginData
-    //   one or more lowercase words followed by a dot.
-    //   then a word sthat starts with a capital letter
-    const fqnPattern = /\b(?:[a-z_][a-z0-9_]*\.)+[A-Z][A-Za-z0-9_]*/g;
+    // one or more lowercase words followed by a dot.
+    // then a word that starts with a capital letter
+    // makes sure at least one lowercase letter so this.CONST will not be allowed.
+    const fqnPattern = /\b(?:[a-z_][a-z0-9_]*\.)+[A-Z][A-Za-z0-9_]*[a-z][A-Za-z0-9_]*/g;
 
     for (const line of fileLines) {
       const trimmedLine = line.trim();
 
-      // Skip import and package lines.. already handled "import entity.User;"
+      // Skip import and package lines since they are already handled
       if (
         trimmedLine.startsWith('import ') ||
         trimmedLine.startsWith('package ')
       ) {
         continue;
       }
-      for (const match of trimmedLine.matchAll(fqnPattern)) {
+      // Accounts for comments.
+      const code = trimmedLine.replace(/\/\/.*$/, '');
+      for (const match of code.matchAll(fqnPattern)) {
         found.add(match[0]);
       }
     }
