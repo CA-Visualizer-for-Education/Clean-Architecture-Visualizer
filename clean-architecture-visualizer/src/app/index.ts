@@ -11,7 +11,6 @@ const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
 import { CleanArchAccess } from '../data_access/cleanArchInfoAccess.js';
 import { FileAccess } from '../data_access/fileAccess.js';
 import { SessionDBAccess } from '../data_access/sessionDBAccess.js';
-import { startCommand } from '../server/startCommand.js';
 import { AppBuilder } from './appBuilder.js';
 
 const program = new Command();
@@ -28,8 +27,7 @@ program
   .description('Start backend server and frontend dev server')
   .option('--backend-only', 'Start only the backend server', false)
   .action(async (options) => {
-    await app.runGraphVerification();
-    await startCommand({ backendOnly: options.backendOnly });
+    await app.runStart(options.backendOnly);
   });
 
 program
