@@ -177,7 +177,12 @@ describe('getFileImports functionality', () => {
     // Run the function on that pretend file
     const result = await fileAccess.getFileImports('/project/A.java');
     // The answer should be a list with just entity.User in it
-    expect(result).toEqual(['entity.User']);
+    expect(result).toEqual([
+      {
+        fileName: 'entity.User',
+        relationshipType: 'dependency',
+      },
+    ]);
   });
 
   it('returns an empty array and logs when the file is not found', async () => {

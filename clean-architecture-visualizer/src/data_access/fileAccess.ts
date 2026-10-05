@@ -268,22 +268,53 @@ export class FileAccess implements FileAccessInterface {
           }
         }
       }
-      // If package detected, with files other than the current file, then iterate through entire file
-      if (packageSet) {
-        const packageImports = this.getPackageImports(fileLines, packageSet);
-        result.push(...packageImports); // pushed depenedency files are stripped of extra details, pushes LoginInputData not '"LoginInputData";'
-      }
+
       // Only do this for Java files, since fully qualified names are a Java thing
       //A fully qualified name is the class's full name. (Skipping import and writing full every time)
       if (filePath.endsWith('.java')) {
         for (const fqn of this.getFullyQualifiedImports(fileLines)) {
-          result.push(fqn);
+          if (!found.has(fqn)) {
+            found.set(fqn, 'dependency');
+          }
         }
       }
+      return [...found].map(([fileName, relationshipType]) => ({
+        fileName,
+        relationshipType,
+      }));
     } catch {
       console.log(`The file: ${filePath} could not be found`);
       return [];
     }
+  }
+
+  /**
+   * Finds class names written in the code,
+   * e.g. "entity.User", where there is no import line for them.
+   */
+  private getFullyQualifiedImports(fileLines: string[]): string[] {
+    const found = new Set<string>();
+
+    // Pattern to spot a full class name in text. Ex: entity.User, use_case.login.LoginData
+    //   one or more lowercase words followed by a dot.
+    //   then a word sthat starts with a capital letter
+    const fqnPattern = /\b(?:[a-z_][a-z0-9_]*\.)+[A-Z][A-Za-z0-9_]*/g;
+
+    for (const line of fileLines) {
+      const trimmedLine = line.trim();
+
+      // Skip import and package lines.. already handled "import entity.User;"
+      if (
+        trimmedLine.startsWith('import ') ||
+        trimmedLine.startsWith('package ')
+      ) {
+        continue;
+      }
+      for (const match of trimmedLine.matchAll(fqnPattern)) {
+        found.add(match[0]);
+      }
+    }
+    return [...found];
   }
 
   private static isCommentLine(trimmedLine: string): boolean {
@@ -293,33 +324,6 @@ export class FileAccess implements FileAccessInterface {
       trimmedLine.startsWith('*')
     );
   }
-
-  /**
- * Finds class names written in the code,
- * e.g. "entity.User", where there is no import line for them.
- */
-private getFullyQualifiedImports(fileLines: string[]): string[] {
-  const found = new Set<string>();
-
-  // Pattern to spot a full class name in text. Ex: entity.User, use_case.login.LoginData
-  //   one or more lowercase words followed by a dot.
-  //   then a word sthat starts with a capital letter
-  const fqnPattern =
-    /\b(?:[a-z_][a-z0-9_]*\.)+[A-Z][A-Za-z0-9_]*/g;
-
-  for (const line of fileLines) {
-    const trimmed_line = line.trim();
-
-    // Skip import and package lines.. already handled "import entity.User;"
-    if (trimmed_line.startsWith('import ') || trimmed_line.startsWith('package ')) {
-      continue;
-    }
-    for (const match of trimmed_line.matchAll(fqnPattern)) {
-      found.add(match[0]);
-    }
-  }
-  return [...found];
-}
 
   /**
    * Get the project name, this is either the directory BEFORE "src", or if the
