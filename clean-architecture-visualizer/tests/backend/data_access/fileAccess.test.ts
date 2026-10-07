@@ -300,6 +300,66 @@ describe('getFileImports functionality', () => {
       { fileName: 'LoginInputData', relationshipType: 'dependency' },
     ]);
   });
+  it('successfully returns wildcard import along with normal imports', async () => {
+    mockReaddir.mockResolvedValueOnce([mockDir('src')] as any);
+    mockReaddir.mockResolvedValueOnce([mockDir('entity')] as any);
+    mockReaddir.mockResolvedValueOnce([
+    'Student.java',
+    'Course.java',
+  ] as any);
+    mockReadFile.mockResolvedValueOnce(
+    'import entity.*;\nStudent s = null;'
+  );
+      const result = await fileAccess.getFileImports(
+    '/project/LoginInteractor.java'
+  );
+
+  expect(result).toEqual([
+    { fileName: 'Student', relationshipType: 'dependency' },
+    ]);
+  });
+
+  it('excludes a wildcard-imported class that is never referenced in the file', async () => {
+    mockReaddir.mockResolvedValueOnce([mockDir('src')] as any);
+    mockReaddir.mockResolvedValueOnce([mockDir('entity')] as any);
+    mockReaddir.mockResolvedValueOnce([
+      'Student.java',
+      'Course.java',
+    ] as any);
+    mockReadFile.mockResolvedValueOnce(
+      'import entity.*;\npublic class LoginInteractor {}'
+    );
+    const result = await fileAccess.getFileImports(
+      '/project/LoginInteractor.java'
+    );
+    expect(result).toEqual([]);
+  });
+
+  it('test a wildcard import with implements and package', async () => {
+    mockReaddir.mockResolvedValueOnce([
+    'LoginInputBoundary.java',
+    'LoginInteractor.java',
+  ] as any);
+    mockReaddir.mockResolvedValueOnce([mockDir('src')] as any);
+    mockReaddir.mockResolvedValueOnce([mockDir('entity')] as any);
+    mockReaddir.mockResolvedValueOnce([
+      'Student.java',
+      'Course.java',
+    ] as any);
+
+    mockReadFile.mockResolvedValueOnce(
+      'package use_case.login;\nimport entity.*;\npublic class LoginInteractor implements Student {\n Course c = null; \n}'
+    );
+
+    const result = await fileAccess.getFileImports(
+    '/project/LoginInteractor.java'
+  );
+
+  expect(result).toEqual([
+    { fileName: 'Student', relationshipType: 'implements' },
+    { fileName: 'Course', relationshipType: 'dependency' },
+  ]);
+});
 });
 
 describe('getUseCases functionality', () => {
