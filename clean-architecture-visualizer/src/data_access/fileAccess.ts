@@ -221,7 +221,7 @@ export class FileAccess implements FileAccessInterface {
             if (dir) {
               const currFileName = path.basename(filePath);
               const files = await fs.readdir(dir);
-              for(const file of files) {
+              for (const file of files) {
                 if (file !== currFileName) {
                   const name = file.replace(/\.[^.]+$/, '');
                   knownNames.set(name, name);
@@ -286,7 +286,6 @@ export class FileAccess implements FileAccessInterface {
             found.set(key, type);
           }
         }
-
       }
       return [...found].map(([fileName, relationshipType]) => ({
         fileName,
@@ -311,21 +310,23 @@ export class FileAccess implements FileAccessInterface {
    * @param packagePath the filepath of the directory given in dot format (student.example.entities)
    * @returns the path of the directory that matches the path of the given package
    */
-  private async getPackageDirectory(packagePath:string): Promise<string | null> {
+  private async getPackageDirectory(
+    packagePath: string
+  ): Promise<string | null> {
     const currPath = process.cwd();
     const srcPath = await this.bfsFindDir(currPath, 'src');
     if (!srcPath) return null;
-    const pathSegments = packagePath.split(".");
+    const pathSegments = packagePath.split('.');
     let currDir = srcPath;
 
     for (const seg of pathSegments) {
-      let found = await this.bfsFindDir(currDir, seg);
+      const found = await this.bfsFindDir(currDir, seg);
       if (!found) return null;
       currDir = found;
     }
 
     return currDir;
-}
+  }
 
   /**
    * Get the project name, this is either the directory BEFORE "src", or if the

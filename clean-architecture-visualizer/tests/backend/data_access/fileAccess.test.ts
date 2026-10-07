@@ -303,29 +303,21 @@ describe('getFileImports functionality', () => {
   it('successfully returns wildcard import along with normal imports', async () => {
     mockReaddir.mockResolvedValueOnce([mockDir('src')] as any);
     mockReaddir.mockResolvedValueOnce([mockDir('entity')] as any);
-    mockReaddir.mockResolvedValueOnce([
-    'Student.java',
-    'Course.java',
-  ] as any);
-    mockReadFile.mockResolvedValueOnce(
-    'import entity.*;\nStudent s = null;'
-  );
-      const result = await fileAccess.getFileImports(
-    '/project/LoginInteractor.java'
-  );
+    mockReaddir.mockResolvedValueOnce(['Student.java', 'Course.java'] as any);
+    mockReadFile.mockResolvedValueOnce('import entity.*;\nStudent s = null;');
+    const result = await fileAccess.getFileImports(
+      '/project/LoginInteractor.java'
+    );
 
-  expect(result).toEqual([
-    { fileName: 'Student', relationshipType: 'dependency' },
+    expect(result).toEqual([
+      { fileName: 'Student', relationshipType: 'dependency' },
     ]);
   });
 
   it('excludes a wildcard-imported class that is never referenced in the file', async () => {
     mockReaddir.mockResolvedValueOnce([mockDir('src')] as any);
     mockReaddir.mockResolvedValueOnce([mockDir('entity')] as any);
-    mockReaddir.mockResolvedValueOnce([
-      'Student.java',
-      'Course.java',
-    ] as any);
+    mockReaddir.mockResolvedValueOnce(['Student.java', 'Course.java'] as any);
     mockReadFile.mockResolvedValueOnce(
       'import entity.*;\npublic class LoginInteractor {}'
     );
@@ -337,29 +329,26 @@ describe('getFileImports functionality', () => {
 
   it('test a wildcard import with implements and package', async () => {
     mockReaddir.mockResolvedValueOnce([
-    'LoginInputBoundary.java',
-    'LoginInteractor.java',
-  ] as any);
+      'LoginInputBoundary.java',
+      'LoginInteractor.java',
+    ] as any);
     mockReaddir.mockResolvedValueOnce([mockDir('src')] as any);
     mockReaddir.mockResolvedValueOnce([mockDir('entity')] as any);
-    mockReaddir.mockResolvedValueOnce([
-      'Student.java',
-      'Course.java',
-    ] as any);
+    mockReaddir.mockResolvedValueOnce(['Student.java', 'Course.java'] as any);
 
     mockReadFile.mockResolvedValueOnce(
       'package use_case.login;\nimport entity.*;\npublic class LoginInteractor implements Student {\n Course c = null; \n}'
     );
 
     const result = await fileAccess.getFileImports(
-    '/project/LoginInteractor.java'
-  );
+      '/project/LoginInteractor.java'
+    );
 
-  expect(result).toEqual([
-    { fileName: 'Student', relationshipType: 'implements' },
-    { fileName: 'Course', relationshipType: 'dependency' },
-  ]);
-});
+    expect(result).toEqual([
+      { fileName: 'Student', relationshipType: 'implements' },
+      { fileName: 'Course', relationshipType: 'dependency' },
+    ]);
+  });
 });
 
 describe('getUseCases functionality', () => {
