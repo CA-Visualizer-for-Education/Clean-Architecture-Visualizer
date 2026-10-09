@@ -61,6 +61,46 @@ jobs:
 
           echo "contract holds: cave detected the illegal entities -> controller dependency"
 
+      - name: Assert violation-static-import reports the entities to presenter edge
+        working-directory: cave-test-repo/violation-static-import
+        run: |
+          out=$(cave verify)
+          echo "$out"
+
+          if ! grep -q 'EnrollStudent' <<< "$out"; then
+            echo "expect cave verify to report the use case EnrollStudent, but it didn't appear. cave probably didn't find a project here."
+            exit 1
+          fi
+
+          if ! grep -E -q '[[:space:]]+entities.*presenter' <<< "$out"; then
+            echo "expect a violation line with entities -> presenter. entity/Student.java
+            statically imports EnrollStudentPresenter.formatStudentName and calls it without
+            a class qualifier, so cave must resolve the method to its declaring Presenter."
+            exit 1
+          fi
+
+          echo "contract holds: cave detected the illegal entities -> presenter dependency"
+
+      - name: Assert violation-qualified-reference reports the outputData to viewModel edge
+        working-directory: cave-test-repo/violation-qualified-reference
+        run: |
+          out=$(cave verify)
+          echo "$out"
+
+          if ! grep -q 'EnrollStudent' <<< "$out"; then
+            echo "expect cave verify to report the use case EnrollStudent, but it didn't appear. cave probably didn't find a project here."
+            exit 1
+          fi
+
+          if ! grep -E -q '[[:space:]]+outputData.*viewModel' <<< "$out"; then
+            echo "expect a violation line with outputData -> viewModel. EnrollStudentOutputData.toViewModel()
+            constructs and returns interface_adapter.EnrollStudent.EnrollStudentViewModel
+            using fully qualified names without an import, so cave must flag it."
+            exit 1
+          fi
+
+          echo "contract holds: cave detected the illegal outputData -> viewModel dependency"
+
       # for good sample
       - name: Assert clean-standard omits the entities to controller edge
         working-directory: cave-test-repo/clean-standard
