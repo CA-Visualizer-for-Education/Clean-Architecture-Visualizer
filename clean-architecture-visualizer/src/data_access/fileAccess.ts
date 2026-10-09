@@ -1,6 +1,7 @@
 import type { Dirent } from 'node:fs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import type { Relationship, RelationshipType } from '../types/relationship.js';
 import type { FileAccessInterface } from './fileAccessInterface.js';
 
 export class FileAccess implements FileAccessInterface {
@@ -164,93 +165,125 @@ export class FileAccess implements FileAccessInterface {
 
     return null;
   }
-
   /**
    * Read the imports of the file that path points to and return a list of module names.
    * Collects normal imports first before collecting package imports.
    * @param filePath is a path to a valid file.
    */
-  async getFileImports(filePath: string): Promise<string[]> {
-    const result: string[] = [];
-
+  async getFileImports(filePath: string): Promise<Relationship[]> {
     try {
       const fileContent: string = await fs.readFile(filePath, {
         encoding: 'utf-8',
       });
       const fileLines = fileContent.split('\n');
+      // Maps a name that can appear in the file body to the key it is reported under
+      const knownNames = new Map<string, string>();
 
-      // package is always the first non-empty line (Package Imports in Java only)
-      let packageSet: Set<string> | null = null;
+      // The package declaration is the first line of code (Java only). Every other
+      // file in the same directory is implicitly imported.
       for (const line of fileLines) {
-        const trimmed_line = line.trim();
-        if (trimmed_line === '') continue;
-        if (trimmed_line.startsWith('package ')) {
-          const packageDir = filePath.substring(
-            0,
-            filePath.lastIndexOf('/') + 1
-          ); // package dir is always one dir above filepath
-          const files = await fs.readdir(packageDir);
-          packageSet = new Set<string>();
-          const currentFileName = filePath.split('/').at(-1) ?? '';
+        const trimmedLine = line.trim();
+        if (trimmedLine === '' || FileAccess.isCommentLine(trimmedLine)) {
+          continue;
+        }
+        if (trimmedLine.startsWith('package ')) {
+          const currentFileName = path.basename(filePath);
+          const files = await fs.readdir(path.dirname(filePath));
           for (const file of files) {
             if (file !== currentFileName) {
-              packageSet.add(file.replace(/\.[^.]+$/, '')); // replaces everything after the dot so fileAccess.ts -> fileAccess
+              const name = file.replace(/\.[^.]+$/, ''); // Strips everything after .
+              knownNames.set(name, name);
             }
           }
         }
         break;
       }
+
+      // Record explicit imports as dependencies, then scan the body for known names,
+      // upgrading them to implements/extends when they follow those keywords.
+      const found = new Map<string, RelationshipType>();
       for (const line of fileLines) {
+        const trimmedLine = line.trim();
+        if (trimmedLine.startsWith('package ') || trimmedLine === '') {
+          continue;
+        }
         if (
-          line.startsWith('import ') ||
-          line.startsWith('from ') ||
-          line.startsWith('import{')
+          trimmedLine.startsWith('import ') ||
+          trimmedLine.startsWith('from ') ||
+          trimmedLine.startsWith('import{')
         ) {
-          const trimmed_line = line.trim();
-          const lastSpace = trimmed_line.lastIndexOf(' ');
-          result.push(trimmed_line.substring(lastSpace + 1));
+          const lastSpace = trimmedLine.lastIndexOf(' ');
+          const name = trimmedLine.substring(lastSpace + 1).replace(/;$/, '');
+          if (!found.has(name)) found.set(name, 'dependency');
+
+          // Java imports are fully qualified (e.g. use_case.login.LoginOutputBoundary)
+          // but the body refers to the class by its simple name.
+          if (/^[A-Za-z_$][\w$]*(\.[A-Za-z_$][\w$]*)+$/.test(name)) {
+            knownNames.set(name.split('.').at(-1) as string, name);
+          }
+
+          // For TypeScript-style imports (e.g. import { Foo, Bar } from './module.js')
+          const braceOpen = trimmedLine.indexOf('{');
+          const braceClose = trimmedLine.indexOf('}');
+          if (braceOpen !== -1 && braceClose !== -1 && braceClose > braceOpen) {
+            const namedImports = trimmedLine
+              .substring(braceOpen + 1, braceClose)
+              .split(',')
+              .map((s) =>
+                (
+                  s
+                    .trim()
+                    .replace(/^type\s+/, '')
+                    .split(/\s+as\s+/)
+                    .at(-1) ?? ''
+                ).trim()
+              )
+              .filter((s) => s.length > 0);
+            for (const namedImport of namedImports) {
+              knownNames.set(namedImport, namedImport);
+            }
+          }
+          continue;
+        }
+        // Separates line into list where each element is a word in the line
+        const words: string[] = trimmedLine.match(/[A-Za-z0-9_$]+/g) ?? []; // strips punctuation
+        const extendsIdx = words.indexOf('extends');
+        const implementsIdx = words.indexOf('implements');
+        // Class extends ... implements ...
+        for (let i = 0; i < words.length; i++) {
+          const key = knownNames.get(words[i]);
+          if (!key) continue;
+          let type: RelationshipType = 'dependency';
+          if (implementsIdx !== -1 && i > implementsIdx) {
+            type = 'implements';
+          } else if (extendsIdx !== -1 && i > extendsIdx) {
+            type = 'extends';
+          }
+          const current = found.get(key);
+          if (
+            current === undefined ||
+            (current === 'dependency' && type !== 'dependency')
+          ) {
+            found.set(key, type);
+          }
         }
       }
-      // If package detected, with files other than the current file, then iterate through entire file
-      if (packageSet) {
-        const packageImports = this.getPackageImports(fileLines, packageSet);
-        result.push(...packageImports); // pushed depenedency files are stripped of extra details, pushes LoginInputData not '"LoginInputData";'
-      }
+      return [...found].map(([fileName, relationshipType]) => ({
+        fileName,
+        relationshipType,
+      }));
     } catch {
       console.log(`The file: ${filePath} could not be found`);
       return [];
     }
-    return result;
   }
 
-  /**
-   * Scan file lines for usages of sibling class names from the same package.
-   * @param fileLines the lines of the file to scan.
-   * @param packageSet set of class names (without extension) in the same package.
-   * @returns list of class names from the package that are used in the file.
-   */
-  private getPackageImports(
-    fileLines: string[],
-    packageSet: Set<string>
-  ): string[] {
-    const found = new Set<string>();
-    for (const line of fileLines) {
-      const trimmed_line = line.trim();
-      if (
-        trimmed_line.startsWith('import ') ||
-        trimmed_line.startsWith('package ') ||
-        trimmed_line === ''
-      ) {
-        continue;
-      }
-      for (const className of packageSet) {
-        if (!found.has(className) && trimmed_line.includes(className)) {
-          found.add(className);
-        }
-      }
-      if (found.size === packageSet.size) break;
-    }
-    return [...found];
+  private static isCommentLine(trimmedLine: string): boolean {
+    return (
+      trimmedLine.startsWith('//') ||
+      trimmedLine.startsWith('/*') ||
+      trimmedLine.startsWith('*')
+    );
   }
 
   /**

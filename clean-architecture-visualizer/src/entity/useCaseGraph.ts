@@ -1,11 +1,13 @@
 import type { cleanNode } from '../types/cleanNode.js';
 import type { neighbourMap } from '../types/neighbourMap.js';
+import type { RelationshipType } from '../types/relationship.js';
 
 export class useCaseGraph {
   private readonly name: string;
   private readonly outNeighbours: neighbourMap;
   private violationEdges: Array<[cleanNode, cleanNode]> = [];
   private readonly files = new Map<string, string>();
+  private readonly edgeTypes = new Map<string, RelationshipType>();
 
   constructor(name: string) {
     this.name = name;
@@ -98,6 +100,28 @@ export class useCaseGraph {
 
   getNeighbourMap(): neighbourMap {
     return this.outNeighbours;
+  }
+
+  /**
+   * Record the relationship type of the edge from -> to. Several files can map
+   * onto the same pair of nodes, so an implements/extends relationship is never
+   * downgraded back to a plain dependency.
+   * @param from is of a cleanNode type.
+   * @param to is of a cleanNode type.
+   * @param type the relationship between the two nodes.
+   */
+  setEdgeType(from: cleanNode, to: cleanNode, type: RelationshipType): void {
+    const key = `${from}->${to}`;
+    if (type === 'dependency' && this.edgeTypes.has(key)) return;
+    this.edgeTypes.set(key, type);
+  }
+
+  getEdgeType(from: cleanNode, to: cleanNode): RelationshipType {
+    return this.edgeTypes.get(`${from}->${to}`) ?? 'dependency';
+  }
+
+  getEdgeTypes(): Map<string, RelationshipType> {
+    return this.edgeTypes;
   }
 
   /**

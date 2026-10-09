@@ -2,6 +2,7 @@
 slug: /
 title: API Home
 ---
+
 # Getting Started with API Endpoints
 
 ## What is Cave?
@@ -31,7 +32,7 @@ Initializes your CSC207 project with a sample clean architecture directory struc
 
 <details>
     <summary>The created structure should look like:</summary>
-    
+
     ```
     src/
     ├── main/
@@ -45,6 +46,7 @@ Initializes your CSC207 project with a sample clean architecture directory struc
     └── test/
         └── <language>/
     ```
+
 </details>
 
 Run this first in your project folder. Cave will scaffold the recommended folder layout so you can start developing! These folders will not immediately be tracked by git as they are empty.
@@ -87,10 +89,10 @@ Accepted Request: POST
 Initializes the folders and file structure for a new use case, in a project packaged by layer.
 
 ```
-<usecasename>   : The name of the new use case. 
+<usecasename>   : The name of the new use case.
 ```
 
-Replace `<usecasename>` with the name of your use case. The language of the files depends entirely on the name of the directory inside 'main', which is also the language passed in when initializing the project. 
+Replace `<usecasename>` with the name of your use case. The language of the files depends entirely on the name of the directory inside 'main', which is also the language passed in when initializing the project.
 
 <details>
     <summary>
@@ -110,9 +112,11 @@ Replace `<usecasename>` with the name of your use case. The language of the file
         ├── <usecasename>Controller.<extension>
         └── <usecasename>Presenter.<extension>
     ```
+
 </details>
 
 In the example above:
+
 ```
 <language>      <extension>
 python          py
@@ -150,10 +154,10 @@ Initializes the folders and file structure for a new use case, in the specified 
 
 ```
 <featurename>   : The name of the feature you want to add the use case to.
-<usecasename>   : The name of the new use case. 
+<usecasename>   : The name of the new use case.
 ```
 
-Replace `<featurename>` with the name of your feature. Replace `<usecasename>` with the name of your use case. The language of the files depends entirely on the name of the directory inside 'main', which is also the language passed in when initializing the project. 
+Replace `<featurename>` with the name of your feature. Replace `<usecasename>` with the name of your use case. The language of the files depends entirely on the name of the directory inside 'main', which is also the language passed in when initializing the project.
 
 <details>
     <summary>
@@ -173,9 +177,11 @@ Replace `<featurename>` with the name of your feature. Replace `<usecasename>` w
         ├── <usecasename>Controller.<extension>
         └── <usecasename>Presenter.<extension>
     ```
+
 </details>
 
 In the example above:
+
 ```
 <language>      <extension>
 python          py
@@ -190,13 +196,13 @@ This will fail if there is no project or if the input feature does not exist or 
 
 Accepted Request: GET
 
-Gets information about the use case associated with id. 
+Gets information about the use case associated with id.
 
 ```
 <id>    : The ID of the interaction (same as ID of use case).
 ```
 
-The information returned includes the name of the use case, a list of node information, a list of edge information, and whether or not anything file imports the interactor (decoupling). For each node in the use case, there is an entry in the list of node information which includes the id of the node, its name (if it exist), what type of clean architecture node it is, what layer of clean architecture it belongs to, its file path, and its status ('VALID', 'MISSING', 'VIOLATION'). For each edge, there is an entry in the list of edge information which includes the id of the edge, the starting node, the target node, its type ('DEPENDENCY'), and its status ('VALID', 'INCORRECT_DEPENDENCY'). 
+The information returned includes the name of the use case, a list of node information, a list of edge information, and whether or not anything file imports the interactor (decoupling). For each node in the use case, there is an entry in the list of node information which includes the id of the node, its name (if it exist), what type of clean architecture node it is, what layer of clean architecture it belongs to, its file path, and its status ('VALID', 'MISSING', 'VIOLATION'). For each edge, there is an entry in the list of edge information which includes the id of the edge, the starting node, the target node, its type ('DEPENDENCY'), and its status ('VALID', 'INCORRECT_DEPENDENCY').
 
 <details>
     <summary>Suppose the following was our project structure:</summary>
@@ -214,6 +220,7 @@ The information returned includes the name of the use case, a list of node infor
         ├── usecase1Controller.java
         └── usecase1Presenter.java
     ```
+
 </details>
 
 Suppose the only file with any lines was 'usecase1Controller.java' and it contained the following:
@@ -347,6 +354,7 @@ Upon contacting the following endpoint:
         "decoupling":false
     }
     ```
+
 </details>
 
 ### `/api/analysis/violations/:interactionId`
@@ -378,6 +386,7 @@ The information returned is a list of all of the violations in a use case. Each 
         ├── usecase1Controller.java
         └── usecase1Presenter.java
     ```
+
 </details>
 
 Suppose the only file with any lines was 'usecase1Controller.java' and it contained the following:
@@ -417,8 +426,8 @@ Upon contacting the following endpoint:
         }
     ]
     ```
-</details>
 
+</details>
 
 ### `/api/analysis/files-with-violations`
 
@@ -427,7 +436,6 @@ Accepted Request: GET
 Get all files in the projects that have violations.
 
 The information returned includes the number of files that are involved in violations and the file paths to those files.
-
 
 <details>
     <summary>Suppose the following was our project structure:</summary>
@@ -446,6 +454,7 @@ The information returned includes the number of files that are involved in viola
         ├── usecase1Controller.java
         └── usecase1Presenter.java
     ```
+
 </details>
 
 Suppose the only file with any lines was 'usecase1Controller.java' and it contained the following:
@@ -471,7 +480,7 @@ Upon contacting the endpoint, the following is the expected result:
 
 Accepted Request: GET
 
-Gets information about the current project. 
+Gets information about the current project.
 
 The information returned includes the name of the project, the number of use cases, the total number of violations, and information about all of the use cases. For each use case, you get the id, name, number of violations, and a list of interactions. The list of interactions includes one entry which includes the interaction id (id of use case) and the interaction name (name of use case).
 
@@ -491,6 +500,7 @@ The information returned includes the name of the project, the number of use cas
         ├── usecase1Controller.java
         └── usecase1Presenter.java
     ```
+
 </details>
 
 Suppose the only file with any lines was 'usecase1Controller.java' and it contained the following:

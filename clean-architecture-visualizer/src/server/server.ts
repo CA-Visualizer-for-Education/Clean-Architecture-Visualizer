@@ -7,7 +7,8 @@ import * as path from 'path';
 import { fileURLToPath } from 'url';
 import type { ViteDevServer } from 'vite';
 
-import analysis from './routes/analysis.js';
+import type { SessionDBAccessInterface } from '../data_access/sessionDBAccessInterface.js';
+import { createAnalysisRouter } from './routes/analysis.js';
 import template from './routes/template.js';
 
 let server: Server | null = null;
@@ -22,13 +23,16 @@ const FRONTEND_DIR = fs.existsSync(frontendPathFromSource)
 
 const isProd = process.env.NODE_ENV !== 'development';
 
-export async function startServer(backendOnly: boolean): Promise<Server> {
+export async function startServer(
+  backendOnly: boolean,
+  db: SessionDBAccessInterface
+): Promise<Server> {
   const app = express();
 
   app.use(express.json());
 
   // Routes
-  app.use('/api', analysis);
+  app.use('/api', createAnalysisRouter(db));
   app.use('/api', template);
 
   // Create Vite server in middleware mode
