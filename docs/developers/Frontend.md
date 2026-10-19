@@ -276,7 +276,12 @@ Good examples in this codebase:
 - `frontend/src/components/code/FileExplorer/index.tsx` plus `frontend/src/components/code/FileExplorer/styles.ts`
 - `frontend/src/components/diagram/ViolationsSideBarContent/index.tsx` plus `frontend/src/components/diagram/ViolationsSideBarContent/styles.ts`
 - `frontend/src/components/diagram/SideBar/index.tsx` plus `frontend/src/components/diagram/SideBar/styles.ts`
-- `frontend/src/pages/CheckerMode/index.tsx` plus `frontend/src/pages/CheckerMode/styles.ts`
+
+Current navigation and Checker entry points:
+
+- `frontend/src/layouts/AppLayout.tsx` imports `frontend/src/components/common/NavBar.tsx`.
+- `frontend/src/App.tsx` imports `frontend/src/pages/CheckerMode.tsx` for the `/checker` route.
+- Keep one implementation per component or page. Avoid adding a same-named directory with an `index.tsx` alongside a `.tsx` file; extensionless imports can resolve to the file while edits to the directory version have no effect.
 
 ### Accessibility
 

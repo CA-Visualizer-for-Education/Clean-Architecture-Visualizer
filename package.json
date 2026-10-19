@@ -3,7 +3,7 @@
   "version": "1.0.1",
   "scripts": {
     "setup": "npm run build",
-    "build": "tsc --project clean-architecture-visualizer/tsconfig.json && node -e \"require('fs').copyFileSync('clean-architecture-visualizer/package.json', 'clean-architecture-visualizer/dist/package.json')\" && npm run build_frontend",
+    "build": "tsc --project clean-architecture-visualizer/tsconfig.json && node -e \"const fs = require('fs'); fs.rmSync('clean-architecture-visualizer/dist/tests', { recursive: true, force: true }); fs.copyFileSync('clean-architecture-visualizer/package.json', 'clean-architecture-visualizer/dist/package.json')\" && npm run build_frontend",
     "build_frontend": "npm install --prefix clean-architecture-visualizer/frontend && npm run build --prefix clean-architecture-visualizer/frontend",
     "start": "node ./clean-architecture-visualizer/dist/src/app/index.js",
     "test": "node --experimental-vm-modules node_modules/.bin/jest",
