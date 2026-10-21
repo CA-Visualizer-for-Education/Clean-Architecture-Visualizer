@@ -1,5 +1,4 @@
 import chalk from 'chalk';
-import { preloadDependencies } from '../utils/astPreload.js';
 import type { CleanArchAccess } from '../data_access/cleanArchInfoAccess.js';
 import type { FileAccess } from '../data_access/fileAccess.js';
 import type { SessionDBAccess } from '../data_access/sessionDBAccess.js';
@@ -33,6 +32,7 @@ import { InitModuleProjectOutputData } from '../use_case/initModuleProject/initM
 import { InitProjectInputData } from '../use_case/initProject/initProjectInputData.js';
 import { InitProjectInteractor } from '../use_case/initProject/initProjectInteractor.js';
 import { InitProjectOutputData } from '../use_case/initProject/initProjectOutputData.js';
+import { preloadDependencies } from '../utils/astPreload.js';
 
 export class AppBuilder {
   private fileAccess?: FileAccess;

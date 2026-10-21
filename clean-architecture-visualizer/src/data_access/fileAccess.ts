@@ -173,8 +173,8 @@ export class FileAccess implements FileAccessInterface {
    */
   async getFileImports(filePath: string): Promise<Relationship[]> {
     const normalized = filePath.replace(/\\/g, '/');
-    if (dependencyCache.has(normalized)) {
-      const astDeps = dependencyCache.get(normalized)!;
+    const astDeps = dependencyCache.get(normalized);
+    if (astDeps) {
       return astDeps.map((fileName) => ({
         fileName,
         relationshipType: 'dependency',
