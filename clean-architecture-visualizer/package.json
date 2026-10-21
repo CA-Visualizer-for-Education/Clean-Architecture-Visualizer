@@ -2,7 +2,7 @@
   "name": "clean-architecture-visualizer",
   "version": "1.0.1",
   "scripts": {
-    "build": "tsc && node -e \"require('fs').copyFileSync('package.json', 'dist/package.json')\" && npm run build_frontend",
+    "build": "tsc && node -e \"require('fs').copyFileSync('package.json', 'dist/package.json'); require('fs').cpSync('assets/wasm', 'dist/assets/wasm', {recursive: true})\" && npm run build_frontend",
     "build_frontend": "npm install --prefix frontend && npm run build --prefix frontend",
     "start": "cross-env NODE_ENV=production node ./dist/src/app/index.js",
     "dev": "npm run build && cross-env NODE_ENV=development node ./dist/src/app/index.js start",
@@ -29,11 +29,13 @@
     "chalk": "^5.6.2",
     "commander": "^14.0.2",
     "express": "^5.2.1",
-    "http-proxy-middleware": "^3.0.5"
+    "http-proxy-middleware": "^3.0.5",
+    "web-tree-sitter": "^0.22.6"
   },
   "type": "module",
   "files": [
     "dist/",
-    "frontend/dist/"
+    "frontend/dist/",
+    "assets/"
   ]
 }
