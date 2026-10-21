@@ -1,4 +1,5 @@
 import chalk from 'chalk';
+import { preloadDependencies } from '../utils/astPreload.js';
 import type { CleanArchAccess } from '../data_access/cleanArchInfoAccess.js';
 import type { FileAccess } from '../data_access/fileAccess.js';
 import type { SessionDBAccess } from '../data_access/sessionDBAccess.js';
@@ -67,6 +68,7 @@ export class AppBuilder {
   }
 
   async runGraphVerification(): Promise<void> {
+    await preloadDependencies(process.cwd());
     const { fileAccess, cleanArchAccess, db } = this.requireDeps();
     const inputData = new GraphVerificationInputData(false);
     const outputData = new GraphVerificationOutputData();
@@ -94,6 +96,7 @@ export class AppBuilder {
   }
 
   async runCLIGraphVerification(): Promise<void> {
+    await preloadDependencies(process.cwd());
     const { fileAccess, cleanArchAccess, db } = this.requireDeps();
     const inputData = new GraphVerificationInputData(true);
     const outputData = new GraphVerificationOutputData();
