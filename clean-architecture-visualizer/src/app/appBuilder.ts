@@ -32,6 +32,7 @@ import { InitModuleProjectOutputData } from '../use_case/initModuleProject/initM
 import { InitProjectInputData } from '../use_case/initProject/initProjectInputData.js';
 import { InitProjectInteractor } from '../use_case/initProject/initProjectInteractor.js';
 import { InitProjectOutputData } from '../use_case/initProject/initProjectOutputData.js';
+import { preloadDependencies } from '../utils/astPreload.js';
 
 export class AppBuilder {
   private fileAccess?: FileAccess;
@@ -67,6 +68,7 @@ export class AppBuilder {
   }
 
   async runGraphVerification(): Promise<void> {
+    await preloadDependencies(process.cwd());
     const { fileAccess, cleanArchAccess, db } = this.requireDeps();
     const inputData = new GraphVerificationInputData(false);
     const outputData = new GraphVerificationOutputData();
@@ -94,6 +96,7 @@ export class AppBuilder {
   }
 
   async runCLIGraphVerification(): Promise<void> {
+    await preloadDependencies(process.cwd());
     const { fileAccess, cleanArchAccess, db } = this.requireDeps();
     const inputData = new GraphVerificationInputData(true);
     const outputData = new GraphVerificationOutputData();

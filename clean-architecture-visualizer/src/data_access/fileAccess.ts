@@ -2,6 +2,7 @@ import type { Dirent } from 'node:fs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import type { Relationship, RelationshipType } from '../types/relationship.js';
+import { dependencyCache } from '../utils/astPreload.js';
 import type { FileAccessInterface } from './fileAccessInterface.js';
 
 export class FileAccess implements FileAccessInterface {
@@ -171,6 +172,14 @@ export class FileAccess implements FileAccessInterface {
    * @param filePath is a path to a valid file.
    */
   async getFileImports(filePath: string): Promise<Relationship[]> {
+    const normalized = filePath.replace(/\\/g, '/');
+    const astDeps = dependencyCache.get(normalized);
+    if (astDeps) {
+      return astDeps.map((fileName) => ({
+        fileName,
+        relationshipType: 'dependency',
+      }));
+    }
     try {
       const fileContent: string = await fs.readFile(filePath, {
         encoding: 'utf-8',
