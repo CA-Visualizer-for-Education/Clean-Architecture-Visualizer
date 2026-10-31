@@ -55,21 +55,40 @@ const Home = () => {
   ];
 
   return (
-    <Container maxWidth="lg" sx={{ py: 10, position: 'relative' }}>
+    <Container
+      maxWidth="lg"
+      sx={{
+        pt: { xs: 4, sm: 6, md: 10 },
+        pb: { xs: 8, md: 10 },
+        position: 'relative',
+      }}
+    >
       <Box
-        mb={12}
+        mb={{ xs: 4, sm: 6, md: 12 }}
         display="flex"
         justifyContent="center"
         alignItems="center"
-        gap={3}
+        gap={{ xs: 2, md: 3 }}
+        sx={{
+          flexDirection: { xs: 'column', sm: 'row' },
+          textAlign: { xs: 'center', sm: 'left' },
+        }}
       >
         <Box
           component="img"
           src={CaveLogo}
           alt="CAVE Logo"
-          sx={{ height: 60 }}
+          sx={{ height: { xs: 44, md: 60 }, flexShrink: 0 }}
         />
-        <Typography variant="h3" component="h1" fontWeight="800">
+        <Typography
+          variant="h3"
+          component="h1"
+          fontWeight="800"
+          sx={{
+            fontSize: { xs: '1.75rem', sm: '2.25rem', md: '3rem' },
+            overflowWrap: 'anywhere',
+          }}
+        >
           {t('title')}
         </Typography>
       </Box>

@@ -2,6 +2,12 @@ import { themes as prismThemes } from 'prism-react-renderer';
 import type { Config } from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
 
+// GitHub Actions supplies the current repository, including when run in a fork.
+const [organizationName, projectName] = (
+  process.env.GITHUB_REPOSITORY ??
+  'CA-Visualizer-for-Education/Clean-Architecture-Visualizer'
+).split('/');
+
 const config: Config = {
   title: 'Cave Docs',
   favicon: 'img/cave_dark.ico',
@@ -10,10 +16,10 @@ const config: Config = {
     v4: true,
   },
 
-  url: 'https://CA-Visualizer-for-Education.github.io',
-  baseUrl: '/Clean-Architecture-Visualizer/',
-  organizationName: 'CA-Visualizer-for-Education',
-  projectName: 'Clean-Architecture-Visualizer',
+  url: `https://${organizationName}.github.io`,
+  baseUrl: `/${projectName}/`,
+  organizationName,
+  projectName,
   deploymentBranch: 'gh-pages',
 
   onBrokenLinks: 'throw',
@@ -104,7 +110,7 @@ const config: Config = {
           items: [
             {
               label: 'GitHub',
-              href: 'https://github.com/CA-Visualizer-for-Education/Clean-Architecture-Visualizer',
+              href: `https://github.com/${organizationName}/${projectName}`,
             },
           ],
         },
