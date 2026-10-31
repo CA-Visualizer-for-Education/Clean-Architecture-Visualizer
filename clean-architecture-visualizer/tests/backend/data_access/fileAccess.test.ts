@@ -168,6 +168,41 @@ describe('getFileImports functionality', () => {
     ]);
   });
 
+  // Test: a Java file that uses a full class name with no import line
+  it('returns fully qualified names used without an import', async () => {
+    // Pretend the file contains a class that uses entity.User
+    mockReadFile.mockResolvedValueOnce(
+      'public class A {\n  entity.User u = new entity.User();\n}'
+    );
+    // Run the function on that pretend file
+    const result = await fileAccess.getFileImports('/project/A.java');
+    // The answer should be a list with just entity.User in it
+    expect(result).toEqual([
+      {
+        fileName: 'entity.User',
+        relationshipType: 'dependency',
+      },
+    ]);
+  });
+
+  // Test: this.CONST is not a class name
+  it('ignores this.CONST style', async () => {
+    mockReadFile.mockResolvedValueOnce(
+      'public class A {\n  int x = this.CONST;\n}'
+    );
+    const result = await fileAccess.getFileImports('/project/A.java');
+    expect(result).toEqual([]);
+  });
+
+  // Test: a name inside a comment is not a real dependency
+  it('ignores fully qualified names in comments', async () => {
+    mockReadFile.mockResolvedValueOnce(
+      'public class A {\n  // entity.User is not used here\n}'
+    );
+    const result = await fileAccess.getFileImports('/project/A.java');
+    expect(result).toEqual([]);
+  });
+
   it('returns an empty array and logs when the file is not found', async () => {
     mockReadFile.mockRejectedValueOnce(new Error('File not found') as any);
     const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
