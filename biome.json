@@ -65,26 +65,7 @@
       "linter": { "rules": { "a11y": { "noSvgWithoutTitle": "off" } } }
     },
     {
-      "includes": [
-        "**/frontend/src/components/**",
-        "**/frontend/src/pages/**",
-        "**/frontend/tests/unit/pages/**"
-      ],
-      "linter": {
-        "rules": {
-          "style": {
-            "useFilenamingConvention": {
-              "level": "warn",
-              "options": {
-                "filenameCases": ["kebab-case", "PascalCase"]
-              }
-            }
-          }
-        }
-      }
-    },
-    {
-      "includes": ["**/*.config.ts", "**/*.d.ts"],
+      "includes": ["**/*.config.ts", "**/*.config.js", "**/*.d.ts"],
       "linter": {
         "rules": {
           "style": {
