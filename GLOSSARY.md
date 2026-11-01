@@ -30,6 +30,12 @@ An object that translates between the View and the Interactors: a Controller, Pr
 View Model.
 _Avoid_: glue code, middleware
 
+**Use case layer**:
+The Clean Architecture layer that holds Interactors, their Input and Output Boundaries, Input
+and Output Data, and Data Access Interfaces; it holds part of every use case, not whole use
+cases.
+_Avoid_: application layer
+
 **Frameworks & Drivers**:
 The View and the Data Access objects: the parts that represent technology choices, isolated
 from the business logic.
