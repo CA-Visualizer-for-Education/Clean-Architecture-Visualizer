@@ -14,7 +14,7 @@ CA Engine diagrams.
 _Avoid_: CAV, the visualizer
 
 **CA Engine**:
-The object diagram of one interaction's path: View, Controller, Interactor, Data Access,
+The object diagram of one use case's path: View, Controller, Interactor, Data Access,
 Presenter, View Model, and back to the View.
 _Avoid_: CA diagram, flow diagram
 
@@ -35,10 +35,20 @@ The View and the Data Access objects: the parts that represent technology choice
 from the business logic.
 _Avoid_: infrastructure
 
-### One interaction
+### One use case
+
+**User interaction**:
+Something a user does in the analysed program, such as clicking "Transfer"; one use case
+handles it.
+_Avoid_: action, event
+
+**Use case**:
+The set of classes that handle one user interaction: its Controller, Input Boundary, Input
+Data, Interactor, Output Boundary, Output Data, and Presenter.
+_Avoid_: interaction (in code)
 
 **Interactor**:
-The business-logic object for a single interaction, depending only on Entities and the
+The business-logic object of a single use case, depending only on Entities and the
 interfaces it declares.
 _Avoid_: service, handler, use case (for the object)
 
