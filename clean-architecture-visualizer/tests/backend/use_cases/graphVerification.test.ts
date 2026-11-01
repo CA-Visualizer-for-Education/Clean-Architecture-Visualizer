@@ -2078,7 +2078,9 @@ describe('Relationship types are passed through to edge storage', () => {
 
     const mockFileAccess = new MockFileAccess(fileMockContents, fileMockPaths);
     const dbAccess = new SessionDBAccess();
-    const presenter = new GraphVerificationPresenter();
+    const presenter = new GraphVerificationPresenter(
+      new GraphVerificationOutputData()
+    );
     const interactor = new GraphVerificationInteractor(
       mockFileAccess,
       genericNeighbourAccess,
@@ -2118,7 +2120,9 @@ describe('Relationship types are passed through to edge storage', () => {
 
     const mockFileAccess = new MockFileAccess(fileMockContents, fileMockPaths);
     const dbAccess = new SessionDBAccess();
-    const presenter = new GraphVerificationPresenter();
+    const presenter = new GraphVerificationPresenter(
+      new GraphVerificationOutputData()
+    );
     const interactor = new GraphVerificationInteractor(
       mockFileAccess,
       genericNeighbourAccess,
@@ -2182,7 +2186,7 @@ describe('Relationship types are passed through to edge storage', () => {
       new MockFileAccess(fileMockContents, fileMockPaths),
       genericNeighbourAccess,
       dbAccess,
-      new GraphVerificationPresenter(),
+      new GraphVerificationPresenter(new GraphVerificationOutputData()),
       [uc]
     );
 
@@ -2213,7 +2217,7 @@ describe('Relationship types are passed through to edge storage', () => {
       new MockFileAccess(new Map(), new Map()),
       genericNeighbourAccess,
       new SessionDBAccess(),
-      new GraphVerificationPresenter(),
+      new GraphVerificationPresenter(new GraphVerificationOutputData()),
       [dependsOnly, implementsToo]
     );
 
@@ -2236,7 +2240,7 @@ describe('Clean Architecture rules', () => {
       new MockFileAccess(new Map(), new Map()),
       genericNeighbourAccess,
       new SessionDBAccess(),
-      new GraphVerificationPresenter(),
+      new GraphVerificationPresenter(new GraphVerificationOutputData()),
       [uc]
     );
     await (interactor as any).verifyOutNeighbours();
