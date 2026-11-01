@@ -145,3 +145,9 @@ You can test a specific file/directory with:
 ```bash
 npm test -- <path-to-file/directory>
 ```
+
+CI also type-checks the backend's source and tests. To run the same check locally:
+
+```bash
+npm run type-check
+```
