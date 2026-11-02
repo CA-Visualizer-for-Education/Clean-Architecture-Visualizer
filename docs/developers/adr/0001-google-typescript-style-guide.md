@@ -4,8 +4,8 @@ CAVE's TypeScript follows Google's
 [TS/JS Style Guide](https://google.github.io/styleguide/tsguide.html) (checked at commit
 `5ec8577`, 2026-10-29), enforced by the Biome rules in the root `biome.json` rather than by
 ESLint. Biome already formats and lints the repo and runs in CI, so one tool does both, and
-Google's naming rules match the defaults of Biome's `useNamingConvention`. Students can read
-Google's guide for the reasons behind each rule.
+Google's naming rules match the defaults of Biome's `useNamingConvention`, except for enum
+members (below). Students can read Google's guide for the reasons behind each rule.
 
 ## Where we differ from Google
 
@@ -18,6 +18,10 @@ Google's guide for the reasons behind each rule.
   Biome's `useConsistentArrayType` (`shorthand`) requires `T[]` for simple and generic types
   (`string[]`, `Foo<Bar>[]`) but accepts either form for union, object, and function types.
   For those we write `Array<…>` (`Array<Foo | Bar>`), as Google does, and review checks it.
+- **Enum members**: Google writes them in `CONSTANT_CASE`; `useNamingConvention` requires
+  `PascalCase` (`NodeKind.Controller`), as the examples in the TypeScript handbook's
+  [Enums](https://www.typescriptlang.org/docs/handbook/enums.html) page do (`Direction.Up`,
+  checked 2026-11-02). We keep Biome's default rather than add a naming option.
 
 ## Considered options
 
