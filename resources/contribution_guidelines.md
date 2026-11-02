@@ -3,15 +3,13 @@
 ### 1. Branching Strategy
 
 - `main`: Production-ready code. Never push directly here.
-- `staging`: Integration branch. All features and fixes merge here first.
 - Feature Branches: Where development happens.
 
 The Workflow:
 
-- Checkout staging and pull the latest changes.
-- Create your feature branch off staging.
-- When finished, open a PR targeting staging.
-- Once testing is complete, merge into main.
+- Checkout main and pull the latest changes.
+- Create your feature branch off main.
+- When finished, open a PR targeting main.
 
 ---
 
@@ -68,40 +66,7 @@ Examples:
 
 ### 5. PR Description Template
 
-```markdown
-### Summary
-
-Short summary of what this PR does and why it matters.
-
-### Related Issues
-
-- Closes #<issue-number>
-- Relates to #<issue-number> (if applicable)
-
-### Changes
-
-- Bullet point 1
-- Bullet point 2
-- Bullet point 3
-
-### How to Test
-
-1. Step-by-step testing instructions
-2. Include example commands (e.g. `npm test`, `pytest`, or `curl` requests)
-3. Mention any environment variables or setup steps
-
-### Screenshots / UI (if applicable)
-
-- Before:
-- After:
-
-### Checklist
-
-- [ ] Tests added or updated
-- [ ] CI passes (lint, tests, build)
-- [ ] Documentation updated (if behavior changed)
-- [ ] No secrets or credentials committed
-```
+GitHub fills in the PR description from `.github/PULL_REQUEST_TEMPLATE.md` when you open a PR. Complete every section, and link issues as described in §6.
 
 ---
 
