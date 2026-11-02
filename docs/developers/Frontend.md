@@ -114,19 +114,20 @@ The following scripts are defined for development, testing, and quality checks:
 | `npm run build`          | Runs TypeScript project build and production bundling. |
 | `npm run preview`        | Serves the local production build for verification.    |
 | `npm run setup`          | Installs Playwright browsers for e2e tests.            |
-| `npm run lint`           | Runs ESLint with warnings treated as failures.         |
 | `npm run type-check`     | Runs TypeScript checks without emitting files.         |
 | `npm run test:unit`      | Executes Vitest unit tests.                            |
 | `npm run test:e2e`       | Runs Playwright end-to-end tests.                      |
 | `npm run test:e2e:ui`    | Runs Playwright tests in UI mode.                      |
 | `npm run test:e2e:debug` | Runs Playwright in debug mode.                         |
 
+Linting and formatting run from the repo root with Biome: `npm run lint` and `npm run format:check`. Style rules report warnings, which don't fail the command; see the [Style Guide](./Style-Guide.md).
+
 ### Suggested daily loop
 
 1. Pull latest changes and run `npm install` if lockfile changed.
 2. Start local dev with `npm run dev`.
 3. Implement changes in small commits.
-4. Before PR: run `npm run type-check`, `npm run lint`, and relevant tests.
+4. Before PR: run `npm run type-check` and the relevant tests here, and `npm run lint` at the repo root.
 
 ### Testing and debugging
 
@@ -186,10 +187,14 @@ Define reusable values once and import them where needed.
 
 ### File naming conventions
 
-- Use `index.tsx` for a component entry file and `styles.ts` for styled definitions.
-- Use `PascalCase` folder names for components and pages (for example: `CodeViewer`, `CheckerMode`).
-- Use `camelCase` for utility/lib files (for example: `storageKeys.ts`).
-- Use descriptive names for hooks and tests (for example: `useSomething.ts`, `ComponentName.test.tsx`).
+These follow [ADR-0003](./adr/0003-file-and-folder-names.md); the [Style Guide](./Style-Guide.md) lists every naming rule.
+
+- Use kebab-case for files and folders (for example: `storage-keys.ts`, `use-analysis.ts`).
+- Use `PascalCase` for React component files and the folders named after a component, matching the component they export (for example: `NavBar.tsx`, `CheckerMode/`).
+- Use `index.tsx` for a component entry file and `styles.ts` for styled definitions; these stay kebab-case inside a PascalCase folder.
+- Name a test after the file it tests (for example: `use-analysis.test.ts`, `NavBar.test.tsx`).
+
+Some existing files still use the old camelCase names until they are renamed.
 
 ### UI styling conventions
 
