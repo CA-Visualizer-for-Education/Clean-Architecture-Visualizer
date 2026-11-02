@@ -10,8 +10,9 @@ decisions recorded as ADRs. This page lists every rule in one place; follow the 
 the reasons.
 
 Biome checks most rules in CI. Each new rule starts as a warning while the existing code is
-brought into line, and becomes an error once its last warning is fixed. Rules marked
-**(review)** are checked in code review, because Biome can't check them.
+brought into line, and becomes an error once its last warning is fixed; `import type` is an
+error already, because no code broke it. Rules marked **(review)** are checked in code
+review, because Biome can't check them.
 
 ## Names
 
@@ -50,13 +51,16 @@ brought into line, and becomes an error once its last warning is fixed. Rules ma
   `use-analysis.ts`. [ADR-0003](./adr/0003-file-and-folder-names.md)
 - **Frontend:** React component files, and folders named after a component, are PascalCase
   matching the component they export (`NavBar.tsx`, `CheckerMode/index.tsx`). Biome allows
-  PascalCase in `frontend/src/components/`, `frontend/src/pages/`, and the test folders that
-  mirror them; elsewhere in those folders, such as `index.tsx`, `styles.ts`, and hooks, names
-  stay kebab-case **(review)**.
+  PascalCase in `frontend/src/components/`, `frontend/src/pages/`, and
+  `frontend/tests/unit/pages/`; other files in those folders, such as `index.tsx`,
+  `styles.ts`, and hooks, stay kebab-case **(review)**.
 - Every import matches the file's case exactly. macOS and Windows ignore case by default,
   but CI runs on Linux, which doesn't.
 - Biome checks file names only. Folder names are checked in review until a CI check is
   added.
+- Files whose names or exports a tool sets keep them: the MSW worker script
+  (`frontend/public/mockServiceWorker.js`, which Biome skips), `*.config.ts` and
+  `*.config.js` files, and type declaration files (`*.d.ts`).
 
 ### Names a library defines
 
@@ -67,7 +71,8 @@ brought into line, and becomes an error once its last warning is fixed. Rules ma
 ## TypeScript
 
 - **Named exports only.** No `export default`; every import uses the real name of what it
-  imports. Config files and type declarations whose tools need a default export are exempt.
+  imports. Config files and type declarations are exempt, because their tools need a default
+  export.
   [Google: Exports](https://google.github.io/styleguide/tsguide.html#exports)
 - **`import type` for type-only imports**, so it's clear which imports exist at runtime.
   Google allows this; CAVE requires it.
@@ -88,12 +93,14 @@ brought into line, and becomes an error once its last warning is fixed. Rules ma
 
 ## JSON field names
 
-- JSON field names in API requests and responses are camelCase, with US spelling and the
-  use case vocabulary: `useCaseId`, not `interaction_id`. Keys in the JSON data files the
-  backend loads use US spelling too. Stored session data is already camelCase, so one
-  convention holds from storage to screen. The backend and frontend declare the same field
-  names, and the route tests compare whole response bodies, so a rename on one side fails
-  the tests on the other. **(review)**
+- JSON field names in API requests and responses are camelCase, with US spelling
+  ([ADR-0004](./adr/0004-us-spelling-in-identifiers.md)) and the use case vocabulary:
+  `useCaseId`, not `interaction_id`. Keys in the JSON data files the backend loads use US
+  spelling too. Stored session data is already camelCase, so one convention holds from
+  storage to screen.
+- Biome's naming rule checks the field names where they're declared in TypeScript, quoted
+  keys included. Agreement between the backend and frontend is checked by the route tests,
+  which compare whole response bodies, and in review **(review)**.
 - This matches the major API style guides (checked 2026-11-02):
   - Google, [JSON Style Guide: Property Name Format](https://google.github.io/styleguide/jsoncguide.html#Property_Name_Format):
     "Property names must be lower camel-cased, ASCII strings."

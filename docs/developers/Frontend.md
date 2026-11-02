@@ -120,7 +120,7 @@ The following scripts are defined for development, testing, and quality checks:
 | `npm run test:e2e:ui`    | Runs Playwright tests in UI mode.                      |
 | `npm run test:e2e:debug` | Runs Playwright in debug mode.                         |
 
-Linting and formatting run from the repo root with Biome: `npm run lint` and `npm run format:check`. Style rules report warnings, which don't fail the command; see the [Style Guide](./Style-Guide.md).
+Linting and formatting run from the repo root with Biome: `npm run lint` and `npm run format:check`. Most style rules report warnings, which don't fail the command; see the [Style Guide](./Style-Guide.md).
 
 ### Suggested daily loop
 
@@ -187,12 +187,9 @@ Define reusable values once and import them where needed.
 
 ### File naming conventions
 
-These follow [ADR-0003](./adr/0003-file-and-folder-names.md); the [Style Guide](./Style-Guide.md) lists every naming rule.
+File and folder names are kebab-case, with PascalCase for React component files and the folders named after a component ([ADR-0003](./adr/0003-file-and-folder-names.md)); the [Style Guide](./Style-Guide.md) lists every naming rule.
 
-- Use kebab-case for files and folders (for example: `storage-keys.ts`, `use-analysis.ts`).
-- Use `PascalCase` for React component files and the folders named after a component, matching the component they export (for example: `NavBar.tsx`, `CheckerMode/`).
 - Use `index.tsx` for a component entry file and `styles.ts` for styled definitions; these stay kebab-case inside a PascalCase folder.
-- Name a test after the file it tests (for example: `use-analysis.test.ts`, `NavBar.test.tsx`).
 
 Some existing files still use the old camelCase names until they are renamed.
 

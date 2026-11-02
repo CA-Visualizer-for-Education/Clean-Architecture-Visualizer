@@ -19,8 +19,9 @@ members (below). Students can read Google's guide for the reasons behind each ru
   (`string[]`, `Foo<Bar>[]`) but accepts either form for union, object, and function types.
   For those we write `Array<…>` (`Array<Foo | Bar>`), as Google does, and review checks it.
 - **Enum members**: Google writes them in `CONSTANT_CASE`; `useNamingConvention` requires
-  `PascalCase` (`NodeKind.Controller`), as the TypeScript handbook's examples do. We keep
-  Biome's default rather than add a naming option.
+  `PascalCase` (`NodeKind.Controller`), as the examples in the TypeScript handbook's
+  [Enums](https://www.typescriptlang.org/docs/handbook/enums.html) page do (`Direction.Up`,
+  checked 2026-11-02). We keep Biome's default rather than add a naming option.
 
 ## Considered options
 
