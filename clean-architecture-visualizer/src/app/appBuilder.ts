@@ -68,8 +68,8 @@ export class AppBuilder {
   }
 
   async runGraphVerification(): Promise<void> {
-    await preloadDependencies(process.cwd());
     const { fileAccess, cleanArchAccess, db } = this.requireDeps();
+    await preloadDependencies(process.cwd(), fileAccess);
     const inputData = new GraphVerificationInputData(false);
     const outputData = new GraphVerificationOutputData();
     const presenter = new GraphVerificationPresenter(outputData);
@@ -96,8 +96,8 @@ export class AppBuilder {
   }
 
   async runCLIGraphVerification(): Promise<void> {
-    await preloadDependencies(process.cwd());
     const { fileAccess, cleanArchAccess, db } = this.requireDeps();
+    await preloadDependencies(process.cwd(), fileAccess);
     const inputData = new GraphVerificationInputData(true);
     const outputData = new GraphVerificationOutputData();
     const presenter = new GraphVerificationPresenter(outputData);

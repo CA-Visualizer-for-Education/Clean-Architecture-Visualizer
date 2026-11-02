@@ -1,125 +1,192 @@
-import fs from 'node:fs';
+import fs from 'node:fs/promises';
+import os from 'node:os';
 import path from 'node:path';
 import {
-  dependencyCache,
-  JavaLanguageParser,
-  preloadDependencies,
-} from '../../../src/utils/astPreload.js';
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+} from '@jest/globals';
+import { JavaLanguageParser } from '../../../src/utils/parsers/javaLanguageParser.js';
 
-describe('AST Preload & Dependency Extraction Engine', () => {
+describe('JavaLanguageParser AST Dependency Extraction', () => {
   const parser = new JavaLanguageParser();
+  let tempDir: string;
 
   beforeAll(async () => {
     await parser.init();
   });
 
-  it('extracts specific import only when it is actually used in the code', async () => {
-    const code = `
-      package interface_adapter.login;
-      import entity.User;
-      import entity.Order;
+  beforeEach(async () => {
+    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'cave-test-'));
+  });
 
-      public class LoginController {
+  afterEach(async () => {
+    await fs.rm(tempDir, { recursive: true, force: true });
+  });
+
+  it('detects implements and extends relationships with exact types', async () => {
+    const code = `
+      package test;
+      public class LoginInteractor extends BaseInteractor implements LoginInputBoundary, Auditable {}
+    `;
+    const thisFile = path.join(tempDir, 'LoginInteractor.java');
+    const result = await parser.extractDependencies(code, thisFile, [thisFile]);
+
+    expect(result).toEqual([
+      { fileName: 'BaseInteractor', relationshipType: 'extends' },
+      { fileName: 'LoginInputBoundary', relationshipType: 'implements' },
+      { fileName: 'Auditable', relationshipType: 'implements' },
+    ]);
+  });
+
+  it('implicitly resolves same-package sibling classes without import', async () => {
+    const siblingFile = path.join(tempDir, 'Presenter.java');
+    const thisFile = path.join(tempDir, 'Controller.java');
+
+    const code = `
+      package test;
+      public class Controller {
+        private Presenter presenter;
+      }
+    `;
+    const result = await parser.extractDependencies(code, thisFile, [
+      thisFile,
+      siblingFile,
+    ]);
+
+    expect(result).toEqual([
+      { fileName: 'Presenter', relationshipType: 'dependency' },
+    ]);
+  });
+
+  it('resolves wildcard star import (*) to only referenced symbols (Case 3)', async () => {
+    const userPath = path.join(tempDir, 'entity', 'User.java');
+    const unusedPath = path.join(tempDir, 'entity', 'GhostUnused.java');
+    const thisFile = path.join(tempDir, 'Controller.java');
+
+    const code = `
+      package test;
+      import entity.*;
+      public class Controller {
         private User user;
       }
     `;
+    const result = await parser.extractDependencies(code, thisFile, [
+      thisFile,
+      userPath,
+      unusedPath,
+    ]);
 
-    // Here, User is used, but Order is NOT used.
-    const deps = await parser.extractDependencies(
-      code,
-      '/mock/LoginController.java',
-      '/mock'
-    );
-    expect(deps).toContain('User');
-    expect(deps).not.toContain('Order');
+    expect(result).toEqual([
+      { fileName: 'User', relationshipType: 'dependency' },
+    ]);
   });
 
-  it('resolves wildcard imports to actual used symbols from package directory', async () => {
-    // Create temporary package directory
-    const tempDir = path.join(process.cwd(), 'temp_test_pkg');
-    const entityDir = path.join(tempDir, 'entity');
-    fs.mkdirSync(entityDir, { recursive: true });
-    fs.writeFileSync(path.join(entityDir, 'User.java'), 'public class User {}');
-    fs.writeFileSync(
-      path.join(entityDir, 'Product.java'),
-      'public class Product {}'
-    );
-
+  it('handles multiple imports declared on a single line (Case 4)', async () => {
+    const thisFile = path.join(tempDir, 'Controller.java');
     const code = `
-      package interface_adapter.login;
-      import entity.*;
-
-      public class LoginController {
-        public void handle(User user) {
-        }
+      package test;
+      import entity.User; import use_case.login.LoginInputBoundary;
+      public class Controller {
+        private User user;
+        private LoginInputBoundary interactor;
       }
     `;
+    const result = await parser.extractDependencies(code, thisFile, [thisFile]);
 
-    try {
-      const deps = await parser.extractDependencies(
-        code,
-        path.join(tempDir, 'LoginController.java'),
-        tempDir
-      );
-      // User is used in method parameter, so it must be resolved
-      expect(deps).toContain('User');
-      // Product is not used in class body, so it must NOT be resolved
-      expect(deps).not.toContain('Product');
-    } finally {
-      fs.rmSync(tempDir, { recursive: true, force: true });
-    }
+    expect(result).toContainEqual({
+      fileName: 'User',
+      relationshipType: 'dependency',
+    });
+    expect(result).toContainEqual({
+      fileName: 'LoginInputBoundary',
+      relationshipType: 'dependency',
+    });
   });
 
-  it('does not resolve wildcard import when no class from package is used', async () => {
-    const tempDir = path.join(process.cwd(), 'temp_test_unused');
-    const entityDir = path.join(tempDir, 'entity');
-    fs.mkdirSync(entityDir, { recursive: true });
-    fs.writeFileSync(path.join(entityDir, 'User.java'), 'public class User {}');
-
+  it('excludes unused imports from recorded dependencies (Case 5)', async () => {
+    const thisFile = path.join(tempDir, 'Service.java');
     const code = `
-      package interface_adapter.login;
-      import entity.*;
-
-      public class LoginController {
-        private String name;
+      package test;
+      import entity.User;
+      import entity.GhostUnused;
+      public class Service {
+        private User user;
       }
     `;
+    const result = await parser.extractDependencies(code, thisFile, [thisFile]);
 
-    try {
-      const deps = await parser.extractDependencies(
-        code,
-        path.join(tempDir, 'LoginController.java'),
-        tempDir
-      );
-      expect(deps).toEqual([]);
-    } finally {
-      fs.rmSync(tempDir, { recursive: true, force: true });
-    }
+    expect(result).toEqual([
+      { fileName: 'User', relationshipType: 'dependency' },
+    ]);
+    expect(result.some((r) => r.fileName === 'GhostUnused')).toBe(false);
   });
 
-  it('preloads project files into dependencyCache', async () => {
-    const tempProject = path.join(process.cwd(), 'temp_proj');
-    const srcDir = path.join(tempProject, 'src', 'demo');
-    fs.mkdirSync(srcDir, { recursive: true });
-    const javaFile = path.join(srcDir, 'App.java');
-    fs.writeFileSync(
-      javaFile,
-      `
-      package demo;
-      import demo.Helper;
-      public class App {
-        Helper helper;
+  it('handles multiline formatted imports cleanly (Case 6)', async () => {
+    const thisFile = path.join(tempDir, 'Service.java');
+    const code = `
+      package test;
+      import
+        entity.User;
+      public class Service {
+        private User user;
       }
-    `
-    );
+    `;
+    const result = await parser.extractDependencies(code, thisFile, [thisFile]);
 
-    try {
-      await preloadDependencies(tempProject);
-      const normalized = javaFile.replace(/\\/g, '/');
-      expect(dependencyCache.has(normalized)).toBe(true);
-      expect(dependencyCache.get(normalized)).toEqual(['Helper']);
-    } finally {
-      fs.rmSync(tempProject, { recursive: true, force: true });
-    }
+    expect(result).toEqual([
+      { fileName: 'User', relationshipType: 'dependency' },
+    ]);
+  });
+
+  it('strips inline comments completely from import declarations (Case 7)', async () => {
+    const thisFile = path.join(tempDir, 'Service.java');
+    const code = `
+      package test;
+      import entity.User; // this is an inline comment
+      public class Service {
+        private User user;
+      }
+    `;
+    const result = await parser.extractDependencies(code, thisFile, [thisFile]);
+
+    expect(result).toEqual([
+      { fileName: 'User', relationshipType: 'dependency' },
+    ]);
+  });
+
+  it('handles spaces preceding trailing semicolons (Case 9)', async () => {
+    const thisFile = path.join(tempDir, 'Service.java');
+    const code = `
+      package test;
+      import entity.User ;
+      public class Service {
+        private User user;
+      }
+    `;
+    const result = await parser.extractDependencies(code, thisFile, [thisFile]);
+
+    expect(result).toEqual([
+      { fileName: 'User', relationshipType: 'dependency' },
+    ]);
+  });
+
+  it('resolves standard single-type import (Case 1)', async () => {
+    const thisFile = path.join(tempDir, 'Service.java');
+    const code = `
+      package test;
+      import entity.User;
+      public class Service {
+        private User user;
+      }
+    `;
+    const result = await parser.extractDependencies(code, thisFile, [thisFile]);
+
+    expect(result).toEqual([
+      { fileName: 'User', relationshipType: 'dependency' },
+    ]);
   });
 });

@@ -35,7 +35,6 @@
   "type": "module",
   "files": [
     "dist/",
-    "frontend/dist/",
-    "assets/"
+    "frontend/dist/"
   ]
 }

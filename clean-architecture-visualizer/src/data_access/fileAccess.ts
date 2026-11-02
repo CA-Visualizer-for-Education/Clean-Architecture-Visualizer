@@ -2,7 +2,7 @@ import type { Dirent } from 'node:fs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import type { Relationship, RelationshipType } from '../types/relationship.js';
-import { dependencyCache } from '../utils/astPreload.js';
+import { globalDependencyRegistry } from './dependencyRegistry.js';
 import type { FileAccessInterface } from './fileAccessInterface.js';
 
 export class FileAccess implements FileAccessInterface {
@@ -70,6 +70,35 @@ export class FileAccess implements FileAccessInterface {
     }
 
     await this.collectFiles(target, paths);
+  }
+
+  async getAllSourceFiles(curr: string = process.cwd()): Promise<string[]> {
+    const srcPath = (await this.bfsFindDir(curr, 'src')) ?? curr;
+    const result: string[] = [];
+    const walk = async (dir: string): Promise<void> => {
+      let entries: Dirent[];
+      try {
+        entries = await fs.readdir(dir, { withFileTypes: true });
+      } catch {
+        return;
+      }
+      for (const entry of entries) {
+        if (
+          FileAccess.ignoredDirNames.has(entry.name) ||
+          entry.name.startsWith('.')
+        ) {
+          continue;
+        }
+        const fullPath = path.join(dir, entry.name);
+        if (entry.isFile()) {
+          result.push(fullPath);
+        } else if (entry.isDirectory()) {
+          await walk(fullPath);
+        }
+      }
+    };
+    await walk(srcPath);
+    return result;
   }
 
   /**
@@ -172,13 +201,9 @@ export class FileAccess implements FileAccessInterface {
    * @param filePath is a path to a valid file.
    */
   async getFileImports(filePath: string): Promise<Relationship[]> {
-    const normalized = filePath.replace(/\\/g, '/');
-    const astDeps = dependencyCache.get(normalized);
-    if (astDeps) {
-      return astDeps.map((fileName) => ({
-        fileName,
-        relationshipType: 'dependency',
-      }));
+    const cached = globalDependencyRegistry.get(filePath);
+    if (cached) {
+      return [...cached];
     }
     try {
       const fileContent: string = await fs.readFile(filePath, {
