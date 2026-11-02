@@ -2,7 +2,7 @@ import type { Dirent } from 'node:fs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import type { Relationship, RelationshipType } from '../types/relationship.js';
-import { globalDependencyRegistry } from './dependencyRegistry.js';
+import { globalDependencyRegistry } from './dependency-registry.js';
 import type { FileAccessInterface } from './fileAccessInterface.js';
 
 export class FileAccess implements FileAccessInterface {

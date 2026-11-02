@@ -1,6 +1,6 @@
-import { globalDependencyRegistry } from '../data_access/dependencyRegistry.js';
+import { globalDependencyRegistry } from '../data_access/dependency-registry.js';
 import { FileAccess } from '../data_access/fileAccess.js';
-import { JavaLanguageParser } from './parsers/javaLanguageParser.js';
+import { JavaLanguageParser } from './parsers/java-language-parser.js';
 
 /**
  * Pre-verification task: preloads and parses source files in the project,

@@ -32,7 +32,7 @@ import { InitModuleProjectOutputData } from '../use_case/initModuleProject/initM
 import { InitProjectInputData } from '../use_case/initProject/initProjectInputData.js';
 import { InitProjectInteractor } from '../use_case/initProject/initProjectInteractor.js';
 import { InitProjectOutputData } from '../use_case/initProject/initProjectOutputData.js';
-import { preloadDependencies } from '../utils/astPreload.js';
+import { preloadDependencies } from '../utils/ast-preload.js';
 
 export class AppBuilder {
   private fileAccess?: FileAccess;

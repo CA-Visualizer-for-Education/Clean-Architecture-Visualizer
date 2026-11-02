@@ -9,7 +9,7 @@ import {
   expect,
   it,
 } from '@jest/globals';
-import { JavaLanguageParser } from '../../../src/utils/parsers/javaLanguageParser.js';
+import { JavaLanguageParser } from '../../../src/utils/parsers/java-language-parser.js';
 
 describe('JavaLanguageParser AST Dependency Extraction', () => {
   const parser = new JavaLanguageParser();

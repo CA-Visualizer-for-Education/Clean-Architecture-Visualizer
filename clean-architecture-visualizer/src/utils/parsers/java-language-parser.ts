@@ -1,7 +1,7 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import Parser from 'web-tree-sitter';
-import type { LanguageParser } from '../../types/languageParser.js';
+import type { LanguageParser } from '../../types/language-parser.js';
 import type {
   Relationship,
   RelationshipType,
