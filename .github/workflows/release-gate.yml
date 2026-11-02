@@ -102,7 +102,7 @@ jobs:
           echo "contract holds: cave detected the illegal outputData -> viewModel dependency"
 
       # for good sample
-      - name: Assert clean-standard omits the entities to controller edge
+      - name: Assert clean-standard reports no violations
         working-directory: cave-test-repo/clean-standard
         run: |
           out=$(cave verify)
@@ -113,13 +113,14 @@ jobs:
             exit 1
           fi
 
-          if grep -E -q '[[:space:]]+entities.*controller' <<< "$out"; then
-            echo "did not expect a violation line with entities -> controller. clean-standard
-            has no entity depending on a controller, so cave has reported a false positive in dependency detection."
+          # cave verify exits 0 even when it finds violations, so look for its violation marker.
+          if grep -q '✗' <<< "$out"; then
+            echo "did not expect any violations. clean-standard follows Clean Architecture,
+            so every line above marked with ✗ is a false positive in dependency detection or in the allowed-edge rules."
             exit 1
           fi
 
-          echo "contract holds: cave reported no entities -> controller dependency in the legal sample"
+          echo "contract holds: cave reported no violations in the legal sample"
 
       # BAD SAMPLE TEST: wildcard star import
 
