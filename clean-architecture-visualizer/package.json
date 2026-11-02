@@ -6,7 +6,8 @@
     "build_frontend": "npm install --prefix frontend && npm run build --prefix frontend",
     "start": "cross-env NODE_ENV=production node ./dist/src/app/index.js",
     "dev": "npm run build && cross-env NODE_ENV=development node ./dist/src/app/index.js start",
-    "test": "cross-env NODE_OPTIONS='--experimental-vm-modules' jest --no-cache"
+    "test": "cross-env NODE_OPTIONS='--experimental-vm-modules' jest --no-cache",
+    "type-check": "tsc -p tsconfig.test.json"
   },
   "license": "MIT",
   "bugs": {
