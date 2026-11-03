@@ -216,4 +216,27 @@ describe('applyRenames', () => {
       "import type { CleanLayer } from '../types/cleanLayer.js';\nexport const layer: CleanLayer = 'entities';\n"
     );
   });
+
+  it('finds an identifier in a file renamed by the same table', () => {
+    applyRenames(
+      root,
+      {
+        files: [
+          { from: 'src/types/cleanLayer.ts', to: 'src/types/clean-layer.ts' },
+        ],
+        identifiers: [
+          {
+            file: 'src/types/clean-layer.ts',
+            from: 'cleanLayer',
+            to: 'CleanLayer',
+          },
+        ],
+      },
+      [{ tsconfig: 'tsconfig.json' }]
+    );
+
+    expect(read('src/data/access.ts')).toBe(
+      "import type { CleanLayer } from '../types/clean-layer.js';\nexport const layer: CleanLayer = 'entities';\n"
+    );
+  });
 });

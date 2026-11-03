@@ -91,7 +91,8 @@ const CAVE_PROJECTS: ProjectConfig[] = [
 
 /**
  * Applies the rename table under `root`. Paths in the table and the project
- * configs are relative to `root`. Entries already applied are skipped, so a
+ * configs are relative to `root`. Files move first, so an identifier's `file`
+ * is its path after the renames. Entries already applied are skipped, so a
  * second run changes nothing.
  */
 export function applyRenames(
@@ -100,8 +101,8 @@ export function applyRenames(
   projects: readonly ProjectConfig[]
 ): void {
   const realRoot = fs.realpathSync(root);
-  renameIdentifiers(realRoot, table.identifiers, projects);
   renameFiles(realRoot, table.files, projects);
+  renameIdentifiers(realRoot, table.identifiers, projects);
 }
 
 /**
