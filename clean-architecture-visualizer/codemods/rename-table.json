@@ -2,7 +2,7 @@
   "files": [
     {
       "from": "tests/backend/use_cases/intiProject.test.ts",
-      "to": "tests/backend/use_cases/initProject.test.ts"
+      "to": "tests/backend/use_cases/init-project.test.ts"
     },
     {
       "from": "src/types/cleanLayer.ts",
