@@ -3,6 +3,10 @@
     {
       "from": "tests/backend/use_cases/intiProject.test.ts",
       "to": "tests/backend/use_cases/initProject.test.ts"
+    },
+    {
+      "from": "src/types/cleanLayer.ts",
+      "to": "src/types/clean-layer.ts"
     }
   ],
   "identifiers": []
