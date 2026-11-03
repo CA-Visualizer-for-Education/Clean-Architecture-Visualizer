@@ -7,6 +7,10 @@
     {
       "from": "src/types/cleanLayer.ts",
       "to": "src/types/clean-layer.ts"
+    },
+    {
+      "from": "frontend/src/actions/useTemplate.ts",
+      "to": "frontend/src/actions/use-template.ts"
     }
   ],
   "identifiers": []
