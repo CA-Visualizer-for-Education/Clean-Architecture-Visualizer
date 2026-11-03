@@ -239,4 +239,24 @@ describe('applyRenames', () => {
       "import type { CleanLayer } from '../types/clean-layer.js';\nexport const layer: CleanLayer = 'entities';\n"
     );
   });
+
+  it('updates imports of the old name added after the rename, when run again', () => {
+    const table = {
+      files: [
+        { from: 'src/types/cleanLayer.ts', to: 'src/types/clean-layer.ts' },
+      ],
+      identifiers: [],
+    };
+    applyRenames(root, table, [{ tsconfig: 'tsconfig.json' }]);
+    write(
+      'src/data/student.ts',
+      "import type { cleanLayer } from '../types/cleanLayer.js';\n"
+    );
+
+    applyRenames(root, table, [{ tsconfig: 'tsconfig.json' }]);
+
+    expect(read('src/data/student.ts')).toBe(
+      "import type { cleanLayer } from '../types/clean-layer.js';\n"
+    );
+  });
 });

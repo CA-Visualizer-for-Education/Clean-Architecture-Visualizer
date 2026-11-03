@@ -50,13 +50,21 @@ export function rewriteSpecifier({
   aliases = [],
 }: SpecifierContext): string | undefined {
   const extension = specifier.match(IMPORT_EXTENSION)?.[0] ?? '';
-  const bare = specifier.slice(0, specifier.length - extension.length);
-  const alias = aliases.find((candidate) => bare.startsWith(candidate.prefix));
+  const withoutExtension = specifier.slice(
+    0,
+    specifier.length - extension.length
+  );
+  const alias = aliases.find((candidate) =>
+    withoutExtension.startsWith(candidate.prefix)
+  );
   let target: string;
   if (alias) {
-    target = path.join(alias.directory, bare.slice(alias.prefix.length));
-  } else if (bare.startsWith('.')) {
-    target = path.resolve(path.dirname(importer), bare);
+    target = path.join(
+      alias.directory,
+      withoutExtension.slice(alias.prefix.length)
+    );
+  } else if (withoutExtension.startsWith('.')) {
+    target = path.resolve(path.dirname(importer), withoutExtension);
   } else {
     return undefined;
   }
@@ -152,12 +160,14 @@ function renameFiles(
   files: RenameTable['files'],
   projects: readonly ProjectConfig[]
 ): void {
+  // Entries already applied stay in the map, so imports of the old name that a
+  // merged branch brings in are still updated.
   const renames = new Map(
     files
       .map(
         ({ from, to }) => [path.join(root, from), path.join(root, to)] as const
       )
-      .filter(([from]) => existsExactly(from))
+      .filter(([from, to]) => existsExactly(from) || existsExactly(to))
   );
   if (renames.size === 0) {
     return;
@@ -189,7 +199,9 @@ function renameFiles(
 
   edits.apply();
   for (const [from, to] of renames) {
-    gitMove(root, from, to);
+    if (existsExactly(from)) {
+      gitMove(root, from, to);
+    }
   }
 }
 
@@ -220,12 +232,16 @@ function loadProject(root: string, config: ProjectConfig): Project {
 function aliasesOf(project: Project): Alias[] {
   const options = project.getCompilerOptions();
   const base = options.baseUrl ?? path.dirname(String(options.configFilePath));
-  return Object.entries(options.paths ?? {})
-    .filter(([key, [target]]) => key.endsWith('/*') && target?.endsWith('/*'))
-    .map(([key, [target]]) => ({
-      prefix: key.slice(0, -1),
-      directory: path.resolve(base, (target as string).slice(0, -2)),
-    }));
+  return Object.entries(options.paths ?? {}).flatMap(([key, [target]]) =>
+    key.endsWith('/*') && target?.endsWith('/*')
+      ? [
+          {
+            prefix: key.slice(0, -1),
+            directory: path.resolve(base, target.slice(0, -2)),
+          },
+        ]
+      : []
+  );
 }
 
 function ownSourceFiles(project: Project, root: string): SourceFile[] {
