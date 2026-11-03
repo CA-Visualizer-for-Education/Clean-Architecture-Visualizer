@@ -49,7 +49,7 @@ describe('analysis routes', () => {
     });
   });
 
-  // The routes' 404 branches never run: an unknown id gets 200 with {}.
+  // The routes' 404 branches never run: an unknown id gets 200 with {} (#264).
   it('answers an unknown use case id with 200 and an empty object', async () => {
     const res = await fetch(`${baseUrl}/analysis/interaction/uc-999`);
 
