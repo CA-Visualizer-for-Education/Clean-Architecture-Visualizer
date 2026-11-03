@@ -1,4 +1,9 @@
 {
-  "files": [],
+  "files": [
+    {
+      "from": "tests/backend/use_cases/intiProject.test.ts",
+      "to": "tests/backend/use_cases/initProject.test.ts"
+    }
+  ],
   "identifiers": []
 }
