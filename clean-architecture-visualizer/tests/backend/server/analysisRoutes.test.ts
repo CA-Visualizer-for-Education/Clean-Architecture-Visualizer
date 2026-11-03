@@ -48,4 +48,19 @@ describe('analysis routes', () => {
       ],
     });
   });
+
+  // The routes' 404 branches never run: an unknown id gets 200 with {}.
+  it('answers an unknown interaction id with 200 and an empty object', async () => {
+    const res = await fetch(`${baseUrl}/analysis/interaction/uc-999`);
+
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({});
+  });
+
+  it('answers violations for an unknown interaction id with 200 and an empty object', async () => {
+    const res = await fetch(`${baseUrl}/analysis/violations/uc-999`);
+
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({});
+  });
 });
