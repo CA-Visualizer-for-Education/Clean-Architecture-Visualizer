@@ -111,16 +111,16 @@ export class GetViolationsInteractor implements GetViolationsInputBoundary {
     for (const matchingNode of matchingNodes) {
       const fileName = matchingNode.filePath?.split('/').at(-1);
       if (!fileName) return undefined;
-      const [snippet, lineNumber] = await Promise.all([
+      const [snippet, line_number] = await Promise.all([
         this.fileAccess.getFileSnippet(matchingNode.filePath as string, to),
         this.fileAccess.getLineNumber(matchingNode.filePath as string, to),
       ]);
 
-      if (snippet && lineNumber) {
+      if (snippet && line_number) {
         return {
           file: fileName,
           ...(snippet && { snippet }),
-          ...(lineNumber && { line_number: lineNumber }),
+          ...(line_number && { line_number }),
         };
       }
     }

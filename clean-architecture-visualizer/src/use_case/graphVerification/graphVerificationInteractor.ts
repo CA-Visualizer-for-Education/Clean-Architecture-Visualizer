@@ -54,7 +54,7 @@ export class GraphVerificationInteractor
   async execute(): Promise<void> {
     // restart db
     this.db.resetDB();
-    const formatForCli = this.inputData.isToCommandLine();
+    const formatForCLI = this.inputData.isToCommandLine();
 
     // main use case logic
     await this.buildFilePaths();
@@ -64,7 +64,7 @@ export class GraphVerificationInteractor
     await this.populateDatabase();
 
     // Paths are defined as <File Name, File Path>
-    if (formatForCli) {
+    if (formatForCLI) {
       this.prepareOutput();
       this.presenter.prepareSuccessView();
     }

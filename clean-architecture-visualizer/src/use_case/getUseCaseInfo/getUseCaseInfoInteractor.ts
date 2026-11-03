@@ -67,11 +67,11 @@ export class GetUseCaseInfoInteractor implements GetUseCaseInfoInputBoundary {
     const allNodes = this.db.getAllNodes();
 
     for (const fileKey of useCase.fileKeys) {
-      const nodeFromDb = allNodes.find(
+      const nodeFromDB = allNodes.find(
         (n) => n.filePath && n.filePath.includes(fileKey)
       );
 
-      if (nodeFromDb !== undefined) fileNodes.push(nodeFromDb);
+      if (nodeFromDB !== undefined) fileNodes.push(nodeFromDB);
     }
 
     for (const node of fileNodes) {

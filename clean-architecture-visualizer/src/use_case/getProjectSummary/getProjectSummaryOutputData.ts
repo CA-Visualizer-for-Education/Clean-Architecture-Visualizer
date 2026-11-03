@@ -1,4 +1,3 @@
-/** The response for GET /analysis/summary. */
 export type ProjectSummaryResponse = {
   project_name: string;
   total_use_cases: number;
@@ -20,6 +19,7 @@ export class GetProjectSummaryOutputData {
     this.summaryOutputData = outputData;
   }
 
+  // An empty object when nothing was set.
   getOutputData(): ProjectSummaryResponse | Record<string, never> {
     if (this.summaryOutputData) return this.summaryOutputData;
     return {};

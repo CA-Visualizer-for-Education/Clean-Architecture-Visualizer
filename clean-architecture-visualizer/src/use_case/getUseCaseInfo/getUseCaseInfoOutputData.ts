@@ -1,7 +1,6 @@
 import type { cleanLayer } from '../../types/cleanLayer.js';
 import type { cleanNode } from '../../types/cleanNode.js';
 
-/** The response for GET /analysis/interaction/:id. */
 export type UseCaseInfoResponse = {
   interaction_name: string;
   nodes: UseCaseNodeResponse[];
@@ -33,7 +32,7 @@ export class GetUseCaseInfoOutputData {
     this.apiOutputData = outputData;
   }
 
-  // An empty object when the use case wasn't found; the route sends it as is.
+  // An empty object when nothing was set, such as for an unknown use case id.
   getOutputData(): UseCaseInfoResponse | Record<string, never> {
     if (this.apiOutputData) return this.apiOutputData;
     return {};

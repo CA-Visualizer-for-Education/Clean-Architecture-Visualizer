@@ -1,4 +1,3 @@
-/** One entry in the response for GET /analysis/violations/:interactionId. */
 export type ViolationEntry = {
   id: string;
   type: 'INCORRECT_DEPENDENCY';
@@ -22,7 +21,7 @@ export class GetViolationsOutputData {
     this.apiOutputData = outputData;
   }
 
-  // An empty object when the use case wasn't found; the route sends it as is.
+  // An empty object when nothing was set, such as for an unknown use case id.
   getOutputData(): ViolationEntry[] | Record<string, never> {
     if (this.apiOutputData) return this.apiOutputData;
     return {};

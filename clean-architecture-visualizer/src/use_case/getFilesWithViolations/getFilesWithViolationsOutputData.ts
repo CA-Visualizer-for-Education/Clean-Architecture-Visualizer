@@ -1,4 +1,3 @@
-/** The response for GET /analysis/files-with-violations. */
 export type FilesWithViolationsResponse = {
   total_violations: number;
   files: string[];
@@ -11,6 +10,7 @@ export class GetFilesWithViolationsOutputData {
     this.filesWithViolationsOutputData = OutputData;
   }
 
+  // An empty object when nothing was set.
   getOutputData(): FilesWithViolationsResponse | Record<string, never> {
     if (this.filesWithViolationsOutputData)
       return this.filesWithViolationsOutputData;
