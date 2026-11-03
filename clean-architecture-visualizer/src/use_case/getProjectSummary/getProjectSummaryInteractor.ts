@@ -1,6 +1,10 @@
 import type { SessionDBAccessInterface } from '../../data_access/sessionDBAccessInterface.js';
 import type { GetProjectSummaryInputBoundary } from './getProjectSummaryInputBoundary.js';
-import type { GetProjectSummaryOutputData } from './getProjectSummaryOutputData.js';
+import type {
+  GetProjectSummaryOutputData,
+  ProjectSummaryResponse,
+  UseCaseSummary,
+} from './getProjectSummaryOutputData.js';
 
 export class GetProjectSummaryInteractor
   implements GetProjectSummaryInputBoundary
@@ -11,19 +15,18 @@ export class GetProjectSummaryInteractor
   ) {}
 
   async getProjectSummary(): Promise<void> {
-    const result: { [key: string]: any } = {};
-
     // populate output JSON response
-    const count = this.db.getNumUseCases();
-    result.project_name = this.db.getProjectName();
-    result.total_use_cases = count;
-    result.total_violations = this.db.getNumViolations();
-    result.use_cases = this.formatUseCaseInfo();
+    const result: ProjectSummaryResponse = {
+      project_name: this.db.getProjectName(),
+      total_use_cases: this.db.getNumUseCases(),
+      total_violations: this.db.getNumViolations(),
+      use_cases: this.formatUseCaseInfo(),
+    };
 
     this.outputData.setOutputData(result);
   }
 
-  formatUseCaseInfo(): { [key: string]: any }[] {
+  formatUseCaseInfo(): UseCaseSummary[] {
     return this.db.getAllUseCases().map((uc) => ({
       id: uc.id,
       name: uc.name,
