@@ -1,34 +1,13 @@
 import type { SessionDBAccessInterface } from '../../data_access/sessionDBAccessInterface.js';
-import type { cleanLayer } from '../../types/cleanLayer.js';
-import type { cleanNode } from '../../types/cleanNode.js';
 import type { EdgeStorage, NodeStorage } from '../../types/sessionData.js';
 import type { GetUseCaseInfoInputBoundary } from './getUseCaseInfoInputBoundary.js';
 import type { GetUseCaseInfoInputData } from './getUseCaseInfoInputData.js';
-import type { GetUseCaseInfoOutputData } from './getUseCaseInfoOutputData.js';
-
-export type UseCaseInfoResponse = {
-  interaction_name: string;
-  nodes: UseCaseNodeResponse[];
-  edges: UseCaseEdgeResponse[];
-  decoupling: boolean;
-};
-
-type UseCaseNodeResponse = {
-  id: string;
-  name?: string;
-  type: cleanNode;
-  layer: cleanLayer;
-  file_path?: string;
-  status: 'VALID' | 'MISSING' | 'VIOLATION';
-};
-
-type UseCaseEdgeResponse = {
-  id: string;
-  source: string;
-  target: string;
-  type: 'DEPENDENCY' | 'IMPLEMENTS';
-  status: 'VALID' | 'INCORRECT_DEPENDENCY';
-};
+import type {
+  GetUseCaseInfoOutputData,
+  UseCaseEdgeResponse,
+  UseCaseInfoResponse,
+  UseCaseNodeResponse,
+} from './getUseCaseInfoOutputData.js';
 
 export class GetUseCaseInfoInteractor implements GetUseCaseInfoInputBoundary {
   constructor(
@@ -88,11 +67,11 @@ export class GetUseCaseInfoInteractor implements GetUseCaseInfoInputBoundary {
     const allNodes = this.db.getAllNodes();
 
     for (const fileKey of useCase.fileKeys) {
-      const nodeFromDB = allNodes.find(
+      const nodeFromDb = allNodes.find(
         (n) => n.filePath && n.filePath.includes(fileKey)
       );
 
-      if (nodeFromDB !== undefined) fileNodes.push(nodeFromDB);
+      if (nodeFromDb !== undefined) fileNodes.push(nodeFromDb);
     }
 
     for (const node of fileNodes) {

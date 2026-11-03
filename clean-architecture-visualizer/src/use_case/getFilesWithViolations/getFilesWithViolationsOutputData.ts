@@ -1,11 +1,17 @@
-export class GetFilesWithViolationsOutputData {
-  private filesWithViolationsOutputData?: { [key: string]: any };
+/** The response for GET /analysis/files-with-violations. */
+export type FilesWithViolationsResponse = {
+  total_violations: number;
+  files: string[];
+};
 
-  setOutputData(OutputData: { [key: string]: any }) {
+export class GetFilesWithViolationsOutputData {
+  private filesWithViolationsOutputData?: FilesWithViolationsResponse;
+
+  setOutputData(OutputData: FilesWithViolationsResponse) {
     this.filesWithViolationsOutputData = OutputData;
   }
 
-  getOutputData(): object {
+  getOutputData(): FilesWithViolationsResponse | Record<string, never> {
     if (this.filesWithViolationsOutputData)
       return this.filesWithViolationsOutputData;
     return {};

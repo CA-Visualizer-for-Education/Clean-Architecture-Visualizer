@@ -4,27 +4,11 @@ import { useCaseGraph } from '../../entity/useCaseGraph.js';
 import type { cleanNode } from '../../types/cleanNode.js';
 import type { GetViolationsInputBoundary } from './GetViolationsInputBoundary.js';
 import type { GetViolationsInputData } from './GetViolationsInputData.js';
-import type { GetViolationsOutputData } from './GetViolationsOutputData.js';
-
-export type ViolationResponse = {
-  violations: ViolationEntry[];
-};
-
-type ViolationEntry = {
-  id: string;
-  type: 'INCORRECT_DEPENDENCY';
-  message: string;
-  suggestion: string;
-  related_node_ids: string[];
-  related_edge_id: string;
-  file_context?: FileContext;
-};
-
-type FileContext = {
-  file: string;
-  line_number?: number;
-  snippet?: string;
-};
+import type {
+  FileContext,
+  GetViolationsOutputData,
+  ViolationEntry,
+} from './GetViolationsOutputData.js';
 
 export class GetViolationsInteractor implements GetViolationsInputBoundary {
   constructor(
@@ -127,16 +111,16 @@ export class GetViolationsInteractor implements GetViolationsInputBoundary {
     for (const matchingNode of matchingNodes) {
       const fileName = matchingNode.filePath?.split('/').at(-1);
       if (!fileName) return undefined;
-      const [snippet, line_number] = await Promise.all([
+      const [snippet, lineNumber] = await Promise.all([
         this.fileAccess.getFileSnippet(matchingNode.filePath as string, to),
         this.fileAccess.getLineNumber(matchingNode.filePath as string, to),
       ]);
 
-      if (snippet && line_number) {
+      if (snippet && lineNumber) {
         return {
           file: fileName,
           ...(snippet && { snippet }),
-          ...(line_number && { line_number }),
+          ...(lineNumber && { line_number: lineNumber }),
         };
       }
     }
