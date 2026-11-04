@@ -1,3 +1,4 @@
+// biome-ignore-all lint/suspicious/noExplicitAny: these tests reach the Interactor's private members until it is split up (#269)
 import {
   afterEach,
   beforeEach,
