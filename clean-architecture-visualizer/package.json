@@ -33,8 +33,7 @@
   },
   "type": "module",
   "files": [
-    "dist/src/",
-    "dist/package.json",
+    "dist/",
     "frontend/dist/"
   ]
 }
