@@ -149,7 +149,7 @@ Starts the front end visualizer so you can explore the interactions in your code
 cave start
 ```
 
-This will open your browser to `http://localhost:5173` to view your project's adherence to clean architecutre.
+This will open your browser to `http://localhost:5173` to view your project's adherence to clean architecture.
 
 ---
 
