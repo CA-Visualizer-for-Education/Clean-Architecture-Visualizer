@@ -1,11 +1,5 @@
 // biome-ignore-all lint/suspicious/noExplicitAny: these tests reach the Interactor's private members until it is split up (#269)
-import {
-  beforeEach,
-  describe,
-  expect,
-  it,
-  jest,
-} from '@jest/globals';
+import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { CleanArchAccess } from '../../../src/data_access/cleanArchInfoAccess.js';
 import { FileAccess } from '../../../src/data_access/fileAccess.js';
 import type { FileAccessInterface } from '../../../src/data_access/fileAccessInterface.js';

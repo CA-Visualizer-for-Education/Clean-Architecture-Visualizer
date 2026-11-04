@@ -1,6 +1,6 @@
-import chalk from 'chalk';
 import { exec } from 'node:child_process';
 import type { AddressInfo } from 'node:net';
+import chalk from 'chalk';
 
 import type { SessionDBAccessInterface } from '../data_access/sessionDBAccessInterface.js';
 import { startServer, stopServer } from './server.js';

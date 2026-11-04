@@ -1,12 +1,6 @@
-import {
-  beforeEach,
-  describe,
-  expect,
-  it,
-  jest,
-} from '@jest/globals';
 import type { Dirent } from 'node:fs';
 import path from 'node:path';
+import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 
 type ReaddirFn = (
   path: string,

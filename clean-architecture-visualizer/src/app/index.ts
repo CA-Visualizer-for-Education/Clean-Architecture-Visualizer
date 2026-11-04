@@ -1,8 +1,8 @@
 #!/usr/bin/env node
-import { Command } from 'commander';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { Command } from 'commander';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const packageJsonPath = path.resolve(__dirname, '../../package.json');
