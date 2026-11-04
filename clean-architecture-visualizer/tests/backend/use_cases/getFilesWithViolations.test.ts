@@ -2,8 +2,8 @@ import { beforeEach, describe, expect, it } from '@jest/globals';
 import { SessionDBAccess } from '../../../src/data_access/sessionDBAccess.js';
 import { GetFilesWithViolationsInteractor } from '../../../src/use_case/getFilesWithViolations/getFilesWithViolationsInteractor.js';
 import type {
-  GetFilesWithViolationsOutputData,
   FilesWithViolationsResponse,
+  GetFilesWithViolationsOutputData,
 } from '../../../src/use_case/getFilesWithViolations/getFilesWithViolationsOutputData.js';
 import { RecordingOutputData } from '../doubles/recording-output-data.js';
 
