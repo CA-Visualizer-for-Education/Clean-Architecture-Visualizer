@@ -126,7 +126,7 @@
   --z-navbar: 200;
   --z-modal: 300;
 
-  /* Navbar height — keep in sync with components/common/NavBar.tsx */
+  /* Fixed navbar height — keep in sync with components/layout/Navbar.module.css */
   --navbar-height: 64px;
 }
 
