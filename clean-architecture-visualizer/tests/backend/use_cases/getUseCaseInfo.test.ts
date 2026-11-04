@@ -63,7 +63,6 @@ describe('GetUseCaseInfoInteractor', () => {
       missingNodes: [],
       outNeighbours: {},
     });
-    // Using any if upsertUseCase isn't public, or standard method if it is
     genericDBAccess.upsertUseCase(mockUseCase);
 
     const outputData = makeOutputData();
