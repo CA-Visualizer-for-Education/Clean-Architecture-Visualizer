@@ -108,7 +108,8 @@ export class FileAccess implements FileAccessInterface {
     const visited = new Set<string>();
 
     while (queue.length > 0) {
-      const currentPath = queue.shift()!;
+      const currentPath = queue.shift();
+      if (currentPath === undefined) break;
 
       if (visited.has(currentPath)) continue;
       visited.add(currentPath);
