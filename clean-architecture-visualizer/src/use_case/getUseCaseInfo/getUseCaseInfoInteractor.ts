@@ -33,12 +33,11 @@ type UseCaseEdgeResponse = {
 export class GetUseCaseInfoInteractor implements GetUseCaseInfoInputBoundary {
   constructor(
     private readonly db: SessionDBAccessInterface,
-    private readonly inputData: GetUseCaseInfoInputData,
     private readonly outputData: GetUseCaseInfoOutputData
   ) {}
 
-  async execute(): Promise<void> {
-    const id = this.inputData.getInteractionId();
+  async execute(inputData: GetUseCaseInfoInputData): Promise<void> {
+    const id = inputData.getInteractionId();
     const useCase = this.db.getUseCaseById(id);
 
     if (!useCase) return;

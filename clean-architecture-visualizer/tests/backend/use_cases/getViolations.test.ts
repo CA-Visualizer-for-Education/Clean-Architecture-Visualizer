@@ -43,11 +43,10 @@ describe('GetViolationsInteractor', () => {
     const interactor = new GetViolationsInteractor(
       genericDBAccess,
       genericFileAccess,
-      makeInputData('invalid-id'),
       outputData
     );
 
-    await interactor.execute();
+    await interactor.execute(makeInputData('invalid-id'));
 
     expect(outputData.result).toBeUndefined();
   });
@@ -93,11 +92,10 @@ describe('GetViolationsInteractor', () => {
       const interactor = new GetViolationsInteractor(
         genericDBAccess,
         genericFileAccess,
-        makeInputData('uc-1'),
         outputData
       );
 
-      await interactor.execute();
+      await interactor.execute(makeInputData('uc-1'));
 
       const violation = outputData.result[0];
       expect(violation.related_node_ids).toContain(
@@ -121,11 +119,10 @@ describe('GetViolationsInteractor', () => {
       const interactor = new GetViolationsInteractor(
         genericDBAccess,
         genericFileAccess,
-        makeInputData('uc-1'),
         outputData
       );
 
-      await interactor.execute();
+      await interactor.execute(makeInputData('uc-1'));
 
       const context = outputData.result[0].file_context;
       expect(context.file).toBe('UserController.java');
@@ -158,11 +155,10 @@ describe('GetViolationsInteractor', () => {
       const interactor = new GetViolationsInteractor(
         genericDBAccess,
         genericFileAccess,
-        makeInputData('uc-1'),
         outputData
       );
 
-      await interactor.execute();
+      await interactor.execute(makeInputData('uc-1'));
       const context = outputData.result[0].file_context;
       expect(context.file).toBe('User2Controller.java');
       expect(context.snippet).toBe(mockSnippet);
@@ -182,11 +178,10 @@ describe('GetViolationsInteractor', () => {
       const interactor = new GetViolationsInteractor(
         genericDBAccess,
         genericFileAccess,
-        makeInputData('uc-empty'),
         outputData
       );
 
-      await interactor.execute();
+      await interactor.execute(makeInputData('uc-empty'));
 
       expect(outputData.result[0].file_context).toBeUndefined();
     });
@@ -223,11 +218,10 @@ describe('execute — Violation Mapping for differently formatted file path.', (
     const interactor = new GetViolationsInteractor(
       genericDBAccess,
       genericFileAccess,
-      makeInputData('uc-1'),
       outputData
     );
 
-    await interactor.execute();
+    await interactor.execute(makeInputData('uc-1'));
 
     const violation = outputData.result[0];
     expect(violation.related_node_ids).toContain(
@@ -267,7 +261,6 @@ describe('findNodeContainsUseCase - Ensures function only checks the last charac
     const interactor = new GetViolationsInteractor(
       genericDBAccess,
       genericFileAccess,
-      makeInputData('uc-1'),
       outputData
     );
 
@@ -283,7 +276,6 @@ describe('findNodeContainsUseCase - Ensures function only checks the last charac
     const interactor = new GetViolationsInteractor(
       genericDBAccess,
       genericFileAccess,
-      makeInputData('uc-1'),
       outputData
     );
 
@@ -299,7 +291,6 @@ describe('findNodeContainsUseCase - Ensures function only checks the last charac
     const interactor = new GetViolationsInteractor(
       genericDBAccess,
       genericFileAccess,
-      makeInputData('uc-1'),
       outputData
     );
 
@@ -315,7 +306,6 @@ describe('findNodeContainsUseCase - Ensures function only checks the last charac
     const interactor = new GetViolationsInteractor(
       genericDBAccess,
       genericFileAccess,
-      makeInputData('uc-1'),
       outputData
     );
 

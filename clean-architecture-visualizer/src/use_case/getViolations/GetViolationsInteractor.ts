@@ -30,12 +30,11 @@ export class GetViolationsInteractor implements GetViolationsInputBoundary {
   constructor(
     private readonly db: SessionDBAccessInterface,
     private readonly fileAccess: FileAccessInterface,
-    private readonly inputData: GetViolationsInputData,
     private readonly outputData: GetViolationsOutputData
   ) {}
 
-  async execute(): Promise<void> {
-    const interactionId = this.inputData.getInteractionId();
+  async execute(inputData: GetViolationsInputData): Promise<void> {
+    const interactionId = inputData.getInteractionId();
 
     const useCase = this.db.getUseCaseById(interactionId);
     if (!useCase) return undefined;
