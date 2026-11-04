@@ -391,7 +391,7 @@ describe('Ensures that populateDatabase correctly populates the database', () =>
  * Mock FileAccess class used to make files with fake imports rather than looking at real project files.
  */
 class MockFileAccess implements FileAccessInterface {
-  // Used to set the return value of getFileImports for specfic file paths.
+  // Used to set the return value of getFileImports for specific file paths.
   contents: Map<string, Relationship[]>;
   internalFilePaths: Map<string, string>;
 
