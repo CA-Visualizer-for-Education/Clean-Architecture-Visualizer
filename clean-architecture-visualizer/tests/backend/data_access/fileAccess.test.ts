@@ -185,6 +185,31 @@ describe('getFileImports functionality', () => {
     ]);
   });
 
+  // Test: a full class name whose package folders are capitalized
+  it('returns fully qualified names with capitalized package folders', async () => {
+    // Pretend the file uses a class in the interface_adapter/EnrollStudent/ folder
+    mockReadFile.mockResolvedValueOnce(
+      'public class A {\n  interface_adapter.EnrollStudent.EnrollStudentViewModel vm;\n}'
+    );
+    const result = await fileAccess.getFileImports('/project/A.java');
+    // The answer should name the whole class, not stop at the EnrollStudent folder
+    expect(result).toEqual([
+      {
+        fileName: 'interface_adapter.EnrollStudent.EnrollStudentViewModel',
+        relationshipType: 'dependency',
+      },
+    ]);
+  });
+
+  // Test: a class and its nested class, like Map.Entry, is not a package path
+  it('ignores nested class names such as Map.Entry', async () => {
+    mockReadFile.mockResolvedValueOnce(
+      'public class A {\n  Map.Entry<String, String> e;\n}'
+    );
+    const result = await fileAccess.getFileImports('/project/A.java');
+    expect(result).toEqual([]);
+  });
+
   // Test: this.CONST is not a class name
   it('ignores this.CONST style', async () => {
     mockReadFile.mockResolvedValueOnce(
