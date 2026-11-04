@@ -6,8 +6,8 @@ import {
   it,
   jest,
 } from '@jest/globals';
-import type { Dirent } from 'fs';
-import path from 'path';
+import type { Dirent } from 'node:fs';
+import path from 'node:path';
 
 type ReaddirFn = (
   path: string,

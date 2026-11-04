@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from '@jest/globals';
-import type { AddressInfo } from 'net';
+import type { AddressInfo } from 'node:net';
 import { SessionDBAccess } from '../../../src/data_access/sessionDBAccess.js';
 import { useCaseGraph } from '../../../src/entity/useCaseGraph.js';
 import { startServer, stopServer } from '../../../src/server/server.js';

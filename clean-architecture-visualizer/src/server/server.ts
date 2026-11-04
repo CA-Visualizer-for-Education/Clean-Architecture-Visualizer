@@ -1,10 +1,10 @@
 import chalk from 'chalk';
 import express from 'express';
-import * as fs from 'fs';
-import type { Server } from 'http';
-import type { AddressInfo } from 'net';
-import * as path from 'path';
-import { fileURLToPath } from 'url';
+import * as fs from 'node:fs';
+import type { Server } from 'node:http';
+import type { AddressInfo } from 'node:net';
+import * as path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import type { ViteDevServer } from 'vite';
 
 import type { SessionDBAccessInterface } from '../data_access/sessionDBAccessInterface.js';
