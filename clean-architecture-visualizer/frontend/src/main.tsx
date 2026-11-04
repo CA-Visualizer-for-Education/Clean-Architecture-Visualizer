@@ -35,7 +35,10 @@ async function enableMocking() {
   }
 }
 
-const rootElement = document.getElementById('root')!;
+const rootElement = document.getElementById('root');
+if (!rootElement) {
+  throw new Error('Missing #root element in index.html');
+}
 
 enableMocking().then(() => {
   ReactDOM.createRoot(rootElement).render(

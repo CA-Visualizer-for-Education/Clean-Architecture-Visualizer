@@ -31,7 +31,7 @@
           }
         },
         "noDefaultExport": "warn",
-        "noNonNullAssertion": "warn",
+        "noNonNullAssertion": "error",
         "useConsistentArrayType": {
           "level": "warn",
           "options": {
@@ -41,7 +41,7 @@
         "useImportType": "error"
       },
       "suspicious": {
-        "noExplicitAny": "warn"
+        "noExplicitAny": "error"
       }
     }
   },

@@ -2,28 +2,21 @@ import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import type { FileAccessInterface } from '../../../src/data_access/fileAccessInterface.js';
 import { InitProjectInputData } from '../../../src/use_case/initProject/initProjectInputData.js';
 import { InitProjectInteractor } from '../../../src/use_case/initProject/initProjectInteractor.js';
-import type { InitProjectOutputData } from '../../../src/use_case/initProject/initProjectOutputData.js';
+import { InitProjectOutputData } from '../../../src/use_case/initProject/initProjectOutputData.js';
+import { makeMockFileAccess } from '../doubles/mock-file-access.js';
 
 describe('InitProjectInteractor', () => {
   let mockFileAccess: jest.Mocked<FileAccessInterface>;
-  let mockOutputData: jest.Mocked<InitProjectOutputData>;
+  let mockOutputData: InitProjectOutputData;
 
   const ROOT_PATH = '/project/root';
 
   beforeEach(() => {
     // Setup Mocks
-    mockFileAccess = {
-      getCurrentPath: jest.fn<any>(),
-      createDirectory: jest.fn<any>(),
-      // These aren't used in InitProject but are part of the interface
-      bfsFindDir: jest.fn<any>(),
-      createFile: jest.fn<any>(),
-      exists: jest.fn<any>(),
-    } as any;
+    mockFileAccess = makeMockFileAccess();
 
-    mockOutputData = {
-      setOutputData: jest.fn<any>(),
-    } as any;
+    mockOutputData = new InitProjectOutputData();
+    jest.spyOn(mockOutputData, 'setOutputData');
   });
 
   function makeInteractor(language: string) {
