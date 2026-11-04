@@ -5,21 +5,21 @@ import type { cleanNode } from '../../../src/types/cleanNode.js';
 import type { neighbourMap } from '../../../src/types/neighbourMap.js';
 import type { SessionData } from '../../../src/types/sessionData.js';
 import { GetProjectSummaryInteractor } from '../../../src/use_case/getProjectSummary/getProjectSummaryInteractor.js';
-import type { GetProjectSummaryOutputData } from '../../../src/use_case/getProjectSummary/getProjectSummaryOutputData.js';
+import type {
+  GetProjectSummaryOutputData,
+  ProjectSummaryResponse,
+} from '../../../src/use_case/getProjectSummary/getProjectSummaryOutputData.js';
+import { RecordingOutputData } from '../doubles/recording-output-data.js';
+import { makeStoredUseCase } from '../fixtures/stored-use-case.js';
 
 const genericDBAccess = new SessionDBAccess();
 
 // Standardized mock for Output Data matching your interface
-function makeOutputData(): GetProjectSummaryOutputData & { result: any } {
-  return {
-    result: undefined,
-    setOutputData(data: any) {
-      this.result = data;
-    },
-    getOutputData() {
-      return this.result;
-    },
-  } as GetProjectSummaryOutputData & { result: any };
+// The Output Data classes have private fields, so the recording double needs a cast.
+function makeOutputData(): GetProjectSummaryOutputData &
+  RecordingOutputData<ProjectSummaryResponse> {
+  return new RecordingOutputData<ProjectSummaryResponse>() as unknown as GetProjectSummaryOutputData &
+    RecordingOutputData<ProjectSummaryResponse>;
 }
 
 // Builds a list of useCaseGraphs with mock violation edges, given a map of use case name to violation count
@@ -175,17 +175,17 @@ describe('GetProjectSummaryInteractor', () => {
   describe('getProjectSummary — Use Case Formatting', () => {
     it('correctly formats use case info with nested interactions', async () => {
       // Setup a mock use case in the DB
-      const mockUseCase = {
+      const mockUseCase = makeStoredUseCase({
         id: 'uc-123',
         name: 'Login',
         violationEdges: [
-          ['A', 'B'],
-          ['C', 'D'],
-        ] as [string, string][],
-      };
+          ['controller', 'entities'],
+          ['presenter', 'view'],
+        ],
+      });
 
       // Manual injection for test setup
-      (genericDBAccess as any).upsertUseCase?.(mockUseCase);
+      genericDBAccess.upsertUseCase(mockUseCase);
 
       const outputData = makeOutputData();
       const interactor = new GetProjectSummaryInteractor(
@@ -196,12 +196,11 @@ describe('GetProjectSummaryInteractor', () => {
       await interactor.getProjectSummary();
 
       const useCaseResult = outputData.result.use_cases.find(
-        (uc: any) => uc.id === 'uc-123'
+        (uc) => uc.id === 'uc-123'
       );
 
-      expect(useCaseResult).toBeDefined();
-      expect(useCaseResult.violation_count).toBe(2);
-      expect(useCaseResult.interactions).toEqual([
+      expect(useCaseResult).toMatchObject({ violation_count: 2 });
+      expect(useCaseResult?.interactions).toEqual([
         {
           interaction_id: 'uc-123',
           interaction_name: 'Login',
