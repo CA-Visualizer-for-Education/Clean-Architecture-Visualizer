@@ -1,6 +1,5 @@
 // biome-ignore-all lint/suspicious/noExplicitAny: these tests reach the Interactor's private members until it is split up (#269)
 import {
-  afterEach,
   beforeEach,
   describe,
   expect,
@@ -419,34 +418,34 @@ class MockFileAccess implements FileAccessInterface {
   async getProjectName(): Promise<string> {
     return 'MockProject';
   }
-  async getFileContent(path: string): Promise<string> {
+  async getFileContent(_path: string): Promise<string> {
     return '';
   }
   async getFileSnippet(
-    filePath: string,
-    target?: string
+    _filePath: string,
+    _target?: string
   ): Promise<string | undefined> {
     return undefined;
   }
   async getLineNumber(
-    filePath: string,
-    target: string
+    _filePath: string,
+    _target: string
   ): Promise<number | undefined> {
     return undefined;
   }
-  async createDirectory(filePath: string): Promise<void> {
+  async createDirectory(_filePath: string): Promise<void> {
     return;
   }
   async getCurrentPath(): Promise<string> {
     return '/mock/path';
   }
-  async bfsFindDir(curr: string, target: string): Promise<string | null> {
+  async bfsFindDir(_curr: string, _target: string): Promise<string | null> {
     return null;
   }
-  async exists(path: string): Promise<boolean> {
+  async exists(_path: string): Promise<boolean> {
     return false;
   }
-  async createFile(filePath: string, content: string = ''): Promise<void> {
+  async createFile(_filePath: string, _content: string = ''): Promise<void> {
     return;
   }
 }
