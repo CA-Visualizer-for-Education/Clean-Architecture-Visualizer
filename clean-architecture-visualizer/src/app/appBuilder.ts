@@ -111,10 +111,9 @@ export class AppBuilder {
     const outputData = new InitProjectOutputData();
     const interactor = new InitProjectInteractor(
       this.requireFileAccess(),
-      inputData,
       outputData
     );
-    await new InitProjectController(interactor).execute();
+    await new InitProjectController(interactor).execute(language);
 
     if (outputData.getOutputData()) {
       console.log(chalk.green('Your project has been initialized.'));
