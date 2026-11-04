@@ -2,26 +2,20 @@ import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import type { FileAccessInterface } from '../../../src/data_access/fileAccessInterface.js';
 import { InitModuleProjectInputData } from '../../../src/use_case/initModuleProject/initModuleProjectInputData.js';
 import { InitModuleProjectInteractor } from '../../../src/use_case/initModuleProject/initModuleProjectInteractor.js';
-import type { InitModuleProjectOutputData } from '../../../src/use_case/initModuleProject/initModuleProjectOutputData.js';
+import { InitModuleProjectOutputData } from '../../../src/use_case/initModuleProject/initModuleProjectOutputData.js';
+import { makeMockFileAccess } from '../doubles/mock-file-access.js';
 
 describe('InitModuleProjectInteractor', () => {
   let mockFileAccess: jest.Mocked<FileAccessInterface>;
-  let mockOutputData: jest.Mocked<InitModuleProjectOutputData>;
+  let mockOutputData: InitModuleProjectOutputData;
 
   const ROOT_PATH = '/project/root';
   beforeEach(() => {
     // Not testing file access, so we give mock values and implementations
-    mockFileAccess = {
-      getCurrentPath: jest.fn<any>(),
-      createDirectory: jest.fn<any>(),
-      bfsFindDir: jest.fn<any>(),
-      createFile: jest.fn<any>(),
-      exists: jest.fn<any>(),
-    } as any;
+    mockFileAccess = makeMockFileAccess();
 
-    mockOutputData = {
-      setOutputData: jest.fn<any>(),
-    } as any;
+    mockOutputData = new InitModuleProjectOutputData();
+    jest.spyOn(mockOutputData, 'setOutputData');
   });
 
   function runInteractor(language: string) {

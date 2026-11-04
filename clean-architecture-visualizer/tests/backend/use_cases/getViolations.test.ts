@@ -3,7 +3,12 @@ import { FileAccess } from '../../../src/data_access/fileAccess.js';
 import { SessionDBAccess } from '../../../src/data_access/sessionDBAccess.js';
 import type { GetViolationsInputData } from '../../../src/use_case/getViolations/GetViolationsInputData.js';
 import { GetViolationsInteractor } from '../../../src/use_case/getViolations/GetViolationsInteractor.js';
-import type { GetViolationsOutputData } from '../../../src/use_case/getViolations/GetViolationsOutputData.js';
+import type {
+  GetViolationsOutputData,
+  ViolationEntry,
+} from '../../../src/use_case/getViolations/GetViolationsOutputData.js';
+import { RecordingOutputData } from '../doubles/recording-output-data.js';
+import { makeStoredUseCase } from '../fixtures/stored-use-case.js';
 
 const genericDBAccess = new SessionDBAccess();
 const genericFileAccess = new FileAccess();
@@ -14,16 +19,23 @@ function makeInputData(interactionId: string): GetViolationsInputData {
   } as unknown as GetViolationsInputData;
 }
 
-function makeOutputData(): GetViolationsOutputData & { result: any } {
-  return {
-    result: undefined,
-    setOutputData(data: any) {
-      this.result = data;
-    },
-    getOutputData() {
-      return this.result;
-    },
-  } as GetViolationsOutputData & { result: any };
+// The Output Data classes have private fields, so the recording double needs a cast.
+function makeOutputData(): GetViolationsOutputData &
+  RecordingOutputData<ViolationEntry[]> {
+  return new RecordingOutputData<
+    ViolationEntry[]
+  >() as unknown as GetViolationsOutputData &
+    RecordingOutputData<ViolationEntry[]>;
+}
+
+// findNodeContainsUseCase is private; a const key reaches it with its types.
+const findNodeContainsUseCaseKey = 'findNodeContainsUseCase';
+function findNodeContainsUseCase(
+  interactor: GetViolationsInteractor,
+  nodeId: string,
+  useCaseName: string
+): boolean {
+  return interactor[findNodeContainsUseCaseKey](nodeId, useCaseName);
 }
 
 describe('GetViolationsInteractor', () => {
@@ -48,7 +60,7 @@ describe('GetViolationsInteractor', () => {
 
     await interactor.execute(makeInputData('invalid-id'));
 
-    expect(outputData.result).toBeUndefined();
+    expect(outputData.getOutputData()).toBeUndefined();
   });
 
   describe('execute — Violation Mapping', () => {
@@ -75,16 +87,16 @@ describe('GetViolationsInteractor', () => {
       });
 
       // Setup the use case with a violation edge
-      const mockUseCase = {
+      const mockUseCase = makeStoredUseCase({
         id: 'uc-1',
         name: 'Process User',
         fileKeys: [
           filePath,
           'src/interface_adapters/uc-1/User2Controller.java',
         ],
-        violationEdges: [[fromNode, toNode]] as [string, string][],
-      };
-      (genericDBAccess as any).upsertUseCase(mockUseCase);
+        violationEdges: [[fromNode, toNode]],
+      });
+      genericDBAccess.upsertUseCase(mockUseCase);
     });
 
     it('correctly resolves related node IDs', async () => {
@@ -125,9 +137,11 @@ describe('GetViolationsInteractor', () => {
       await interactor.execute(makeInputData('uc-1'));
 
       const context = outputData.result[0].file_context;
-      expect(context.file).toBe('UserController.java');
-      expect(context.snippet).toBe(mockSnippet);
-      expect(context.line_number).toBe(mockLine);
+      expect(context).toMatchObject({
+        file: 'UserController.java',
+        snippet: mockSnippet,
+        line_number: mockLine,
+      });
     });
 
     it('populates file context with snippets and line numbers from FileAccess when first node is invalid', async () => {
@@ -160,19 +174,23 @@ describe('GetViolationsInteractor', () => {
 
       await interactor.execute(makeInputData('uc-1'));
       const context = outputData.result[0].file_context;
-      expect(context.file).toBe('User2Controller.java');
-      expect(context.snippet).toBe(mockSnippet);
-      expect(context.line_number).toBe(mockLine);
+      expect(context).toMatchObject({
+        file: 'User2Controller.java',
+        snippet: mockSnippet,
+        line_number: mockLine,
+      });
     });
 
     it('handles missing file context gracefully if no matching node exists', async () => {
       // Reset DB and add use case without matching nodes
       genericDBAccess.resetDB();
-      (genericDBAccess as any).upsertUseCase({
-        id: 'uc-empty',
-        fileKeys: ['some/path.java'],
-        violationEdges: [['A', 'B']],
-      });
+      genericDBAccess.upsertUseCase(
+        makeStoredUseCase({
+          id: 'uc-empty',
+          fileKeys: ['some/path.java'],
+          violationEdges: [['controller', 'entities']],
+        })
+      );
 
       const outputData = makeOutputData();
       const interactor = new GetViolationsInteractor(
@@ -204,13 +222,13 @@ describe('execute — Violation Mapping for differently formatted file path.', (
     });
 
     // Setup the use case with a violation edge
-    const mockUseCase = {
+    const mockUseCase = makeStoredUseCase({
       id: 'uc-1',
       name: 'Process User',
       fileKeys: ['User-Controller.java'],
-      violationEdges: [[fromNode, toNode]] as [string, string][],
-    };
-    (genericDBAccess as any).upsertUseCase(mockUseCase);
+      violationEdges: [[fromNode, toNode]],
+    });
+    genericDBAccess.upsertUseCase(mockUseCase);
   });
 
   it('correctly resolves related node IDs where fileKeys stores names of files', async () => {
@@ -247,13 +265,13 @@ describe('findNodeContainsUseCase - Ensures function only checks the last charac
     });
 
     // Setup the use case with a violation edge
-    const mockUseCase = {
+    const mockUseCase = makeStoredUseCase({
       id: 'uc-1',
       name: 'Process User',
       fileKeys: ['User-Controller.java'],
-      violationEdges: [[fromNode, toNode]] as [string, string][],
-    };
-    (genericDBAccess as any).upsertUseCase(mockUseCase);
+      violationEdges: [[fromNode, toNode]],
+    });
+    genericDBAccess.upsertUseCase(mockUseCase);
   });
 
   it('Ensures that string is not part of use case if id is shorter than the string.', () => {
@@ -264,10 +282,7 @@ describe('findNodeContainsUseCase - Ensures function only checks the last charac
       outputData
     );
 
-    const result = (interactor as any).findNodeContainsUseCase(
-      'blah',
-      'Process User'
-    );
+    const result = findNodeContainsUseCase(interactor, 'blah', 'Process User');
     expect(result).toBe(false);
   });
 
@@ -279,7 +294,8 @@ describe('findNodeContainsUseCase - Ensures function only checks the last charac
       outputData
     );
 
-    const result = (interactor as any).findNodeContainsUseCase(
+    const result = findNodeContainsUseCase(
+      interactor,
       'src/interface_adapters/uc-1/User-Controller.java-Process User',
       'Process User'
     );
@@ -294,7 +310,8 @@ describe('findNodeContainsUseCase - Ensures function only checks the last charac
       outputData
     );
 
-    const result = (interactor as any).findNodeContainsUseCase(
+    const result = findNodeContainsUseCase(
+      interactor,
       'src/interface_adapters/uc-1/User-Controller.java-usecase1',
       'Process User'
     );
@@ -309,7 +326,8 @@ describe('findNodeContainsUseCase - Ensures function only checks the last charac
       outputData
     );
 
-    const result = (interactor as any).findNodeContainsUseCase(
+    const result = findNodeContainsUseCase(
+      interactor,
       'src/interface_adapters/uc-1/User-Controller-Process User.java-usecase1',
       'Process User'
     );

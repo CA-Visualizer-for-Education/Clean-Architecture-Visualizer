@@ -4,6 +4,7 @@ import { CreateFeatureInputData } from '../../../src/use_case/createFeature/crea
 import { CreateFeatureInteractor } from '../../../src/use_case/createFeature/createFeatureInteractor.js';
 import type { CreateFeatureOutputBoundary } from '../../../src/use_case/createFeature/createFeatureOutputBoundary.js';
 import { CreateFeatureOutputData } from '../../../src/use_case/createFeature/createFeatureOutputData.js';
+import { makeMockFileAccess } from '../doubles/mock-file-access.js';
 
 describe('CreateFeatureInteractor', () => {
   let mockFileAccess: jest.Mocked<FileAccessInterface>;
@@ -11,17 +12,13 @@ describe('CreateFeatureInteractor', () => {
   let outputData: CreateFeatureOutputData;
 
   beforeEach(() => {
-    mockFileAccess = {
-      getCurrentPath: jest.fn<any>(),
-      bfsFindDir: jest.fn<any>(),
-      exists: jest.fn<any>(),
-      createDirectory: jest.fn<any>(),
-    } as any;
+    mockFileAccess = makeMockFileAccess();
 
     mockPresenter = {
-      showSuccessView: jest.fn<any>(),
-      showFailView: jest.fn<any>(),
-    } as any;
+      showSuccessView:
+        jest.fn<CreateFeatureOutputBoundary['showSuccessView']>(),
+      showFailView: jest.fn<CreateFeatureOutputBoundary['showFailView']>(),
+    };
 
     outputData = new CreateFeatureOutputData();
   });

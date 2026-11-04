@@ -108,7 +108,8 @@ export class FileAccess implements FileAccessInterface {
     const visited = new Set<string>();
 
     while (queue.length > 0) {
-      const currentPath = queue.shift()!;
+      const currentPath = queue.shift();
+      if (currentPath === undefined) break;
 
       if (visited.has(currentPath)) continue;
       visited.add(currentPath);
@@ -316,10 +317,11 @@ export class FileAccess implements FileAccessInterface {
 
     // Pattern to spot a full class name in text. Ex: entity.User, use_case.login.LoginData
     // one or more lowercase words followed by a dot.
+    // then any capitalized package folders followed by a dot, Ex: interface_adapter.EnrollStudent.
     // then a word that starts with a capital letter
     // makes sure at least one lowercase letter so this.CONST will not be allowed.
     const fqnPattern =
-      /\b(?:[a-z_][a-z0-9_]*\.)+[A-Z][A-Za-z0-9_]*[a-z][A-Za-z0-9_]*/g;
+      /\b(?:[a-z_][a-z0-9_]*\.)+(?:[A-Z][A-Za-z0-9_]*\.)*[A-Z][A-Za-z0-9_]*[a-z][A-Za-z0-9_]*/g;
 
     for (const line of fileLines) {
       const trimmedLine = line.trim();

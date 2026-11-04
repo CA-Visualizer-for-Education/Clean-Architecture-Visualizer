@@ -7,7 +7,6 @@ on:
       - 'docs/**'
       - '**/*.md'
   pull_request:
-    branches: [main]
     paths-ignore:
       - 'docs/**'
       - '**/*.md'
@@ -28,6 +27,22 @@ jobs:
 
       - name: Run jest
         run: npm test
+
+  backend-type-check:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./clean-architecture-visualizer
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - uses: ./.github/actions/setup-node-env
+        with:
+          working-directory: ./clean-architecture-visualizer
+
+      - name: Run type check
+        run: npm run type-check
 
   frontend-validation:
     runs-on: ubuntu-latest

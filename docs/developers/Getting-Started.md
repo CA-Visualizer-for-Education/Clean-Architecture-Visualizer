@@ -145,3 +145,25 @@ You can test a specific file/directory with:
 ```bash
 npm test -- <path-to-file/directory>
 ```
+
+CI also type-checks the backend's source and tests. To run the same check locally:
+
+```bash
+npm run type-check
+```
+
+## 6. Working on the Docs
+
+The docs site in `docs/` uses npm, like the rest of the repo. From the repo root:
+
+```bash
+cd docs
+npm ci
+npm start
+```
+
+Before opening a PR that changes `docs/`, check that the site builds:
+
+```bash
+npm run build
+```

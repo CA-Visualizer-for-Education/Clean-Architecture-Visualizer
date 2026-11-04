@@ -2,7 +2,12 @@ import { beforeEach, describe, expect, it } from '@jest/globals';
 import { SessionDBAccess } from '../../../src/data_access/sessionDBAccess.js';
 import type { GetUseCaseInfoInputData } from '../../../src/use_case/getUseCaseInfo/getUseCaseInfoInputData.js';
 import { GetUseCaseInfoInteractor } from '../../../src/use_case/getUseCaseInfo/getUseCaseInfoInteractor.js';
-import type { GetUseCaseInfoOutputData } from '../../../src/use_case/getUseCaseInfo/getUseCaseInfoOutputData.js';
+import type {
+  GetUseCaseInfoOutputData,
+  UseCaseInfoResponse,
+} from '../../../src/use_case/getUseCaseInfo/getUseCaseInfoOutputData.js';
+import { RecordingOutputData } from '../doubles/recording-output-data.js';
+import { makeStoredUseCase } from '../fixtures/stored-use-case.js';
 
 const genericDBAccess = new SessionDBAccess();
 
@@ -12,16 +17,11 @@ function makeInputData(id: string): GetUseCaseInfoInputData {
   } as unknown as GetUseCaseInfoInputData;
 }
 
-function makeOutputData(): GetUseCaseInfoOutputData & { result: any } {
-  return {
-    result: undefined,
-    setOutputData(data: any) {
-      this.result = data;
-    },
-    getOutputData() {
-      return this.result;
-    },
-  } as GetUseCaseInfoOutputData & { result: any };
+// The Output Data classes have private fields, so the recording double needs a cast.
+function makeOutputData(): GetUseCaseInfoOutputData &
+  RecordingOutputData<UseCaseInfoResponse> {
+  return new RecordingOutputData<UseCaseInfoResponse>() as unknown as GetUseCaseInfoOutputData &
+    RecordingOutputData<UseCaseInfoResponse>;
 }
 
 describe('GetUseCaseInfoInteractor', () => {
@@ -38,7 +38,7 @@ describe('GetUseCaseInfoInteractor', () => {
 
     await interactor.execute(makeInputData('non-existent'));
 
-    expect(outputData.result).toBeUndefined();
+    expect(outputData.getOutputData()).toBeUndefined();
   });
 
   it('correctly assembles nodes from fileKeys', async () => {
@@ -55,15 +55,14 @@ describe('GetUseCaseInfoInteractor', () => {
     });
 
     // 2. Setup a use case that references that file
-    const mockUseCase = {
+    const mockUseCase = makeStoredUseCase({
       id: 'uc-1',
       name: 'Create User',
       fileKeys: [filePath],
       missingNodes: [],
       outNeighbours: {},
-    };
-    // Using any if upsertUseCase isn't public, or standard method if it is
-    (genericDBAccess as any).upsertUseCase(mockUseCase);
+    });
+    genericDBAccess.upsertUseCase(mockUseCase);
 
     const outputData = makeOutputData();
     const interactor = new GetUseCaseInfoInteractor(
@@ -89,14 +88,14 @@ describe('GetUseCaseInfoInteractor', () => {
       status: 'MISSING',
     });
 
-    const mockUseCase = {
+    const mockUseCase = makeStoredUseCase({
       id: 'uc-1',
       name: 'Test Missing',
       fileKeys: [],
       missingNodes: ['controller'],
       outNeighbours: {},
-    };
-    (genericDBAccess as any).upsertUseCase(mockUseCase);
+    });
+    genericDBAccess.upsertUseCase(mockUseCase);
 
     const outputData = makeOutputData();
     const interactor = new GetUseCaseInfoInteractor(
@@ -107,10 +106,9 @@ describe('GetUseCaseInfoInteractor', () => {
     await interactor.execute(makeInputData('uc-1'));
 
     const missingNode = outputData.result.nodes.find(
-      (n: any) => n.status === 'MISSING'
+      (n) => n.status === 'MISSING'
     );
-    expect(missingNode).toBeDefined();
-    expect(missingNode.type).toBe('controller');
+    expect(missingNode).toMatchObject({ type: 'controller' });
     expect(outputData.result.decoupling).toBe(false);
   });
 
@@ -120,15 +118,15 @@ describe('GetUseCaseInfoInteractor', () => {
     const edgeId = `${sourceId}->${targetId}`;
 
     // Setup the edge in the DB
-    (genericDBAccess as any).upsertEdge({
+    genericDBAccess.upsertEdge({
       id: edgeId,
       source: sourceId,
       target: targetId,
       type: 'DEPENDENCY',
-      status: 'INVALID',
+      status: 'INCORRECT_DEPENDENCY',
     });
 
-    const mockUseCase = {
+    const mockUseCase = makeStoredUseCase({
       id: 'uc-edge',
       name: 'Edge Test',
       fileKeys: [],
@@ -136,8 +134,8 @@ describe('GetUseCaseInfoInteractor', () => {
       outNeighbours: {
         [sourceId]: [targetId],
       },
-    };
-    (genericDBAccess as any).upsertUseCase(mockUseCase);
+    });
+    genericDBAccess.upsertUseCase(mockUseCase);
 
     const outputData = makeOutputData();
     const interactor = new GetUseCaseInfoInteractor(
@@ -149,7 +147,7 @@ describe('GetUseCaseInfoInteractor', () => {
 
     expect(outputData.result.edges).toHaveLength(1);
     expect(outputData.result.edges[0].id).toBe(edgeId);
-    expect(outputData.result.edges[0].status).toBe('INVALID');
+    expect(outputData.result.edges[0].status).toBe('INCORRECT_DEPENDENCY');
     expect(outputData.result.decoupling).toBe(true);
   });
 
@@ -159,7 +157,7 @@ describe('GetUseCaseInfoInteractor', () => {
     const edgeId = `${sourceId}->${targetId}`;
 
     // Setup the edge in the DB
-    (genericDBAccess as any).upsertEdge({
+    genericDBAccess.upsertEdge({
       id: edgeId,
       source: sourceId,
       target: targetId,
@@ -167,7 +165,7 @@ describe('GetUseCaseInfoInteractor', () => {
       status: 'VALID',
     });
 
-    const mockUseCase = {
+    const mockUseCase = makeStoredUseCase({
       id: 'uc-edge',
       name: 'Edge Test',
       fileKeys: [],
@@ -175,8 +173,8 @@ describe('GetUseCaseInfoInteractor', () => {
       outNeighbours: {
         [sourceId]: [targetId],
       },
-    };
-    (genericDBAccess as any).upsertUseCase(mockUseCase);
+    });
+    genericDBAccess.upsertUseCase(mockUseCase);
 
     const outputData = makeOutputData();
     const interactor = new GetUseCaseInfoInteractor(
