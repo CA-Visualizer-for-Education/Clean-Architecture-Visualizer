@@ -68,7 +68,7 @@ export class GetUseCaseInfoInteractor implements GetUseCaseInfoInputBoundary {
 
     for (const fileKey of useCase.fileKeys) {
       const nodeFromDB = allNodes.find(
-        (n) => n.filePath && n.filePath.includes(fileKey)
+        (n) => n.filePath?.includes(fileKey)
       );
 
       if (nodeFromDB !== undefined) fileNodes.push(nodeFromDB);
@@ -134,7 +134,7 @@ export class GetUseCaseInfoInteractor implements GetUseCaseInfoInputBoundary {
     const nodeName = words.join(' ');
 
     if (node.status === 'MISSING') {
-      return nodeName + ' (Missing)';
+      return `${nodeName} (Missing)`;
     } else {
       return nodeName;
     }
