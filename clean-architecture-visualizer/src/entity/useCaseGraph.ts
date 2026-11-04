@@ -5,7 +5,7 @@ import type { RelationshipType } from '../types/relationship.js';
 export class useCaseGraph {
   private readonly name: string;
   private readonly outNeighbours: neighbourMap;
-  private violationEdges: Array<[cleanNode, cleanNode]> = [];
+  private violationEdges: [cleanNode, cleanNode][] = [];
   private readonly files = new Map<string, string>();
   private readonly edgeTypes = new Map<string, RelationshipType>();
 
@@ -86,7 +86,7 @@ export class useCaseGraph {
     return this.violationEdges.length;
   }
 
-  getViolationEdges(): Array<[cleanNode, cleanNode]> {
+  getViolationEdges(): [cleanNode, cleanNode][] {
     return this.violationEdges;
   }
 

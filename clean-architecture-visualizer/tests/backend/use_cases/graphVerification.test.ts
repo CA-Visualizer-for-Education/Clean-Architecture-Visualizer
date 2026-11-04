@@ -2143,7 +2143,7 @@ describe('Relationship types are passed through to edge storage', () => {
   });
 
   it('resolves Java package-path imports to files in the same use case', async () => {
-    const files: Array<[string, string]> = [
+    const files: [string, string][] = [
       [
         'LoginPresenter.java',
         '/mock/interface_adapter/login/LoginPresenter.java',
@@ -2233,8 +2233,8 @@ describe('Relationship types are passed through to edge storage', () => {
 
 describe('Clean Architecture rules', () => {
   const verify = async (
-    edges: Array<[cleanNode, cleanNode]>
-  ): Promise<Array<[cleanNode, cleanNode]>> => {
+    edges: [cleanNode, cleanNode][]
+  ): Promise<[cleanNode, cleanNode][]> => {
     const uc = new useCaseGraph('rules');
     for (const [from, to] of edges) uc.setNodeNeighbour(from, to);
     const interactor = new GraphVerificationInteractor(

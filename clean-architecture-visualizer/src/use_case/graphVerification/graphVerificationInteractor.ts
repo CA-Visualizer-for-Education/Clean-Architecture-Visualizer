@@ -33,7 +33,7 @@ export class GraphVerificationInteractor
   // The node of files <File Name, Node>
   private readonly externalNodes: Record<string, cleanNode> = {};
 
-  private crossUseCaseEdges: Array<[cleanNode, cleanNode]>[] = [];
+  private crossUseCaseEdges: [cleanNode, cleanNode][][] = [];
   private crossUseCaseFiles = new Set<string>();
   private outputData: GraphVerificationOutputData;
 
@@ -130,7 +130,7 @@ export class GraphVerificationInteractor
       externalFilesToUseCaseGraphs.set(filePath, new Set<string>());
     }
     // allEdges will store all of the edges in the form of (fromNodePath, toNodePath, relationshipType)
-    const allEdges: Array<[string, string, RelationshipType]> = [];
+    const allEdges: [string, string, RelationshipType][] = [];
     // map use case graph names to graphs
     const useCaseGraphNamesToGraph = new Map<string, useCaseGraph>();
     let useCaseIndex = 0;
@@ -728,7 +728,7 @@ export class GraphVerificationInteractor
     }
     this.outputData.setOutputData(lines, lineColours);
   }
-  getCrossUseCaseEdges(): Array<[cleanNode, cleanNode]>[] {
+  getCrossUseCaseEdges(): [cleanNode, cleanNode][][] {
     return structuredClone(this.crossUseCaseEdges);
   }
 }
