@@ -7,6 +7,7 @@ export function makeMockFileAccess(): jest.Mocked<FileAccessInterface> {
   return {
     getUseCases: jest.fn<FileAccessInterface['getUseCases']>(),
     getFilePaths: jest.fn<FileAccessInterface['getFilePaths']>(),
+    getAllSourceFiles: jest.fn<FileAccessInterface['getAllSourceFiles']>(),
     getFileImports: jest.fn<FileAccessInterface['getFileImports']>(),
     getProjectName: jest.fn<FileAccessInterface['getProjectName']>(),
     getFileContent: jest.fn<FileAccessInterface['getFileContent']>(),
