@@ -1,20 +1,19 @@
 import { beforeEach, describe, expect, it } from '@jest/globals';
 import { SessionDBAccess } from '../../../src/data_access/sessionDBAccess.js';
 import { GetFilesWithViolationsInteractor } from '../../../src/use_case/getFilesWithViolations/getFilesWithViolationsInteractor.js';
-import type { GetFilesWithViolationsOutputData } from '../../../src/use_case/getFilesWithViolations/getFilesWithViolationsOutputData.js';
+import type {
+  FilesWithViolationsResponse,
+  GetFilesWithViolationsOutputData,
+} from '../../../src/use_case/getFilesWithViolations/getFilesWithViolationsOutputData.js';
+import { RecordingOutputData } from '../doubles/recording-output-data.js';
 
 const genericDBAccess = new SessionDBAccess();
 
-function makeOutputData(): GetFilesWithViolationsOutputData & { result: any } {
-  return {
-    result: undefined,
-    setOutputData(data: any) {
-      this.result = data;
-    },
-    getOutputData() {
-      return this.result;
-    },
-  } as GetFilesWithViolationsOutputData & { result: any };
+// The Output Data classes have private fields, so the recording double needs a cast.
+function makeOutputData(): GetFilesWithViolationsOutputData &
+  RecordingOutputData<FilesWithViolationsResponse> {
+  return new RecordingOutputData<FilesWithViolationsResponse>() as unknown as GetFilesWithViolationsOutputData &
+    RecordingOutputData<FilesWithViolationsResponse>;
 }
 
 describe('GetFilesWithViolationsInteractor', () => {

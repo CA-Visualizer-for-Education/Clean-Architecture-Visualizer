@@ -278,7 +278,7 @@ export class GraphVerificationInteractor
   }
 
   /**
-   * Given an external file path, find the xternal file path that represents it
+   * Given an external file path, find the external file path that represents it
    * @param externalFilePath The external file path we are trying to get the rep of
    * @param externalFilePathRepresentatives The map of external file paths to their reps
    * @param externalFilePathToUseCaseGraphs The map of external file paths to the set of use cases they belong to.

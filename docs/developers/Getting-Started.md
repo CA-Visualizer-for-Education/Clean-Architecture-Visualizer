@@ -42,7 +42,7 @@ git pull main
 
 To keep a readable and linear commit history we use [conventional commits](https://gist.github.com/qoomon/5dfcdf8eec66a051ecd85625518cfd13). Each commit should be a task that can be summarized by its commit to make the lives of reviewers easier.
 
-Let's say you have 5 commits that acheive one thing. We can check it out with
+Let's say you have 5 commits that achieve one thing. We can check it out with
 
 ```bash
 git rebase -i HEAD~5
@@ -88,7 +88,7 @@ pick a5 commit5
 
 with no loss of work.
 
-Let's say the work done in `a5` was unnessecary or you want to restart on a part of a task
+Let's say the work done in `a5` was unnecessary or you want to restart on a part of a task
 
 `git rebase -i HEAD~4`
 
@@ -144,4 +144,26 @@ You can test a specific file/directory with:
 
 ```bash
 npm test -- <path-to-file/directory>
+```
+
+CI also type-checks the backend's source and tests. To run the same check locally:
+
+```bash
+npm run type-check
+```
+
+## 6. Working on the Docs
+
+The docs site in `docs/` uses npm, like the rest of the repo. From the repo root:
+
+```bash
+cd docs
+npm ci
+npm start
+```
+
+Before opening a PR that changes `docs/`, check that the site builds:
+
+```bash
+npm run build
 ```

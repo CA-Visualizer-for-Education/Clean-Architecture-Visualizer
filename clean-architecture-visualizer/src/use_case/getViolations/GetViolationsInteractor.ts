@@ -4,27 +4,11 @@ import { useCaseGraph } from '../../entity/useCaseGraph.js';
 import type { cleanNode } from '../../types/cleanNode.js';
 import type { GetViolationsInputBoundary } from './GetViolationsInputBoundary.js';
 import type { GetViolationsInputData } from './GetViolationsInputData.js';
-import type { GetViolationsOutputData } from './GetViolationsOutputData.js';
-
-export type ViolationResponse = {
-  violations: ViolationEntry[];
-};
-
-type ViolationEntry = {
-  id: string;
-  type: 'INCORRECT_DEPENDENCY';
-  message: string;
-  suggestion: string;
-  related_node_ids: string[];
-  related_edge_id: string;
-  file_context?: FileContext;
-};
-
-type FileContext = {
-  file: string;
-  line_number?: number;
-  snippet?: string;
-};
+import type {
+  FileContext,
+  GetViolationsOutputData,
+  ViolationEntry,
+} from './GetViolationsOutputData.js';
 
 export class GetViolationsInteractor implements GetViolationsInputBoundary {
   constructor(

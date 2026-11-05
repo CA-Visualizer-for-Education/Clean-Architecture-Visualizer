@@ -4,6 +4,7 @@ import { CreateModuleUseCaseInputData } from '../../../src/use_case/createModule
 import { CreateModuleUseCaseInteractor } from '../../../src/use_case/createModuleUseCase/createModuleUseCaseInteractor.js';
 import type { CreateModuleUseCaseOutputBoundary } from '../../../src/use_case/createModuleUseCase/createModuleUseCaseOutputBoundary.js';
 import { CreateModuleUseCaseOutputData } from '../../../src/use_case/createModuleUseCase/createModuleUseCaseOutputData.js';
+import { makeMockFileAccess } from '../doubles/mock-file-access.js';
 
 describe('CreateFeatureInteractor', () => {
   let mockFileAccess: jest.Mocked<FileAccessInterface>;
@@ -11,17 +12,14 @@ describe('CreateFeatureInteractor', () => {
   let outputData: CreateModuleUseCaseOutputData;
 
   beforeEach(() => {
-    mockFileAccess = {
-      getCurrentPath: jest.fn<any>(),
-      bfsFindDir: jest.fn<any>(),
-      createDirectory: jest.fn<any>(),
-      createFile: jest.fn<any>(),
-    } as any;
+    mockFileAccess = makeMockFileAccess();
 
     mockPresenter = {
-      showSuccessView: jest.fn<any>(),
-      showFailView: jest.fn<any>(),
-    } as any;
+      showSuccessView:
+        jest.fn<CreateModuleUseCaseOutputBoundary['showSuccessView']>(),
+      showFailView:
+        jest.fn<CreateModuleUseCaseOutputBoundary['showFailView']>(),
+    };
 
     outputData = new CreateModuleUseCaseOutputData();
   });

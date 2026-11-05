@@ -67,6 +67,13 @@ export class AppBuilder {
     };
   }
 
+  private requireFileAccess(): FileAccess {
+    if (!this.fileAccess) {
+      throw new Error('FileAccess must be set');
+    }
+    return this.fileAccess;
+  }
+
   async runGraphVerification(): Promise<void> {
     const { fileAccess, cleanArchAccess, db } = this.requireDeps();
     await preloadDependencies(process.cwd(), fileAccess);
@@ -117,7 +124,7 @@ export class AppBuilder {
     const inputData = new InitProjectInputData(language);
     const outputData = new InitProjectOutputData();
     const interactor = new InitProjectInteractor(
-      this.fileAccess!,
+      this.requireFileAccess(),
       inputData,
       outputData
     );
@@ -138,7 +145,7 @@ export class AppBuilder {
     const inputData = new InitModuleProjectInputData(language);
     const outputData = new InitModuleProjectOutputData();
     const interactor = new InitModuleProjectInteractor(
-      this.fileAccess!,
+      this.requireFileAccess(),
       inputData,
       outputData
     );
@@ -162,7 +169,7 @@ export class AppBuilder {
     const outputData = new CreateUseCaseOutputData();
     const presenter = new CreateUseCasePresenter(outputData);
     const interactor = new CreateUseCaseInteractor(
-      this.fileAccess!,
+      this.requireFileAccess(),
       presenter,
       inputData,
       outputData
@@ -175,7 +182,7 @@ export class AppBuilder {
     const outputData = new CreateFeatureOutputData();
     const presenter = new CreateFeaturePresenter(outputData);
     const interactor = new CreateFeatureInteractor(
-      this.fileAccess!,
+      this.requireFileAccess(),
       presenter,
       inputData,
       outputData
@@ -188,7 +195,7 @@ export class AppBuilder {
     const outputData = new CreateModuleUseCaseOutputData();
     const presenter = new CreateModuleUseCasePresenter(outputData);
     const interactor = new CreateModuleUseCaseInteractor(
-      this.fileAccess!,
+      this.requireFileAccess(),
       presenter,
       inputData,
       outputData

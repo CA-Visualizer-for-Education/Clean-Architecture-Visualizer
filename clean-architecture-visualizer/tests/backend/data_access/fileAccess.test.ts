@@ -12,7 +12,7 @@ import path from 'path';
 type ReaddirFn = (
   path: string,
   options?: { withFileTypes?: boolean }
-) => Promise<Dirent[]>;
+) => Promise<Dirent[] | string[]>;
 
 const mockReaddir = jest.fn() as jest.MockedFunction<ReaddirFn>;
 const mockReadFile = jest.fn() as jest.MockedFunction<
@@ -47,10 +47,7 @@ describe('bfsFindDir functionality', () => {
   });
 
   it('returns the src directory when it exists at the top level', async () => {
-    mockReaddir.mockResolvedValueOnce([
-      mockDir('src'),
-      mockDir('tests'),
-    ] as any);
+    mockReaddir.mockResolvedValueOnce([mockDir('src'), mockDir('tests')]);
 
     const result = await fileAccess.bfsFindDir('/project', 'src');
     expect(result).toBe(path.join('/project', 'src'));
@@ -58,8 +55,8 @@ describe('bfsFindDir functionality', () => {
 
   it('finds src nested one level deep', async () => {
     mockReaddir
-      .mockResolvedValueOnce([mockDir('packages')] as any)
-      .mockResolvedValueOnce([mockDir('src')] as any);
+      .mockResolvedValueOnce([mockDir('packages')])
+      .mockResolvedValueOnce([mockDir('src')]);
 
     const result = await fileAccess.bfsFindDir('/project', 'src');
     expect(result).toBe(path.join('/project', 'packages', 'src'));
@@ -67,7 +64,7 @@ describe('bfsFindDir functionality', () => {
 
   it('returns null when no src directory exists', async () => {
     mockReaddir
-      .mockResolvedValueOnce([mockDir('tests'), mockDir('dist')] as any)
+      .mockResolvedValueOnce([mockDir('tests'), mockDir('dist')])
       .mockResolvedValueOnce([])
       .mockResolvedValueOnce([]);
 
@@ -80,7 +77,7 @@ describe('bfsFindDir functionality', () => {
       mockFile('index.ts'),
       mockFile('package.json'),
       mockDir('src'),
-    ] as any);
+    ]);
 
     const result = await fileAccess.bfsFindDir('/project', 'src');
     expect(result).toBe(path.join('/project', 'src'));
@@ -94,7 +91,7 @@ describe('bfsFindDir functionality', () => {
   });
 
   it('finds src at the starting directory itself', async () => {
-    mockReaddir.mockResolvedValueOnce([mockDir('src')] as any);
+    mockReaddir.mockResolvedValueOnce([mockDir('src')]);
 
     const result = await fileAccess.bfsFindDir('/project', 'src');
     expect(result).toBe(path.join('/project', 'src'));
@@ -109,14 +106,14 @@ describe('getFileImports functionality', () => {
   });
 
   it('returns an empty array for a file with no imports', async () => {
-    mockReadFile.mockResolvedValueOnce('const x = 1;\nconsole.log(x);' as any);
+    mockReadFile.mockResolvedValueOnce('const x = 1;\nconsole.log(x);');
 
     const result = await fileAccess.getFileImports('/project/index.ts');
     expect(result).toEqual([]);
   });
 
   it('returns a single import', async () => {
-    mockReadFile.mockResolvedValueOnce('import fs from "fs/promises";' as any);
+    mockReadFile.mockResolvedValueOnce('import fs from "fs/promises";');
 
     const result = await fileAccess.getFileImports('/project/index.ts');
     expect(result).toEqual([
@@ -126,7 +123,7 @@ describe('getFileImports functionality', () => {
 
   it('returns multiple imports', async () => {
     mockReadFile.mockResolvedValueOnce(
-      'import fs from "fs/promises";\nimport path from "path";\nconst x = 1;' as any
+      'import fs from "fs/promises";\nimport path from "path";\nconst x = 1;'
     );
 
     const result = await fileAccess.getFileImports('/project/index.ts');
@@ -140,7 +137,7 @@ describe('getFileImports functionality', () => {
     mockReaddir.mockResolvedValueOnce([
       'LoginInputBoundary.java',
       'LoginInputData.java',
-    ] as any);
+    ]);
     mockReadFile.mockResolvedValueOnce(
       'package use_case.login;\nfinal int x = 5\nLoginInputData output = new LoginOutputData()'
     );
@@ -155,7 +152,7 @@ describe('getFileImports functionality', () => {
       'LoginInputBoundary.java',
       'LoginInputData.java',
       'LoginInteractor.java',
-    ] as any);
+    ]);
     mockReadFile.mockResolvedValueOnce(
       'package use_case.login;\nimport entity.User;\npublic class LoginInteractor implements LoginInputBoundary{}'
     );
@@ -185,6 +182,31 @@ describe('getFileImports functionality', () => {
     ]);
   });
 
+  // Test: a full class name whose package folders are capitalized
+  it('returns fully qualified names with capitalized package folders', async () => {
+    // Pretend the file uses a class in the interface_adapter/EnrollStudent/ folder
+    mockReadFile.mockResolvedValueOnce(
+      'public class A {\n  interface_adapter.EnrollStudent.EnrollStudentViewModel vm;\n}'
+    );
+    const result = await fileAccess.getFileImports('/project/A.java');
+    // The answer should name the whole class, not stop at the EnrollStudent folder
+    expect(result).toEqual([
+      {
+        fileName: 'interface_adapter.EnrollStudent.EnrollStudentViewModel',
+        relationshipType: 'dependency',
+      },
+    ]);
+  });
+
+  // Test: a class and its nested class, like Map.Entry, is not a package path
+  it('ignores nested class names such as Map.Entry', async () => {
+    mockReadFile.mockResolvedValueOnce(
+      'public class A {\n  Map.Entry<String, String> e;\n}'
+    );
+    const result = await fileAccess.getFileImports('/project/A.java');
+    expect(result).toEqual([]);
+  });
+
   // Test: this.CONST is not a class name
   it('ignores this.CONST style', async () => {
     mockReadFile.mockResolvedValueOnce(
@@ -204,7 +226,7 @@ describe('getFileImports functionality', () => {
   });
 
   it('returns an empty array and logs when the file is not found', async () => {
-    mockReadFile.mockRejectedValueOnce(new Error('File not found') as any);
+    mockReadFile.mockRejectedValueOnce(new Error('File not found'));
     const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
 
     const result = await fileAccess.getFileImports('/project/missing.ts');
@@ -216,7 +238,7 @@ describe('getFileImports functionality', () => {
 
   it('ignores lines that do not start with import', async () => {
     mockReadFile.mockResolvedValueOnce(
-      '// import fake from "fake";\nconst x = 1;\nimport real from "real";' as any
+      '// import fake from "fake";\nconst x = 1;\nimport real from "real";'
     );
 
     const result = await fileAccess.getFileImports('/project/index.ts');
@@ -229,7 +251,7 @@ describe('getFileImports functionality', () => {
     mockReaddir.mockResolvedValueOnce([
       'BaseController.java',
       'LoginController.java',
-    ] as any);
+    ]);
     mockReadFile.mockResolvedValueOnce(
       'package interface_adapter.login;\npublic class LoginController extends BaseController {}'
     );
@@ -245,7 +267,7 @@ describe('getFileImports functionality', () => {
     mockReaddir.mockResolvedValueOnce([
       'LoginInputBoundary.java',
       'LoginInteractor.java',
-    ] as any);
+    ]);
     mockReadFile.mockResolvedValueOnce(
       'package use_case.login;\npublic class LoginInteractor implements LoginInputBoundary {}'
     );
@@ -258,7 +280,7 @@ describe('getFileImports functionality', () => {
   });
 
   it('detects implements on a class imported from another package', async () => {
-    mockReaddir.mockResolvedValueOnce(['LoginPresenter.java'] as any);
+    mockReaddir.mockResolvedValueOnce(['LoginPresenter.java']);
     mockReadFile.mockResolvedValueOnce(
       'package interface_adapter.login;\n' +
         'import use_case.login.LoginOutputBoundary;\n' +
@@ -309,7 +331,7 @@ describe('getFileImports functionality', () => {
     mockReaddir.mockResolvedValueOnce([
       'LoginInputBoundary.java',
       'LoginInteractor.java',
-    ] as any);
+    ]);
     mockReadFile.mockResolvedValueOnce(
       'package use_case.login;\npublic class LoginInteractor implements LoginInputBoundary {}'
     );
@@ -324,7 +346,7 @@ describe('getFileImports functionality', () => {
     mockReaddir.mockResolvedValueOnce([
       'LoginInputData.java',
       'LoginInteractor.java',
-    ] as any);
+    ]);
     mockReadFile.mockResolvedValueOnce(
       '/*\n * Login use case.\n */\npackage use_case.login;\nLoginInputData data = null;'
     );
@@ -336,9 +358,9 @@ describe('getFileImports functionality', () => {
     ]);
   });
   it('successfully returns wildcard import along with normal imports', async () => {
-    mockReaddir.mockResolvedValueOnce([mockDir('src')] as any);
-    mockReaddir.mockResolvedValueOnce([mockDir('entity')] as any);
-    mockReaddir.mockResolvedValueOnce(['Student.java', 'Course.java'] as any);
+    mockReaddir.mockResolvedValueOnce([mockDir('src')]);
+    mockReaddir.mockResolvedValueOnce([mockDir('entity')]);
+    mockReaddir.mockResolvedValueOnce(['Student.java', 'Course.java']);
     mockReadFile.mockResolvedValueOnce('import entity.*;\nStudent s = null;');
     const result = await fileAccess.getFileImports(
       '/project/LoginInteractor.java'
@@ -350,9 +372,9 @@ describe('getFileImports functionality', () => {
   });
 
   it('excludes a wildcard-imported class that is never referenced in the file', async () => {
-    mockReaddir.mockResolvedValueOnce([mockDir('src')] as any);
-    mockReaddir.mockResolvedValueOnce([mockDir('entity')] as any);
-    mockReaddir.mockResolvedValueOnce(['Student.java', 'Course.java'] as any);
+    mockReaddir.mockResolvedValueOnce([mockDir('src')]);
+    mockReaddir.mockResolvedValueOnce([mockDir('entity')]);
+    mockReaddir.mockResolvedValueOnce(['Student.java', 'Course.java']);
     mockReadFile.mockResolvedValueOnce(
       'import entity.*;\npublic class LoginInteractor {}'
     );
@@ -366,10 +388,10 @@ describe('getFileImports functionality', () => {
     mockReaddir.mockResolvedValueOnce([
       'LoginInputBoundary.java',
       'LoginInteractor.java',
-    ] as any);
-    mockReaddir.mockResolvedValueOnce([mockDir('src')] as any);
-    mockReaddir.mockResolvedValueOnce([mockDir('entity')] as any);
-    mockReaddir.mockResolvedValueOnce(['Student.java', 'Course.java'] as any);
+    ]);
+    mockReaddir.mockResolvedValueOnce([mockDir('src')]);
+    mockReaddir.mockResolvedValueOnce([mockDir('entity')]);
+    mockReaddir.mockResolvedValueOnce(['Student.java', 'Course.java']);
 
     mockReadFile.mockResolvedValueOnce(
       'package use_case.login;\nimport entity.*;\npublic class LoginInteractor implements Student {\n Course c = null; \n}'
@@ -396,11 +418,11 @@ describe('getUseCases functionality', () => {
   it('Gets all use cases when packaged by module.', async () => {
     // We want to make sure that when we get use cases, it finds the src and features directories
     mockReaddir
-      .mockResolvedValueOnce([mockDir('src')] as any)
-      .mockResolvedValueOnce([mockDir('features')] as any)
-      .mockResolvedValueOnce([mockDir('feature1'), mockDir('feature2')] as any)
-      .mockResolvedValueOnce([mockDir('usecase1')] as any)
-      .mockResolvedValueOnce([mockDir('usecase2')] as any);
+      .mockResolvedValueOnce([mockDir('src')])
+      .mockResolvedValueOnce([mockDir('features')])
+      .mockResolvedValueOnce([mockDir('feature1'), mockDir('feature2')])
+      .mockResolvedValueOnce([mockDir('usecase1')])
+      .mockResolvedValueOnce([mockDir('usecase2')]);
 
     const result = await fileAccess.getUseCases();
     expect(result).toEqual(['usecase1', 'usecase2']);
@@ -409,11 +431,11 @@ describe('getUseCases functionality', () => {
   it('Gets all use cases when packaged by module (even if there is a use_case directory).', async () => {
     // We want to make sure that when we get use cases, it finds the src and features directories
     mockReaddir
-      .mockResolvedValueOnce([mockDir('src')] as any)
-      .mockResolvedValueOnce([mockDir('use_case')] as any)
-      .mockResolvedValueOnce([mockDir('features')] as any)
-      .mockResolvedValueOnce([mockDir('feature1')] as any)
-      .mockResolvedValueOnce([mockDir('usecase1')] as any);
+      .mockResolvedValueOnce([mockDir('src')])
+      .mockResolvedValueOnce([mockDir('use_case')])
+      .mockResolvedValueOnce([mockDir('features')])
+      .mockResolvedValueOnce([mockDir('feature1')])
+      .mockResolvedValueOnce([mockDir('usecase1')]);
 
     const result = await fileAccess.getUseCases();
     expect(result).toEqual(['usecase1']);
@@ -421,9 +443,9 @@ describe('getUseCases functionality', () => {
 
   it('Returns no use cases when packaged by module when there are no features.', async () => {
     mockReaddir
-      .mockResolvedValueOnce([mockDir('src')] as any)
-      .mockResolvedValueOnce([mockDir('features')] as any)
-      .mockResolvedValueOnce([] as any);
+      .mockResolvedValueOnce([mockDir('src')])
+      .mockResolvedValueOnce([mockDir('features')])
+      .mockResolvedValueOnce([]);
 
     const result = await fileAccess.getUseCases();
     expect(result).toEqual([]);
@@ -431,10 +453,10 @@ describe('getUseCases functionality', () => {
 
   it('Returns no use cases when packaged by module when there are no use cases.', async () => {
     mockReaddir
-      .mockResolvedValueOnce([mockDir('src')] as any)
-      .mockResolvedValueOnce([mockDir('features')] as any)
-      .mockResolvedValueOnce([mockDir('feature1')] as any)
-      .mockResolvedValueOnce([] as any);
+      .mockResolvedValueOnce([mockDir('src')])
+      .mockResolvedValueOnce([mockDir('features')])
+      .mockResolvedValueOnce([mockDir('feature1')])
+      .mockResolvedValueOnce([]);
 
     const result = await fileAccess.getUseCases();
     expect(result).toEqual([]);
@@ -442,10 +464,10 @@ describe('getUseCases functionality', () => {
 
   it('Gets all use cases when packaged by layer.', async () => {
     mockReaddir
-      .mockResolvedValueOnce([mockDir('src')] as any)
-      .mockResolvedValueOnce([] as any)
-      .mockResolvedValueOnce([mockDir('use_case')] as any)
-      .mockResolvedValueOnce([mockDir('usecase1'), mockDir('usecase2')] as any);
+      .mockResolvedValueOnce([mockDir('src')])
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([mockDir('use_case')])
+      .mockResolvedValueOnce([mockDir('usecase1'), mockDir('usecase2')]);
 
     const result = await fileAccess.getUseCases();
     expect(result).toEqual(['usecase1', 'usecase2']);
@@ -453,17 +475,17 @@ describe('getUseCases functionality', () => {
 
   it('Returns no use cases when packaged by layer.', async () => {
     mockReaddir
-      .mockResolvedValueOnce([mockDir('src')] as any)
-      .mockResolvedValueOnce([] as any)
-      .mockResolvedValueOnce([mockDir('use_case')] as any)
-      .mockResolvedValueOnce([] as any);
+      .mockResolvedValueOnce([mockDir('src')])
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([mockDir('use_case')])
+      .mockResolvedValueOnce([]);
 
     const result = await fileAccess.getUseCases();
     expect(result).toEqual([]);
   });
 
   it('Returns no use cases if src directory does not exist.', async () => {
-    mockReaddir.mockResolvedValueOnce([] as any);
+    mockReaddir.mockResolvedValueOnce([]);
 
     const result = await fileAccess.getUseCases();
     expect(result).toEqual([]);
@@ -471,9 +493,9 @@ describe('getUseCases functionality', () => {
 
   it('Returns no use cases if features and use_case directory does not exist.', async () => {
     mockReaddir
-      .mockResolvedValueOnce([mockDir('src')] as any)
-      .mockResolvedValueOnce([] as any)
-      .mockResolvedValueOnce([] as any);
+      .mockResolvedValueOnce([mockDir('src')])
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([]);
 
     const result = await fileAccess.getUseCases();
     expect(result).toEqual([]);

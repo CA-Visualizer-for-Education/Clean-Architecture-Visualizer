@@ -1,4 +1,21 @@
 {
   "root": false,
-  "extends": "//"
+  "extends": "//",
+  "overrides": [
+    {
+      "includes": ["src/components/**", "src/pages/**", "tests/unit/pages/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "useFilenamingConvention": {
+              "level": "warn",
+              "options": {
+                "filenameCases": ["kebab-case", "PascalCase"]
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
 }

@@ -1,3 +1,4 @@
+// biome-ignore-all lint/suspicious/noExplicitAny: these tests reach the Interactor's private members until it is split up (#269)
 import {
   afterEach,
   beforeEach,
@@ -391,7 +392,7 @@ describe('Ensures that populateDatabase correctly populates the database', () =>
  * Mock FileAccess class used to make files with fake imports rather than looking at real project files.
  */
 class MockFileAccess implements FileAccessInterface {
-  // Used to set the return value of getFileImports for specfic file paths.
+  // Used to set the return value of getFileImports for specific file paths.
   contents: Map<string, Relationship[]>;
   internalFilePaths: Map<string, string>;
 
@@ -2078,7 +2079,9 @@ describe('Relationship types are passed through to edge storage', () => {
 
     const mockFileAccess = new MockFileAccess(fileMockContents, fileMockPaths);
     const dbAccess = new SessionDBAccess();
-    const presenter = new GraphVerificationPresenter();
+    const presenter = new GraphVerificationPresenter(
+      new GraphVerificationOutputData()
+    );
     const interactor = new GraphVerificationInteractor(
       mockFileAccess,
       genericNeighbourAccess,
@@ -2118,7 +2121,9 @@ describe('Relationship types are passed through to edge storage', () => {
 
     const mockFileAccess = new MockFileAccess(fileMockContents, fileMockPaths);
     const dbAccess = new SessionDBAccess();
-    const presenter = new GraphVerificationPresenter();
+    const presenter = new GraphVerificationPresenter(
+      new GraphVerificationOutputData()
+    );
     const interactor = new GraphVerificationInteractor(
       mockFileAccess,
       genericNeighbourAccess,
@@ -2182,7 +2187,7 @@ describe('Relationship types are passed through to edge storage', () => {
       new MockFileAccess(fileMockContents, fileMockPaths),
       genericNeighbourAccess,
       dbAccess,
-      new GraphVerificationPresenter(),
+      new GraphVerificationPresenter(new GraphVerificationOutputData()),
       [uc]
     );
 
@@ -2213,7 +2218,7 @@ describe('Relationship types are passed through to edge storage', () => {
       new MockFileAccess(new Map(), new Map()),
       genericNeighbourAccess,
       new SessionDBAccess(),
-      new GraphVerificationPresenter(),
+      new GraphVerificationPresenter(new GraphVerificationOutputData()),
       [dependsOnly, implementsToo]
     );
 
@@ -2236,7 +2241,7 @@ describe('Clean Architecture rules', () => {
       new MockFileAccess(new Map(), new Map()),
       genericNeighbourAccess,
       new SessionDBAccess(),
-      new GraphVerificationPresenter(),
+      new GraphVerificationPresenter(new GraphVerificationOutputData()),
       [uc]
     );
     await (interactor as any).verifyOutNeighbours();
