@@ -2,7 +2,7 @@ import type { CleanArchInfoAccessInterface } from '../../data_access/cleanArchIn
 import type { FileAccessInterface } from '../../data_access/fileAccessInterface.js';
 import type { SessionDBAccessInterface } from '../../data_access/sessionDBAccessInterface.js';
 import { useCaseGraph } from '../../entity/useCaseGraph.js';
-import type { cleanLayer } from '../../types/cleanLayer.js';
+import type { cleanLayer } from '../../types/clean-layer.js';
 import type { cleanNode } from '../../types/cleanNode.js';
 import type { RelationshipType } from '../../types/relationship.js';
 import type {
