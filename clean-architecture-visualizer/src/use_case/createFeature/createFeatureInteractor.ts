@@ -15,7 +15,7 @@ export class CreateFeatureInteractor implements CreateFeatureInputBoundary {
   async execute(inputData: CreateFeatureInputData): Promise<void> {
     try {
       // Want to remove all spaces from the name of the feature
-      const feature = inputData.getFeatureName().split(' ').join('');
+      const feature = inputData.getFeatureName();
       const currPath = await this.fileAccess.getCurrentPath();
       // If "features" the directory doesn't exist, abort
       const featuresDirectory = await this.fileAccess.bfsFindDir(

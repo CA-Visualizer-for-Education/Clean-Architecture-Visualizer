@@ -21,8 +21,8 @@ export class InitModuleProjectInteractor
   async execute(inputData: InitModuleProjectInputData): Promise<void> {
     try {
       const acceptedLanguage = ['typescript', 'javascript', 'java', 'python'];
-      const language = inputData.getLanguage().trim();
-      if (!acceptedLanguage.includes(language.toLowerCase())) {
+      const language = inputData.getLanguage();
+      if (!acceptedLanguage.includes(language)) {
         throw new Error(
           'You must enter a valid programming language of: java, python, typescript, or javascript. Blank defaults to Java.'
         );
@@ -47,9 +47,9 @@ export class InitModuleProjectInteractor
       const programmingPath = path.join(
         currPath,
         'main',
-        language.toLowerCase()
+        language
       );
-      const testPath = path.join(currPath, 'test', language.toLowerCase());
+      const testPath = path.join(currPath, 'test', language);
       await this.fileAccess.createDirectory(programmingPath);
       await this.fileAccess.createDirectory(testPath);
 
