@@ -4,8 +4,8 @@ import { GetUseCaseInfoInputData } from '../../use_case/getUseCaseInfo/getUseCas
 export class GetUseCaseInfoController {
   constructor(private readonly inputBoundary: GetUseCaseInfoInputBoundary) {}
 
-  async execute(interactionId: string): Promise<void> {
-    const inputData = new GetUseCaseInfoInputData(interactionId);
+  async execute(useCaseId: string): Promise<void> {
+    const inputData = new GetUseCaseInfoInputData(useCaseId);
     await this.inputBoundary.execute(inputData);
   }
 }

@@ -13,9 +13,9 @@ import { makeStoredUseCase } from '../fixtures/stored-use-case.js';
 const genericDBAccess = new SessionDBAccess();
 const genericFileAccess = new FileAccess();
 
-function makeInputData(interactionId: string): GetViolationsInputData {
+function makeInputData(useCaseId: string): GetViolationsInputData {
   return {
-    getInteractionId: () => interactionId,
+    getUseCaseId: () => useCaseId,
   } as unknown as GetViolationsInputData;
 }
 

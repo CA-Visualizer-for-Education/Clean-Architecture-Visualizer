@@ -4,8 +4,8 @@ import { GetViolationsInputData } from '../../use_case/getViolations/GetViolatio
 export class GetViolationsController {
   constructor(private readonly inputBoundary: GetViolationsInputBoundary) {}
 
-  async execute(interactionId: string): Promise<void> {
-    const inputData = new GetViolationsInputData(interactionId);
+  async execute(useCaseId: string): Promise<void> {
+    const inputData = new GetViolationsInputData(useCaseId);
     await this.inputBoundary.execute(inputData);
   }
 }

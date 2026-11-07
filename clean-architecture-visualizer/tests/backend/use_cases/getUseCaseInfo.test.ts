@@ -13,7 +13,7 @@ const genericDBAccess = new SessionDBAccess();
 
 function makeInputData(id: string): GetUseCaseInfoInputData {
   return {
-    getInteractionId: () => id,
+    getUseCaseId: () => id,
   } as unknown as GetUseCaseInfoInputData;
 }
 

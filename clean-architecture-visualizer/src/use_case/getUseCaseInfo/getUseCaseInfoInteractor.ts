@@ -16,7 +16,7 @@ export class GetUseCaseInfoInteractor implements GetUseCaseInfoInputBoundary {
   ) {}
 
   async execute(inputData: GetUseCaseInfoInputData): Promise<void> {
-    const id = inputData.getInteractionId();
+    const id = inputData.getUseCaseId();
     const useCase = this.db.getUseCaseById(id);
 
     if (!useCase) return;

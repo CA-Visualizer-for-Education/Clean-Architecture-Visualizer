@@ -18,9 +18,9 @@ export class GetViolationsInteractor implements GetViolationsInputBoundary {
   ) {}
 
   async execute(inputData: GetViolationsInputData): Promise<void> {
-    const interactionId = inputData.getInteractionId();
+    const useCaseId = inputData.getUseCaseId();
 
-    const useCase = this.db.getUseCaseById(interactionId);
+    const useCase = this.db.getUseCaseById(useCaseId);
     if (!useCase) return undefined;
     const violations: ViolationEntry[] = await Promise.all(
       useCase.violationEdges.map(async ([from, to], index) => {
