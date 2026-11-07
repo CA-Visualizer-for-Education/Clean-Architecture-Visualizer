@@ -5,8 +5,6 @@ export class InitProjectController {
   constructor(private readonly inputBoundary: InitProjectInputBoundary) {}
 
   async execute(language: string): Promise<void> {
-    language = language.trim().toLowerCase()
-
     const inputData = new InitProjectInputData(language);
     await this.inputBoundary.execute(inputData);
   }

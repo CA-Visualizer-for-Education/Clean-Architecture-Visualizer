@@ -7,9 +7,6 @@ export class CreateModuleUseCaseController {
   ) {}
 
   async execute(feature: string, useCaseName: string): Promise<void> {
-    feature = feature.split(' ').join('');
-    useCaseName = useCaseName.split(' ').join('')
-
     const inputData = new CreateModuleUseCaseInputData(feature, useCaseName);
     await this.inputBoundary.execute(inputData);
   }

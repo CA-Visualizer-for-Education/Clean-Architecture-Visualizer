@@ -19,8 +19,8 @@ export class InitProjectInteractor implements InitProjectInputBoundary {
   async execute(inputData: InitProjectInputData): Promise<void> {
     try {
       const acceptedLanguage = ['typescript', 'javascript', 'java', 'python'];
-      const language = inputData.getLanguage();
-      if (!acceptedLanguage.includes(language)) {
+      const language = inputData.getLanguage().trim();
+      if (!acceptedLanguage.includes(language.toLowerCase())) {
         throw new Error(
           'You must enter a valid programming language of: java, python, typescript, or javascript. Blank defaults to Java.'
         );
@@ -45,9 +45,9 @@ export class InitProjectInteractor implements InitProjectInputBoundary {
       const programmingPath = path.join(
         currPath,
         'main',
-        language
+        language.toLowerCase()
       );
-      const testPath = path.join(currPath, 'test', language);
+      const testPath = path.join(currPath, 'test', language.toLowerCase());
 
       // 2. Define sub-directories within the java path
       const subDirs = [
