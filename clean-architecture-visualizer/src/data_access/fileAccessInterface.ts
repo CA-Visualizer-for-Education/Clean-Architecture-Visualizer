@@ -3,6 +3,7 @@ import type { Relationship } from '../types/relationship.js';
 export interface FileAccessInterface {
   getUseCases(): Promise<string[]>;
   getFilePaths(node: string, paths: Map<string, string>): Promise<void>;
+  getAllSourceFiles(curr?: string): Promise<string[]>;
   getFileImports(path: string): Promise<Relationship[]>;
   getProjectName(): Promise<string>;
   getFileContent(path: string): Promise<string>;
