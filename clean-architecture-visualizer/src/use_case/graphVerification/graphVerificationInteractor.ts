@@ -2,7 +2,7 @@ import type { CleanArchInfoAccessInterface } from '../../data_access/cleanArchIn
 import type { FileAccessInterface } from '../../data_access/fileAccessInterface.js';
 import type { SessionDBAccessInterface } from '../../data_access/sessionDBAccessInterface.js';
 import { useCaseGraph } from '../../entity/useCaseGraph.js';
-import type { cleanLayer } from '../../types/cleanLayer.js';
+import type { cleanLayer } from '../../types/clean-layer.js';
 import type { cleanNode } from '../../types/cleanNode.js';
 import type { RelationshipType } from '../../types/relationship.js';
 import type {
@@ -275,7 +275,7 @@ export class GraphVerificationInteractor
   }
 
   /**
-   * Given an external file path, find the xternal file path that represents it
+   * Given an external file path, find the external file path that represents it
    * @param externalFilePath The external file path we are trying to get the rep of
    * @param externalFilePathRepresentatives The map of external file paths to their reps
    * @param externalFilePathToUseCaseGraphs The map of external file paths to the set of use cases they belong to.
