@@ -11,7 +11,7 @@ import type {
   NodeStorage,
 } from '../../types/sessionData.js';
 import type { GraphVerificationInputBoundary } from './graphVerificationInputBoundary.js';
-import { GraphVerificationInputData } from './graphVerificationInputData.js';
+import type { GraphVerificationInputData } from './graphVerificationInputData.js';
 import type { GraphVerificationOutputBoundary } from './graphVerificationOutputBoundary.js';
 import { GraphVerificationOutputData } from './graphVerificationOutputData.js';
 
@@ -43,18 +43,15 @@ export class GraphVerificationInteractor
     private readonly db: SessionDBAccessInterface,
     private readonly presenter: GraphVerificationOutputBoundary,
     private readonly useCaseGraphList: useCaseGraph[] = [],
-    outputData: GraphVerificationOutputData = new GraphVerificationOutputData(),
-    private readonly inputData: GraphVerificationInputData = new GraphVerificationInputData(
-      false
-    )
+    outputData: GraphVerificationOutputData = new GraphVerificationOutputData()
   ) {
     this.outputData = outputData;
   }
 
-  async execute(): Promise<void> {
+  async execute(inputData: GraphVerificationInputData): Promise<void> {
     // restart db
     this.db.resetDB();
-    const formatForCLI = this.inputData.isToCommandLine();
+    const formatForCLI = inputData.isToCommandLine();
 
     // main use case logic
     await this.buildFilePaths();
