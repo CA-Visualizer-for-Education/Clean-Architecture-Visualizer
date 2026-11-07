@@ -32,8 +32,6 @@ describe('CreateUseCaseInteractor', () => {
     return interactor.execute(new CreateUseCaseInputData(name));
   }
 
-  // TODO: Add a separate test case checking if use case names with spaces wer properly sanitized
-
   it('successfully creates directories and files for a valid use case name in java', async () => {
     // Arrange
     mockFileAccess.getCurrentPath.mockResolvedValue('/root');
