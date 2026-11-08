@@ -133,8 +133,12 @@ git merge upstream/main
 Once your PR is open, merge rather than rebase: a merge keeps the commits your reviewers
 have already seen, and your PR is squashed into one commit when it merges anyway.
 
-If git reports conflicts, open each file it lists, keep both changes (yours and `main`'s),
-and delete the conflict markers. Then `git add` those files and run `git commit`.
+If git reports conflicts, open each file it lists. Each conflict sits between markers: your
+version is between `<<<<<<<` and `=======`, and `main`'s is between `=======` and `>>>>>>>`.
+Decide what the code should be. Often that means keeping both changes, but if you both
+changed the same lines, you may need one side, the other, or a mix of the two. Delete the
+markers, then `git add` those files and run `git merge --continue`. To start over instead,
+`git merge --abort` puts your branch back the way it was before the merge.
 
 ### After a rename
 
