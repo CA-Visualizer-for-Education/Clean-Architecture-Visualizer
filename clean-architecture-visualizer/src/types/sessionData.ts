@@ -6,14 +6,14 @@ export type SessionData = {
   projectName: string;
   numUseCases: number;
   numViolations: number;
-  useCases: {
+  useCases: Array<{
     id: string;
     name: string;
     outNeighbours: neighbourMap;
     fileKeys: string[]; // refers to the files map
     violationEdges: [cleanNode, cleanNode][];
     missingNodes: cleanNode[];
-  }[];
+  }>;
   files: FileStorage[];
   edges: EdgeStorage[];
   nodes: NodeStorage[];

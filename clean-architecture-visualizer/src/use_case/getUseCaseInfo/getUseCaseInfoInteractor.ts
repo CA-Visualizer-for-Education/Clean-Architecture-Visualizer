@@ -12,12 +12,11 @@ import type {
 export class GetUseCaseInfoInteractor implements GetUseCaseInfoInputBoundary {
   constructor(
     private readonly db: SessionDBAccessInterface,
-    private readonly inputData: GetUseCaseInfoInputData,
     private readonly outputData: GetUseCaseInfoOutputData
   ) {}
 
-  async execute(): Promise<void> {
-    const id = this.inputData.getInteractionId();
+  async execute(inputData: GetUseCaseInfoInputData): Promise<void> {
+    const id = inputData.getUseCaseId();
     const useCase = this.db.getUseCaseById(id);
 
     if (!useCase) return;
@@ -67,9 +66,7 @@ export class GetUseCaseInfoInteractor implements GetUseCaseInfoInputBoundary {
     const allNodes = this.db.getAllNodes();
 
     for (const fileKey of useCase.fileKeys) {
-      const nodeFromDB = allNodes.find(
-        (n) => n.filePath && n.filePath.includes(fileKey)
-      );
+      const nodeFromDB = allNodes.find((n) => n.filePath?.includes(fileKey));
 
       if (nodeFromDB !== undefined) fileNodes.push(nodeFromDB);
     }
@@ -134,7 +131,7 @@ export class GetUseCaseInfoInteractor implements GetUseCaseInfoInputBoundary {
     const nodeName = words.join(' ');
 
     if (node.status === 'MISSING') {
-      return nodeName + ' (Missing)';
+      return `${nodeName} (Missing)`;
     } else {
       return nodeName;
     }

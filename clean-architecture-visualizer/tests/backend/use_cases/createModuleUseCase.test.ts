@@ -24,12 +24,14 @@ describe('CreateFeatureInteractor', () => {
     outputData = new CreateModuleUseCaseOutputData();
   });
 
-  function makeInteractor(feature: string, usecase: string) {
-    return new CreateModuleUseCaseInteractor(
+  function runInteractor(feature: string, usecase: string) {
+    const interactor = new CreateModuleUseCaseInteractor(
       mockFileAccess,
       mockPresenter,
-      new CreateModuleUseCaseInputData(feature, usecase),
       outputData
+    );
+    return interactor.execute(
+      new CreateModuleUseCaseInputData(feature, usecase)
     );
   }
 
@@ -43,8 +45,8 @@ describe('CreateFeatureInteractor', () => {
       .mockImplementationOnce(
         async (_, dirName) => `/root/src/features/${dirName}`
       )
-      .mockImplementationOnce(async (_, dirName) => null);
-    await makeInteractor('newFeature', 'newUseCase').execute();
+      .mockImplementationOnce(async (_, _dirName) => null);
+    await runInteractor('newFeature', 'newUseCase');
 
     expect(mockFileAccess.createDirectory).toHaveBeenCalledWith(
       '/root/src/features/newFeature/newUseCase/interface_adapter'
@@ -77,8 +79,8 @@ describe('CreateFeatureInteractor', () => {
       .mockImplementationOnce(
         async (_, dirName) => `/root/src/features/${dirName}`
       )
-      .mockImplementationOnce(async (_, dirName) => null);
-    await makeInteractor('newFeature', 'newUseCase').execute();
+      .mockImplementationOnce(async (_, _dirName) => null);
+    await runInteractor('newFeature', 'newUseCase');
 
     expect(mockFileAccess.createDirectory).toHaveBeenCalledWith(
       '/root/src/features/newFeature/newUseCase/interface_adapter'
@@ -114,8 +116,8 @@ describe('CreateFeatureInteractor', () => {
       .mockImplementationOnce(
         async (_, dirName) => `/root/src/features/${dirName}`
       )
-      .mockImplementationOnce(async (_, dirName) => null);
-    await makeInteractor('newFeature', 'newUseCase').execute();
+      .mockImplementationOnce(async (_, _dirName) => null);
+    await runInteractor('newFeature', 'newUseCase');
 
     expect(mockFileAccess.createDirectory).toHaveBeenCalledWith(
       '/root/src/features/newFeature/newUseCase/interface_adapter'
@@ -152,8 +154,8 @@ describe('CreateFeatureInteractor', () => {
       .mockImplementationOnce(
         async (_, dirName) => `/root/src/features/${dirName}`
       )
-      .mockImplementationOnce(async (_, dirName) => null);
-    await makeInteractor('newFeature', 'newUseCase').execute();
+      .mockImplementationOnce(async (_, _dirName) => null);
+    await runInteractor('newFeature', 'newUseCase');
 
     expect(mockFileAccess.createDirectory).toHaveBeenCalledWith(
       '/root/src/features/newFeature/newUseCase/interface_adapter'
@@ -184,7 +186,7 @@ describe('CreateFeatureInteractor', () => {
     mockFileAccess.bfsFindDir
       .mockResolvedValueOnce('/root/src/python')
       .mockResolvedValueOnce(null);
-    await makeInteractor('newFeature', 'newUseCase').execute();
+    await runInteractor('newFeature', 'newUseCase');
     expect(mockPresenter.showSuccessView).not.toHaveBeenCalled();
     expect(mockPresenter.showFailView).toHaveBeenCalledWith(
       'The features directory does not exist. Please initialize the project first.'
@@ -201,8 +203,8 @@ describe('CreateFeatureInteractor', () => {
 
     mockFileAccess.bfsFindDir
       .mockImplementationOnce(async (_, dirName) => `/root/src/${dirName}`)
-      .mockImplementationOnce(async (_, dirName) => null);
-    await makeInteractor('newFeature', 'newUseCase').execute();
+      .mockImplementationOnce(async (_, _dirName) => null);
+    await runInteractor('newFeature', 'newUseCase');
     expect(mockPresenter.showSuccessView).not.toHaveBeenCalled();
     expect(mockPresenter.showFailView).toHaveBeenCalledWith(
       'The input feature does not exist in the features directory. Please choose a feature that does exist or create this feature.'
@@ -220,7 +222,7 @@ describe('CreateFeatureInteractor', () => {
       .mockImplementationOnce(
         async (_, dirName) => `/root/src/features/newFeature/${dirName}`
       );
-    await makeInteractor('newFeature', 'newUseCase').execute();
+    await runInteractor('newFeature', 'newUseCase');
     expect(mockPresenter.showSuccessView).not.toHaveBeenCalled();
     expect(mockPresenter.showFailView).toHaveBeenCalledWith(
       'The input usecase already exists. Please choose a different name.'
@@ -237,7 +239,7 @@ describe('CreateFeatureInteractor', () => {
       .mockImplementationOnce(
         async (_, dirName) => `/root/src/features/blah/${dirName}`
       );
-    await makeInteractor('newFeature', 'newUseCase').execute();
+    await runInteractor('newFeature', 'newUseCase');
     expect(mockPresenter.showSuccessView).not.toHaveBeenCalled();
     expect(mockPresenter.showFailView).toHaveBeenCalledWith(
       'The input usecase already exists. Please choose a different name.'
@@ -253,9 +255,9 @@ describe('CreateFeatureInteractor', () => {
       .mockImplementationOnce(
         async (_, dirName) => `/root/src/features/${dirName}`
       )
-      .mockImplementationOnce(async (_, dirName) => null);
+      .mockImplementationOnce(async (_, _dirName) => null);
     mockFileAccess.createDirectory.mockRejectedValue(new Error('Disk Full'));
-    await makeInteractor('newFeature', 'newUseCase').execute();
+    await runInteractor('newFeature', 'newUseCase');
     expect(mockPresenter.showSuccessView).not.toHaveBeenCalled();
     expect(mockPresenter.showFailView).toHaveBeenCalled();
   });
@@ -269,11 +271,11 @@ describe('CreateFeatureInteractor', () => {
       .mockImplementationOnce(
         async (_, dirName) => `/root/src/features/${dirName}`
       )
-      .mockImplementationOnce(async (_, dirName) => null);
+      .mockImplementationOnce(async (_, _dirName) => null);
     mockFileAccess.createFile.mockRejectedValue(
       new Error('Failed to create directory.')
     );
-    await makeInteractor('newFeature', 'newUseCase').execute();
+    await runInteractor('newFeature', 'newUseCase');
     expect(mockPresenter.showSuccessView).not.toHaveBeenCalled();
     expect(mockPresenter.showFailView).toHaveBeenCalled();
   });
@@ -286,7 +288,7 @@ describe('CreateFeatureInteractor', () => {
       .mockResolvedValue(null)
       .mockResolvedValue(null)
       .mockResolvedValue(null);
-    await makeInteractor('newFeature', 'newUseCase').execute();
+    await runInteractor('newFeature', 'newUseCase');
     expect(mockPresenter.showSuccessView).not.toHaveBeenCalled();
     expect(mockPresenter.showFailView).toHaveBeenCalled();
   });
