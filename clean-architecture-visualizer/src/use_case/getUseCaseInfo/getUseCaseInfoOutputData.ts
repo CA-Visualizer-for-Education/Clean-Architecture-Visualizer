@@ -1,5 +1,5 @@
-import type { cleanLayer } from '../../types/clean-layer.js';
-import type { cleanNode } from '../../types/cleanNode.js';
+import type { CleanLayer } from '../../types/clean-layer.js';
+import type { CleanNode } from '../../types/cleanNode.js';
 
 export type UseCaseInfoResponse = {
   interaction_name: string;
@@ -11,8 +11,8 @@ export type UseCaseInfoResponse = {
 export type UseCaseNodeResponse = {
   id: string;
   name?: string;
-  type: cleanNode;
-  layer: cleanLayer;
+  type: CleanNode;
+  layer: CleanLayer;
   file_path?: string;
   status: 'VALID' | 'MISSING' | 'VIOLATION';
 };

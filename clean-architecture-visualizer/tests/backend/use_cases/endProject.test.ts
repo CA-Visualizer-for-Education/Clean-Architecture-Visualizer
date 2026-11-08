@@ -9,15 +9,15 @@ import {
 
 const serverModulePath = '../../../src/server/server.js';
 const appBuilderModulePath = '../../../src/app/appBuilder.js';
-const sessionDBAccessPath = '../../../src/data_access/sessionDBAccess.js';
+const sessionDbAccessPath = '../../../src/data_access/sessionDBAccess.js';
 
 let AppBuilder: typeof import('../../../src/app/appBuilder.js').AppBuilder;
-let SessionDBAccess: typeof import('../../../src/data_access/sessionDBAccess.js').SessionDBAccess;
+let SessionDbAccess: typeof import('../../../src/data_access/sessionDBAccess.js').SessionDbAccess;
 let mockStopServer: jest.Mock;
 
 describe('AppBuilder runEndProject', () => {
   let appBuilder: InstanceType<typeof AppBuilder>;
-  let mockDb: InstanceType<typeof SessionDBAccess>;
+  let mockDb: InstanceType<typeof SessionDbAccess>;
 
   beforeAll(async () => {
     jest.resetModules();
@@ -33,31 +33,31 @@ describe('AppBuilder runEndProject', () => {
     const serverModule = await import(serverModulePath);
     mockStopServer = serverModule.stopServer as jest.Mock;
 
-    const sessionDbModule = await import(sessionDBAccessPath);
-    SessionDBAccess = sessionDbModule.SessionDBAccess;
+    const sessionDbModule = await import(sessionDbAccessPath);
+    SessionDbAccess = sessionDbModule.SessionDbAccess;
   });
 
   beforeEach(() => {
-    mockDb = new SessionDBAccess();
-    jest.spyOn(mockDb, 'resetDB');
-    appBuilder = new AppBuilder().withSessionDBAccess(mockDb);
+    mockDb = new SessionDbAccess();
+    jest.spyOn(mockDb, 'resetDb');
+    appBuilder = new AppBuilder().withSessionDbAccess(mockDb);
     mockStopServer.mockReset();
   });
 
   it('resets the session database and closes the server', async () => {
     await appBuilder.runEndProject();
 
-    expect(mockDb.resetDB).toHaveBeenCalledTimes(1);
+    expect(mockDb.resetDb).toHaveBeenCalledTimes(1);
     expect(mockStopServer).toHaveBeenCalledTimes(1);
   });
 
   it('actually clears stored session state when closing the server', async () => {
-    const realDb = new SessionDBAccess();
+    const realDb = new SessionDbAccess();
     realDb.setProjectName('test-project');
 
     expect(realDb.getProjectName()).toBe('test-project');
 
-    appBuilder = new AppBuilder().withSessionDBAccess(realDb);
+    appBuilder = new AppBuilder().withSessionDbAccess(realDb);
 
     await appBuilder.runEndProject();
 
@@ -85,11 +85,11 @@ describe('Server lifecycle', () => {
 
     const { startServer } = await import(serverModulePath);
     const { AppBuilder } = await import(appBuilderModulePath);
-    const { SessionDBAccess } = await import(sessionDBAccessPath);
+    const { SessionDbAccess } = await import(sessionDbAccessPath);
 
-    const db = new SessionDBAccess();
+    const db = new SessionDbAccess();
     const server = await startServer(true, db);
-    const appBuilder = new AppBuilder().withSessionDBAccess(db);
+    const appBuilder = new AppBuilder().withSessionDbAccess(db);
 
     await appBuilder.runEndProject();
 

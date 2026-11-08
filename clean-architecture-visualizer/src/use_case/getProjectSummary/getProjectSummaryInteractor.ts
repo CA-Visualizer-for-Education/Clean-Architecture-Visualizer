@@ -1,4 +1,4 @@
-import type { SessionDBAccessInterface } from '../../data_access/sessionDBAccessInterface.js';
+import type { SessionDbAccessInterface } from '../../data_access/sessionDBAccessInterface.js';
 import type { GetProjectSummaryInputBoundary } from './getProjectSummaryInputBoundary.js';
 import type {
   GetProjectSummaryOutputData,
@@ -10,7 +10,7 @@ export class GetProjectSummaryInteractor
   implements GetProjectSummaryInputBoundary
 {
   constructor(
-    private readonly db: SessionDBAccessInterface,
+    private readonly db: SessionDbAccessInterface,
     private readonly outputData: GetProjectSummaryOutputData
   ) {}
 

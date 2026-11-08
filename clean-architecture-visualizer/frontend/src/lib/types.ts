@@ -1,10 +1,10 @@
 // Clean Architecture layer identifiers used across diagram and code view models.
-export type CALayer =
+export type CaLayer =
   | 'Frameworks'
   | 'InterfaceAdapters'
   | 'ApplicationBusinessRules'
   | 'EnterpriseBusinessRules';
-export type CALayerKey = 'entities' | 'useCases' | 'adapters' | 'drivers';
+export type CaLayerKey = 'entities' | 'useCases' | 'adapters' | 'drivers';
 
 // Canonical value sets; related union types are derived from these constants.
 export const COMPONENT_TYPES = [
@@ -25,17 +25,17 @@ export const COMPONENT_TYPES = [
 export type CAComponentType = (typeof COMPONENT_TYPES)[number];
 
 export const NODE_STATUSES = ['VALID', 'MISSING', 'VIOLATION'] as const;
-export type CANodeStatus = (typeof NODE_STATUSES)[number];
+export type CaNodeStatus = (typeof NODE_STATUSES)[number];
 
 export const EDGE_TYPES = ['DEPENDENCY', 'ASSOCIATION', 'IMPLEMENTS'] as const;
-export type CAEdgeType = (typeof EDGE_TYPES)[number];
+export type CaEdgeType = (typeof EDGE_TYPES)[number];
 
 export const EDGE_STATUSES = [
   'VALID',
   'VIOLATION',
   'INCORRECT_DEPENDENCY',
 ] as const;
-export type CAEdgeStatus = (typeof EDGE_STATUSES)[number];
+export type CaEdgeStatus = (typeof EDGE_STATUSES)[number];
 
 export const ARROW_HEAD_TYPES = [
   'filledTriangle',
@@ -46,11 +46,11 @@ export type ArrowHeadType = (typeof ARROW_HEAD_TYPES)[number];
 
 // UI metadata for mapping architecture layers to palette groups and display labels.
 interface LayerMetadata {
-  paletteKey: CALayerKey;
+  paletteKey: CaLayerKey;
   label: string;
 }
 
-export const LAYER_METADATA: Record<CALayer, LayerMetadata> = {
+export const LAYER_METADATA: Record<CaLayer, LayerMetadata> = {
   EnterpriseBusinessRules: {
     paletteKey: 'entities',
     label: 'Enterprise Entity',
@@ -70,27 +70,27 @@ export const LAYER_METADATA: Record<CALayer, LayerMetadata> = {
 };
 
 // Core graph entities used by interaction detail views.
-export interface CANode {
+export interface CaNode {
   id: string;
   name?: string;
   type: CAComponentType;
-  layer: CALayer;
+  layer: CaLayer;
   file_path?: string;
-  status: CANodeStatus;
+  status: CaNodeStatus;
 }
 
-export interface CAEdge {
+export interface CaEdge {
   id: string;
   source: string;
   target: string;
-  type: CAEdgeType;
-  status: CAEdgeStatus;
+  type: CaEdgeType;
+  status: CaEdgeStatus;
 }
 
 export interface InteractionDetail {
   interaction_name: string;
-  nodes: CANode[];
-  edges: CAEdge[];
+  nodes: CaNode[];
+  edges: CaEdge[];
   decoupling: boolean;
 }
 
@@ -137,14 +137,14 @@ export interface FileNode {
   path: string;
   children?: FileNode[];
   hasViolation?: boolean;
-  layer?: CALayer;
+  layer?: CaLayer;
 }
 
 export interface FileContent {
   file_path: string;
   content: string;
   language: string;
-  layer: CALayer;
+  layer: CaLayer;
   lines_with_violations: number[];
 }
 
@@ -153,5 +153,5 @@ export type FileRelation = {
   target_file: string;
   type: string;
   description?: string;
-  layer: CALayer;
+  layer: CaLayer;
 };

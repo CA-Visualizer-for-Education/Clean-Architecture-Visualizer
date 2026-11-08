@@ -1,26 +1,26 @@
 import { Typography } from '@mui/material';
-import { type CANode, LAYER_METADATA } from '../../../lib/types';
+import { type CaNode, LAYER_METADATA } from '../../../lib/types';
 import { type LayerColor, NodePaper } from './styles';
 
 export type NodeClickInfo = {
   id: string;
   title: string;
-  type: CANode['type'];
-  layer: CANode['layer'];
-  status?: CANode['status'];
+  type: CaNode['type'];
+  layer: CaNode['layer'];
+  status?: CaNode['status'];
   filePath?: string;
 };
 
-type CANodeViewProps = CANode & {
+type CaNodeViewProps = CaNode & {
   isInteractive?: boolean;
   onNodeClick?: (info: NodeClickInfo) => void;
 };
 
-export function CANodeView({
+export function CaNodeView({
   isInteractive,
   onNodeClick,
   ...nodeObject
-}: CANodeViewProps) {
+}: CaNodeViewProps) {
   const title = nodeObject.name ?? nodeObject.id;
   const layerColor: LayerColor = LAYER_METADATA[nodeObject.layer].paletteKey;
 

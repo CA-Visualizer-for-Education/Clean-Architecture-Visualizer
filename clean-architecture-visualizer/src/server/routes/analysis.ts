@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { FileAccess } from '../../data_access/fileAccess.js';
-import type { SessionDBAccessInterface } from '../../data_access/sessionDBAccessInterface.js';
+import type { SessionDbAccessInterface } from '../../data_access/sessionDBAccessInterface.js';
 import { GetFilesWithViolationsController } from '../../interface_adapter/getFilesWithViolations/getFilesWithViolationsController.js';
 import { GetFilesWithViolationsPresenter } from '../../interface_adapter/getFilesWithViolations/getFilesWithViolationsPresenter.js';
 import { GetProjectSummaryController } from '../../interface_adapter/getProjectSummary/getProjectSummaryController.js';
@@ -24,7 +24,7 @@ import { GetViolationsOutputData } from '../../use_case/getViolations/GetViolati
  * instead of a copy loaded before verification ran.
  */
 export function createAnalysisRouter(
-  dbAccess: SessionDBAccessInterface
+  dbAccess: SessionDbAccessInterface
 ): Router {
   const router = Router();
   const fileAccess = new FileAccess();

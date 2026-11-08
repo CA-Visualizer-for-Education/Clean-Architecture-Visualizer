@@ -1,7 +1,7 @@
 import chalk from 'chalk';
 import type { CleanArchAccess } from '../data_access/cleanArchInfoAccess.js';
 import type { FileAccess } from '../data_access/fileAccess.js';
-import type { SessionDBAccess } from '../data_access/sessionDBAccess.js';
+import type { SessionDbAccess } from '../data_access/sessionDBAccess.js';
 import { CreateModuleUseCaseController } from '../interface_adapter/CreateModuleUseCase/createModuleUseCaseController.js';
 import { CreateModuleUseCasePresenter } from '../interface_adapter/CreateModuleUseCase/createModuleUseCasePresenter.js';
 import { CreateFeatureController } from '../interface_adapter/createFeature/createFeatureController.js';
@@ -30,7 +30,7 @@ import { InitProjectOutputData } from '../use_case/initProject/initProjectOutput
 export class AppBuilder {
   private fileAccess?: FileAccess;
   private cleanArchAccess?: CleanArchAccess;
-  private db?: SessionDBAccess;
+  private db?: SessionDbAccess;
 
   withFileAccess(fileAccess: FileAccess): this {
     this.fileAccess = fileAccess;
@@ -42,7 +42,7 @@ export class AppBuilder {
     return this;
   }
 
-  withSessionDBAccess(db: SessionDBAccess): this {
+  withSessionDbAccess(db: SessionDbAccess): this {
     this.db = db;
     return this;
   }
@@ -92,7 +92,7 @@ export class AppBuilder {
     await startCommand({ backendOnly, db });
   }
 
-  async runCLIGraphVerification(): Promise<void> {
+  async runCliGraphVerification(): Promise<void> {
     const { fileAccess, cleanArchAccess, db } = this.requireDeps();
     const outputData = new GraphVerificationOutputData();
     const presenter = new GraphVerificationPresenter(outputData);
@@ -181,7 +181,7 @@ export class AppBuilder {
   }
 
   async runEndProject(): Promise<void> {
-    this.db?.resetDB();
+    this.db?.resetDb();
     await stopServer();
   }
 }

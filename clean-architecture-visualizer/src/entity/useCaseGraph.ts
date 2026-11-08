@@ -1,20 +1,20 @@
-import type { cleanNode } from '../types/cleanNode.js';
-import type { neighbourMap } from '../types/neighbourMap.js';
+import type { CleanNode } from '../types/cleanNode.js';
+import type { NeighbourMap } from '../types/neighbourMap.js';
 import type { RelationshipType } from '../types/relationship.js';
 
-export class useCaseGraph {
+export class UseCaseGraph {
   private readonly name: string;
-  private readonly outNeighbours: neighbourMap;
-  private violationEdges: [cleanNode, cleanNode][] = [];
+  private readonly outNeighbours: NeighbourMap;
+  private violationEdges: [CleanNode, CleanNode][] = [];
   private readonly files = new Map<string, string>();
   private readonly edgeTypes = new Map<string, RelationshipType>();
 
   constructor(name: string) {
     this.name = name;
-    this.outNeighbours = useCaseGraph.createEmptyNeighbourMap();
+    this.outNeighbours = UseCaseGraph.createEmptyNeighbourMap();
   }
 
-  private static createEmptyNeighbourMap(): neighbourMap {
+  private static createEmptyNeighbourMap(): NeighbourMap {
     return {
       controller: [],
       presenter: [],
@@ -54,7 +54,7 @@ export class useCaseGraph {
    * @param node is a cleanNode type.
    * @returns an array of cleanNodes.
    */
-  getNodeNeighbours(node: cleanNode): cleanNode[] {
+  getNodeNeighbours(node: CleanNode): CleanNode[] {
     return this.outNeighbours[node];
   }
 
@@ -65,7 +65,7 @@ export class useCaseGraph {
    * @param from is of a cleanNode type.
    * @param to is of a cleanNode type.
    */
-  setNodeNeighbour(from: cleanNode, to: cleanNode): void {
+  setNodeNeighbour(from: CleanNode, to: CleanNode): void {
     if (from === to) {
       return;
     }
@@ -78,7 +78,7 @@ export class useCaseGraph {
    * Sets a violation of the Clean Architecture structure within a use case.
    * @param edge is a tuple [from, to] which indicates the origin and destination of the violation.
    */
-  setViolation(edge: [cleanNode, cleanNode]): void {
+  setViolation(edge: [CleanNode, CleanNode]): void {
     this.violationEdges.push(edge);
   }
 
@@ -86,7 +86,7 @@ export class useCaseGraph {
     return this.violationEdges.length;
   }
 
-  getViolationEdges(): [cleanNode, cleanNode][] {
+  getViolationEdges(): [CleanNode, CleanNode][] {
     return this.violationEdges;
   }
 
@@ -98,7 +98,7 @@ export class useCaseGraph {
     this.violationEdges = [];
   }
 
-  getNeighbourMap(): neighbourMap {
+  getNeighbourMap(): NeighbourMap {
     return this.outNeighbours;
   }
 
@@ -110,13 +110,13 @@ export class useCaseGraph {
    * @param to is of a cleanNode type.
    * @param type the relationship between the two nodes.
    */
-  setEdgeType(from: cleanNode, to: cleanNode, type: RelationshipType): void {
+  setEdgeType(from: CleanNode, to: CleanNode, type: RelationshipType): void {
     const key = `${from}->${to}`;
     if (type === 'dependency' && this.edgeTypes.has(key)) return;
     this.edgeTypes.set(key, type);
   }
 
-  getEdgeType(from: cleanNode, to: cleanNode): RelationshipType {
+  getEdgeType(from: CleanNode, to: CleanNode): RelationshipType {
     return this.edgeTypes.get(`${from}->${to}`) ?? 'dependency';
   }
 
@@ -132,15 +132,15 @@ export class useCaseGraph {
    *
    * @returns a list of cleanNodes, those that are missing from this use case.
    */
-  getMissingNodes(): cleanNode[] {
-    let verificationList = Object.keys(this.outNeighbours) as cleanNode[];
+  getMissingNodes(): CleanNode[] {
+    let verificationList = Object.keys(this.outNeighbours) as CleanNode[];
 
     for (const [node, neighbours] of Object.entries(this.outNeighbours)) {
       if (neighbours.length > 0) {
         verificationList = verificationList.filter((n) => n !== node);
       }
       verificationList = verificationList.filter(
-        (n) => !neighbours.includes(n as cleanNode)
+        (n) => !neighbours.includes(n as CleanNode)
       );
     }
 

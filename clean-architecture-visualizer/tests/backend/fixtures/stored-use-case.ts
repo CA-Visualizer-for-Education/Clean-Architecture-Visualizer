@@ -1,9 +1,9 @@
-import type { neighbourMap } from '../../../src/types/neighbourMap.js';
+import type { NeighbourMap } from '../../../src/types/neighbourMap.js';
 import type { SessionData } from '../../../src/types/sessionData.js';
 
 type StoredUseCase = SessionData['useCases'][number];
 
-function emptyOutNeighbours(): neighbourMap {
+function emptyOutNeighbours(): NeighbourMap {
   return {
     controller: [],
     presenter: [],
@@ -26,7 +26,7 @@ function emptyOutNeighbours(): neighbourMap {
 export function makeStoredUseCase(
   fields: Partial<Omit<StoredUseCase, 'outNeighbours'>> & {
     id: string;
-    outNeighbours?: Partial<neighbourMap>;
+    outNeighbours?: Partial<NeighbourMap>;
   }
 ): StoredUseCase {
   const { outNeighbours, ...rest } = fields;

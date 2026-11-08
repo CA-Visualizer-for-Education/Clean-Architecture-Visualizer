@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it } from '@jest/globals';
-import { SessionDBAccess } from '../../../src/data_access/sessionDBAccess.js';
-import { useCaseGraph } from '../../../src/entity/useCaseGraph.js';
-import type { cleanNode } from '../../../src/types/cleanNode.js';
-import type { neighbourMap } from '../../../src/types/neighbourMap.js';
+import { SessionDbAccess } from '../../../src/data_access/sessionDBAccess.js';
+import { UseCaseGraph } from '../../../src/entity/useCaseGraph.js';
+import type { CleanNode } from '../../../src/types/cleanNode.js';
+import type { NeighbourMap } from '../../../src/types/neighbourMap.js';
 import type { SessionData } from '../../../src/types/sessionData.js';
 import { GetProjectSummaryInteractor } from '../../../src/use_case/getProjectSummary/getProjectSummaryInteractor.js';
 import type {
@@ -12,7 +12,7 @@ import type {
 import { RecordingOutputData } from '../doubles/recording-output-data.js';
 import { makeStoredUseCase } from '../fixtures/stored-use-case.js';
 
-const genericDBAccess = new SessionDBAccess();
+const genericDbAccess = new SessionDbAccess();
 
 // Standardized mock for Output Data matching your interface
 // The Output Data classes have private fields, so the recording double needs a cast.
@@ -25,14 +25,14 @@ function makeOutputData(): GetProjectSummaryOutputData &
 // Builds a list of useCaseGraphs with mock violation edges, given a map of use case name to violation count
 function mockUseCaseGraphList(
   namesToNumViolationEdges: Map<string, number>
-): useCaseGraph[] {
-  const result = [] as useCaseGraph[];
+): UseCaseGraph[] {
+  const result = [] as UseCaseGraph[];
 
   for (const [name, numViolationEdges] of namesToNumViolationEdges) {
-    const ucGraph = new useCaseGraph(name);
+    const ucGraph = new UseCaseGraph(name);
     for (let i = 0; i < numViolationEdges; i++) {
       // "view" and "controller" are arbitrary cleanNode values and can be modified
-      ucGraph.setViolation(['view', 'controller'] as [cleanNode, cleanNode]);
+      ucGraph.setViolation(['view', 'controller'] as [CleanNode, CleanNode]);
     }
     result.push(ucGraph);
   }
@@ -42,16 +42,16 @@ function mockUseCaseGraphList(
 
 describe('GetProjectSummaryInteractor', () => {
   beforeEach(() => {
-    genericDBAccess.resetDB();
+    genericDbAccess.resetDb();
   });
 
   describe('getProjectSummary — Project Name', () => {
     it('correctly handles an empty project name', async () => {
-      genericDBAccess.setProjectName('');
+      genericDbAccess.setProjectName('');
 
       const outputData = makeOutputData();
       const interactor = new GetProjectSummaryInteractor(
-        genericDBAccess,
+        genericDbAccess,
         outputData
       );
       await interactor.getProjectSummary();
@@ -60,11 +60,11 @@ describe('GetProjectSummaryInteractor', () => {
     });
 
     it('does not change the project name from the database', async () => {
-      genericDBAccess.setProjectName('My Project');
+      genericDbAccess.setProjectName('My Project');
 
       const outputData = makeOutputData();
       const interactor = new GetProjectSummaryInteractor(
-        genericDBAccess,
+        genericDbAccess,
         outputData
       );
       await interactor.getProjectSummary();
@@ -77,7 +77,7 @@ describe('GetProjectSummaryInteractor', () => {
     it('returns the correct properties in the output', async () => {
       const outputData = makeOutputData();
       const interactor = new GetProjectSummaryInteractor(
-        genericDBAccess,
+        genericDbAccess,
         outputData
       );
 
@@ -96,7 +96,7 @@ describe('GetProjectSummaryInteractor', () => {
         {
           id: 'uc-1',
           name: 'Sign in',
-          outNeighbours: {} as neighbourMap,
+          outNeighbours: {} as NeighbourMap,
           fileKeys: [],
           violationEdges: [],
           missingNodes: [],
@@ -104,7 +104,7 @@ describe('GetProjectSummaryInteractor', () => {
         {
           id: 'uc-2',
           name: 'Sign out',
-          outNeighbours: {} as neighbourMap,
+          outNeighbours: {} as NeighbourMap,
           fileKeys: [],
           violationEdges: [],
           missingNodes: [],
@@ -112,7 +112,7 @@ describe('GetProjectSummaryInteractor', () => {
         {
           id: 'uc-3',
           name: 'Create user',
-          outNeighbours: {} as neighbourMap,
+          outNeighbours: {} as NeighbourMap,
           fileKeys: [],
           violationEdges: [],
           missingNodes: [],
@@ -121,13 +121,13 @@ describe('GetProjectSummaryInteractor', () => {
 
       // Inject them into the database
       for (const uc of mockUseCases) {
-        genericDBAccess.setNumUseCases(genericDBAccess.getNumUseCases() + 1);
-        genericDBAccess.upsertUseCase(uc);
+        genericDbAccess.setNumUseCases(genericDbAccess.getNumUseCases() + 1);
+        genericDbAccess.upsertUseCase(uc);
       }
 
       const outputData = makeOutputData();
       const interactor = new GetProjectSummaryInteractor(
-        genericDBAccess,
+        genericDbAccess,
         outputData
       );
       await interactor.getProjectSummary();
@@ -144,7 +144,7 @@ describe('GetProjectSummaryInteractor', () => {
         ['Sign out', 0],
         ['Create user', 1],
       ]);
-      const mockUseCases: useCaseGraph[] = mockUseCaseGraphList(mockUseCaseMap);
+      const mockUseCases: UseCaseGraph[] = mockUseCaseGraphList(mockUseCaseMap);
 
       // compute violation count from the useCaseGraph list
       let violationCount = 0;
@@ -153,11 +153,11 @@ describe('GetProjectSummaryInteractor', () => {
         violationCount += useCase.getViolationCount();
       });
 
-      genericDBAccess.setNumViolations(violationCount);
+      genericDbAccess.setNumViolations(violationCount);
 
       const outputData = makeOutputData();
       const interactor = new GetProjectSummaryInteractor(
-        genericDBAccess,
+        genericDbAccess,
         outputData
       );
       await interactor.getProjectSummary();
@@ -185,11 +185,11 @@ describe('GetProjectSummaryInteractor', () => {
       });
 
       // Manual injection for test setup
-      genericDBAccess.upsertUseCase(mockUseCase);
+      genericDbAccess.upsertUseCase(mockUseCase);
 
       const outputData = makeOutputData();
       const interactor = new GetProjectSummaryInteractor(
-        genericDBAccess,
+        genericDbAccess,
         outputData
       );
 
@@ -211,7 +211,7 @@ describe('GetProjectSummaryInteractor', () => {
     it('returns an empty array for use_cases if none exist in DB', async () => {
       const outputData = makeOutputData();
       const interactor = new GetProjectSummaryInteractor(
-        genericDBAccess,
+        genericDbAccess,
         outputData
       );
 

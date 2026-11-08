@@ -4,19 +4,19 @@
 
 import { CircularProgress, Container, Typography } from '@mui/material';
 import { useParams } from 'react-router-dom';
-import type { cleanLayer } from '../../../../src/types/clean-layer';
-import type { cleanNode } from '../../../../src/types/cleanNode';
+import type { CleanLayer } from '../../../../src/types/clean-layer';
+import type { CleanNode } from '../../../../src/types/cleanNode';
 import { useInteraction } from '../../actions/useAnalysis';
 import type {
   CAComponentType,
-  CALayer,
-  CANode,
+  CaLayer,
+  CaNode,
   InteractionDetail,
 } from '../../lib/types';
-import { CADiagramView } from './CADiagramView';
+import { CaDiagramView } from './CADiagramView';
 import type { NodeClickInfo } from './CANodeView';
 
-const componentLayerMap: Record<CAComponentType, CALayer> = {
+const componentLayerMap: Record<CAComponentType, CaLayer> = {
   Controller: 'InterfaceAdapters',
   Presenter: 'InterfaceAdapters',
   View: 'Frameworks',
@@ -32,7 +32,7 @@ const componentLayerMap: Record<CAComponentType, CALayer> = {
   Database: 'Frameworks',
 };
 
-const cleanNodeToCAComponentType: Record<cleanNode, CAComponentType> = {
+const cleanNodeToCAComponentType: Record<CleanNode, CAComponentType> = {
   controller: 'Controller',
   presenter: 'Presenter',
   viewModel: 'ViewModel',
@@ -48,14 +48,14 @@ const cleanNodeToCAComponentType: Record<cleanNode, CAComponentType> = {
   useCaseInteractor: 'Interactor',
 };
 
-const cleanLayerToCALayer: Record<cleanLayer, CALayer> = {
+const cleanLayerToCaLayer: Record<CleanLayer, CaLayer> = {
   interfaceAdapters: 'InterfaceAdapters',
   frameworksAndDrivers: 'Frameworks',
   enterpriseBusinessRules: 'EnterpriseBusinessRules',
   applicationBusinessRules: 'ApplicationBusinessRules',
 };
 
-const getNodeByType = (nodes: CANode[], type: CAComponentType): CANode => {
+const getNodeByType = (nodes: CaNode[], type: CAComponentType): CaNode => {
   const node = nodes.find((candidate) => candidate.type === type);
   return (
     node ?? {
@@ -91,13 +91,13 @@ function formatInteractionData(data: InteractionDetail): InteractionDetail {
     ...data,
     nodes: data.nodes.map((node) => ({
       ...node,
-      type: cleanNodeToCAComponentType[node.type as cleanNode],
-      layer: cleanLayerToCALayer[node.layer as cleanLayer],
+      type: cleanNodeToCAComponentType[node.type as CleanNode],
+      layer: cleanLayerToCaLayer[node.layer as CleanLayer],
     })),
   };
 }
 
-export function CADiagram({
+export function CaDiagram({
   onNodeClick,
 }: {
   onNodeClick?: (info: NodeClickInfo) => void;
@@ -173,7 +173,7 @@ export function CADiagram({
   const edges = interactionData.edges;
 
   return (
-    <CADiagramView
+    <CaDiagramView
       controller={controller}
       presenter={presenter}
       viewModel={viewModel}

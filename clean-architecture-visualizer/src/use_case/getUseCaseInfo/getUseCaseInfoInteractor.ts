@@ -1,4 +1,4 @@
-import type { SessionDBAccessInterface } from '../../data_access/sessionDBAccessInterface.js';
+import type { SessionDbAccessInterface } from '../../data_access/sessionDBAccessInterface.js';
 import type { EdgeStorage, NodeStorage } from '../../types/sessionData.js';
 import type { GetUseCaseInfoInputBoundary } from './getUseCaseInfoInputBoundary.js';
 import type { GetUseCaseInfoInputData } from './getUseCaseInfoInputData.js';
@@ -11,7 +11,7 @@ import type {
 
 export class GetUseCaseInfoInteractor implements GetUseCaseInfoInputBoundary {
   constructor(
-    private readonly db: SessionDBAccessInterface,
+    private readonly db: SessionDbAccessInterface,
     private readonly outputData: GetUseCaseInfoOutputData
   ) {}
 
@@ -57,7 +57,7 @@ export class GetUseCaseInfoInteractor implements GetUseCaseInfoInputBoundary {
    * - MISSING nodes come from the use case's missingNodes list.
    */
   private buildNodes(
-    useCase: ReturnType<SessionDBAccessInterface['getUseCaseById']> & {}
+    useCase: ReturnType<SessionDbAccessInterface['getUseCaseById']> & {}
   ): UseCaseNodeResponse[] {
     const result: UseCaseNodeResponse[] = [];
 
@@ -66,9 +66,9 @@ export class GetUseCaseInfoInteractor implements GetUseCaseInfoInputBoundary {
     const allNodes = this.db.getAllNodes();
 
     for (const fileKey of useCase.fileKeys) {
-      const nodeFromDB = allNodes.find((n) => n.filePath?.includes(fileKey));
+      const nodeFromDb = allNodes.find((n) => n.filePath?.includes(fileKey));
 
-      if (nodeFromDB !== undefined) fileNodes.push(nodeFromDB);
+      if (nodeFromDb !== undefined) fileNodes.push(nodeFromDb);
     }
 
     for (const node of fileNodes) {
@@ -95,7 +95,7 @@ export class GetUseCaseInfoInteractor implements GetUseCaseInfoInputBoundary {
    * up in EdgeStorage for status information.
    */
   private buildEdges(
-    useCase: ReturnType<SessionDBAccessInterface['getUseCaseById']> & {}
+    useCase: ReturnType<SessionDbAccessInterface['getUseCaseById']> & {}
   ): UseCaseEdgeResponse[] {
     const result: UseCaseEdgeResponse[] = [];
 

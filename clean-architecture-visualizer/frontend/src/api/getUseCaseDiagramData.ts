@@ -1,9 +1,9 @@
 import type {
   AnalysisSummary,
   CAComponentType,
-  CAEdge,
-  CALayer,
-  CANode,
+  CaEdge,
+  CaLayer,
+  CaNode,
   Interaction,
 } from '../lib/types';
 import {
@@ -19,24 +19,24 @@ const validComponentTypes: ReadonlySet<CAComponentType> = new Set(
   COMPONENT_TYPES
 );
 
-const validLayers: ReadonlySet<CALayer> = new Set(
-  Object.keys(LAYER_METADATA) as CALayer[]
+const validLayers: ReadonlySet<CaLayer> = new Set(
+  Object.keys(LAYER_METADATA) as CaLayer[]
 );
 
-const validNodeStatuses: ReadonlySet<CANode['status']> = new Set(NODE_STATUSES);
+const validNodeStatuses: ReadonlySet<CaNode['status']> = new Set(NODE_STATUSES);
 
-const validEdgeTypes: ReadonlySet<CAEdge['type']> = new Set(EDGE_TYPES);
+const validEdgeTypes: ReadonlySet<CaEdge['type']> = new Set(EDGE_TYPES);
 
-const validEdgeStatuses: ReadonlySet<CAEdge['status']> = new Set(EDGE_STATUSES);
+const validEdgeStatuses: ReadonlySet<CaEdge['status']> = new Set(EDGE_STATUSES);
 
 export interface UseCaseDiagramData {
   interactionId: string;
   interactionName: string;
-  nodes: CANode[];
-  edges: CAEdge[];
+  nodes: CaNode[];
+  edges: CaEdge[];
 }
 
-function toCANodes(rawNodes: unknown): CANode[] {
+function toCaNodes(rawNodes: unknown): CaNode[] {
   if (!Array.isArray(rawNodes)) {
     return [];
   }
@@ -58,8 +58,8 @@ function toCANodes(rawNodes: unknown): CANode[] {
       typeof layer !== 'string' ||
       typeof status !== 'string' ||
       !validComponentTypes.has(type as CAComponentType) ||
-      !validLayers.has(layer as CALayer) ||
-      !validNodeStatuses.has(status as CANode['status'])
+      !validLayers.has(layer as CaLayer) ||
+      !validNodeStatuses.has(status as CaNode['status'])
     ) {
       return [];
     }
@@ -73,15 +73,15 @@ function toCANodes(rawNodes: unknown): CANode[] {
         id,
         name,
         type: type as CAComponentType,
-        layer: layer as CALayer,
+        layer: layer as CaLayer,
         file_path,
-        status: status as CANode['status'],
+        status: status as CaNode['status'],
       },
     ];
   });
 }
 
-function toCAEdges(rawEdges: unknown): CAEdge[] {
+function toCaEdges(rawEdges: unknown): CaEdge[] {
   if (!Array.isArray(rawEdges)) {
     return [];
   }
@@ -104,8 +104,8 @@ function toCAEdges(rawEdges: unknown): CAEdge[] {
       typeof target !== 'string' ||
       typeof type !== 'string' ||
       typeof status !== 'string' ||
-      !validEdgeTypes.has(type as CAEdge['type']) ||
-      !validEdgeStatuses.has(status as CAEdge['status'])
+      !validEdgeTypes.has(type as CaEdge['type']) ||
+      !validEdgeStatuses.has(status as CaEdge['status'])
     ) {
       return [];
     }
@@ -115,8 +115,8 @@ function toCAEdges(rawEdges: unknown): CAEdge[] {
         id,
         source,
         target,
-        type: type as CAEdge['type'],
-        status: status as CAEdge['status'],
+        type: type as CaEdge['type'],
+        status: status as CaEdge['status'],
       },
     ];
   });
@@ -188,7 +188,7 @@ export async function getUseCaseDiagramData(
       typeof detail.interaction_name === 'string'
         ? detail.interaction_name
         : interaction.interaction_name,
-    nodes: toCANodes(detail.nodes),
-    edges: toCAEdges(detail.edges),
+    nodes: toCaNodes(detail.nodes),
+    edges: toCaEdges(detail.edges),
   };
 }

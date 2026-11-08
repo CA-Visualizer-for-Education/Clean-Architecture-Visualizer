@@ -1,6 +1,6 @@
-import type { cleanLayer } from './clean-layer.js';
-import type { cleanNode } from './cleanNode.js';
-import type { neighbourMap } from './neighbourMap.js';
+import type { CleanLayer } from './clean-layer.js';
+import type { CleanNode } from './cleanNode.js';
+import type { NeighbourMap } from './neighbourMap.js';
 
 export type SessionData = {
   projectName: string;
@@ -9,10 +9,10 @@ export type SessionData = {
   useCases: Array<{
     id: string;
     name: string;
-    outNeighbours: neighbourMap;
+    outNeighbours: NeighbourMap;
     fileKeys: string[]; // refers to the files map
-    violationEdges: [cleanNode, cleanNode][];
-    missingNodes: cleanNode[];
+    violationEdges: [CleanNode, CleanNode][];
+    missingNodes: CleanNode[];
   }>;
   files: FileStorage[];
   edges: EdgeStorage[];
@@ -22,8 +22,8 @@ export type SessionData = {
 export type FileStorage = {
   filePath: string;
   fileType: 'java' | 'python' | 'javascript' | 'typescript' | 'unknown';
-  layer: cleanLayer;
-  node: cleanNode;
+  layer: CleanLayer;
+  node: CleanNode;
 };
 
 export type EdgeStorage = {
@@ -38,7 +38,7 @@ export type NodeStorage = {
   id: string;
   name?: string;
   filePath?: string;
-  type: cleanNode;
-  layer: cleanLayer;
+  type: CleanNode;
+  layer: CleanLayer;
   status: 'VALID' | 'MISSING' | 'VIOLATION';
 };

@@ -1,3 +1,3 @@
-import type { cleanNode } from './cleanNode.js';
+import type { CleanNode } from './cleanNode.js';
 
-export type neighbourMap = Record<cleanNode, cleanNode[]>;
+export type NeighbourMap = Record<CleanNode, CleanNode[]>;

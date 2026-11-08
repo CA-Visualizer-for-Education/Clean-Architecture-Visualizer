@@ -1,20 +1,20 @@
-import { SessionDB } from '../database/sessionDb.js';
-import type { useCaseGraph } from '../entity/useCaseGraph.js';
-import type { cleanLayer } from '../types/clean-layer.js';
-import type { cleanNode } from '../types/cleanNode.js';
+import { SessionDb } from '../database/sessionDb.js';
+import type { UseCaseGraph } from '../entity/useCaseGraph.js';
+import type { CleanLayer } from '../types/clean-layer.js';
+import type { CleanNode } from '../types/cleanNode.js';
 import type {
   EdgeStorage,
   FileStorage,
   NodeStorage,
   SessionData,
 } from '../types/sessionData.js';
-import type { SessionDBAccessInterface } from './sessionDBAccessInterface.js';
+import type { SessionDbAccessInterface } from './sessionDBAccessInterface.js';
 
-export class SessionDBAccess implements SessionDBAccessInterface {
-  private readonly db: SessionDB<SessionData>;
+export class SessionDbAccess implements SessionDbAccessInterface {
+  private readonly db: SessionDb<SessionData>;
 
   constructor() {
-    this.db = new SessionDB<SessionData>();
+    this.db = new SessionDb<SessionData>();
     this.db.load();
   }
 
@@ -34,7 +34,7 @@ export class SessionDBAccess implements SessionDBAccessInterface {
 
   // Setters - useCases
 
-  setUseCases(useCaseList: useCaseGraph[], files: FileStorage[]): void {
+  setUseCases(useCaseList: UseCaseGraph[], files: FileStorage[]): void {
     const existingFiles = this.db.get('files') ?? [];
     const existingFilePaths = new Set(existingFiles.map((f) => f.filePath));
 
@@ -199,7 +199,7 @@ export class SessionDBAccess implements SessionDBAccessInterface {
     return this.getUseCaseById(id)?.violationEdges;
   }
 
-  getUseCaseMissingNodes(id: string): cleanNode[] | undefined {
+  getUseCaseMissingNodes(id: string): CleanNode[] | undefined {
     return this.getUseCaseById(id)?.missingNodes;
   }
 
@@ -213,7 +213,7 @@ export class SessionDBAccess implements SessionDBAccessInterface {
     return this.db.get('files')?.find((f) => f.filePath === filePath);
   }
 
-  getFilesByLayer(layer: cleanLayer): FileStorage[] {
+  getFilesByLayer(layer: CleanLayer): FileStorage[] {
     return this.getAllFiles().filter((f) => f.layer === layer);
   }
 
@@ -221,7 +221,7 @@ export class SessionDBAccess implements SessionDBAccessInterface {
     return this.getAllFiles().filter((f) => f.fileType === fileType);
   }
 
-  getFilesByNode(node: cleanNode): FileStorage[] {
+  getFilesByNode(node: CleanNode): FileStorage[] {
     return this.getAllFiles().filter((f) => f.node === node);
   }
 
@@ -257,11 +257,11 @@ export class SessionDBAccess implements SessionDBAccessInterface {
     return this.db.get('nodes')?.find((n) => n.id === id);
   }
 
-  getNodesByType(type: cleanNode): NodeStorage[] {
+  getNodesByType(type: CleanNode): NodeStorage[] {
     return this.getAllNodes().filter((n) => n.type === type);
   }
 
-  getNodesByLayer(layer: cleanLayer): NodeStorage[] {
+  getNodesByLayer(layer: CleanLayer): NodeStorage[] {
     return this.getAllNodes().filter((n) => n.layer === layer);
   }
 
@@ -277,7 +277,7 @@ export class SessionDBAccess implements SessionDBAccessInterface {
     return this.getAllNodes().find((n) => n.name === name);
   }
 
-  resetDB(): undefined {
+  resetDb(): undefined {
     this.db.clear();
   }
 }

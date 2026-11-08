@@ -1,6 +1,6 @@
 import type { FileAccessInterface } from '../../data_access/fileAccessInterface.js';
-import type { SessionDBAccessInterface } from '../../data_access/sessionDBAccessInterface.js';
-import type { cleanNode } from '../../types/cleanNode.js';
+import type { SessionDbAccessInterface } from '../../data_access/sessionDBAccessInterface.js';
+import type { CleanNode } from '../../types/cleanNode.js';
 import type { GetViolationsInputBoundary } from './GetViolationsInputBoundary.js';
 import type { GetViolationsInputData } from './GetViolationsInputData.js';
 import type {
@@ -11,7 +11,7 @@ import type {
 
 export class GetViolationsInteractor implements GetViolationsInputBoundary {
   constructor(
-    private readonly db: SessionDBAccessInterface,
+    private readonly db: SessionDbAccessInterface,
     private readonly fileAccess: FileAccessInterface,
     private readonly outputData: GetViolationsOutputData
   ) {}
@@ -56,8 +56,8 @@ export class GetViolationsInteractor implements GetViolationsInputBoundary {
    * and belong to this use case's file keys.
    */
   private resolveRelatedNodeIds(
-    from: cleanNode,
-    to: cleanNode,
+    from: CleanNode,
+    to: CleanNode,
     fileKeys: string[],
     useCaseName: string
   ): string[] {
@@ -84,8 +84,8 @@ export class GetViolationsInteractor implements GetViolationsInputBoundary {
    * Returns undefined if no matching file is found in this use case's file keys.
    */
   private async resolveFileContext(
-    from: cleanNode,
-    to: cleanNode,
+    from: CleanNode,
+    to: CleanNode,
     fileKeys: string[],
     useCaseName: string
   ): Promise<FileContext | undefined> {

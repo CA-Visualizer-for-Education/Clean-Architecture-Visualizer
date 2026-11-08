@@ -1,4 +1,4 @@
-import type { SessionDBAccessInterface } from '../../data_access/sessionDBAccessInterface.js';
+import type { SessionDbAccessInterface } from '../../data_access/sessionDBAccessInterface.js';
 import type { GetFilesWithViolationsInputBoundary } from './getFilesWithViolationsInputBoundary.js';
 import type { GetFilesWithViolationsOutputData } from './getFilesWithViolationsOutputData.js';
 
@@ -6,7 +6,7 @@ export class GetFilesWithViolationsInteractor
   implements GetFilesWithViolationsInputBoundary
 {
   constructor(
-    private readonly db: SessionDBAccessInterface,
+    private readonly db: SessionDbAccessInterface,
     private readonly outputdata: GetFilesWithViolationsOutputData
   ) {}
 

@@ -1,4 +1,4 @@
-export type cleanNode =
+export type CleanNode =
   | 'controller'
   | 'presenter'
   | 'viewModel'
