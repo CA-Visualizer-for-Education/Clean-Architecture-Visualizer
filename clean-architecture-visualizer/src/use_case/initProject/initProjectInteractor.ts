@@ -1,4 +1,4 @@
-import path from 'path';
+import path from 'node:path';
 import type { FileAccessInterface } from '../../data_access/fileAccessInterface.js';
 import type { InitProjectInputBoundary } from './initProjectInputBoundary.js';
 import type { InitProjectInputData } from './initProjectInputData.js';
