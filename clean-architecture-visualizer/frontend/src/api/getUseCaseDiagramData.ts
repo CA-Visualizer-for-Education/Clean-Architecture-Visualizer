@@ -65,7 +65,7 @@ function toCaNodes(rawNodes: unknown): CaNode[] {
     }
 
     const name = typeof node.name === 'string' ? node.name : undefined;
-    const file_path =
+    const filePath =
       typeof node.file_path === 'string' ? node.file_path : undefined;
 
     return [
@@ -74,7 +74,7 @@ function toCaNodes(rawNodes: unknown): CaNode[] {
         name,
         type: type as CAComponentType,
         layer: layer as CaLayer,
-        file_path,
+        file_path: filePath,
         status: status as CaNode['status'],
       },
     ];

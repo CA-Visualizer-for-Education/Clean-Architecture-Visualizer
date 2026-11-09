@@ -198,6 +198,16 @@
       "file": "frontend/src/api/getUseCaseDiagramData.ts",
       "from": "toCAEdges",
       "to": "toCaEdges"
+    },
+    {
+      "file": "frontend/src/api/getUseCaseDiagramData.ts",
+      "from": "file_path",
+      "to": "filePath"
+    },
+    {
+      "file": "src/use_case/getViolations/GetViolationsInteractor.ts",
+      "from": "line_number",
+      "to": "lineNumber"
     }
   ]
 }
