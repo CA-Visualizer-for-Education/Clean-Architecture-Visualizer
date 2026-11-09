@@ -1,5 +1,5 @@
+import fs from 'node:fs';
 import { afterEach, beforeEach, describe, expect, it } from '@jest/globals';
-import fs from 'fs';
 import { SESSION_FILE, SessionDB } from '../../../src/database/sessionDb.js';
 import type { SessionData } from '../../../src/types/sessionData.js';
 

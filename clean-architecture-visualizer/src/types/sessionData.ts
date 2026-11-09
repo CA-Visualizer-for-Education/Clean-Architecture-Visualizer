@@ -1,4 +1,4 @@
-import type { cleanLayer } from './cleanLayer.js';
+import type { cleanLayer } from './clean-layer.js';
 import type { cleanNode } from './cleanNode.js';
 import type { neighbourMap } from './neighbourMap.js';
 
@@ -6,14 +6,14 @@ export type SessionData = {
   projectName: string;
   numUseCases: number;
   numViolations: number;
-  useCases: {
+  useCases: Array<{
     id: string;
     name: string;
     outNeighbours: neighbourMap;
     fileKeys: string[]; // refers to the files map
     violationEdges: [cleanNode, cleanNode][];
     missingNodes: cleanNode[];
-  }[];
+  }>;
   files: FileStorage[];
   edges: EdgeStorage[];
   nodes: NodeStorage[];

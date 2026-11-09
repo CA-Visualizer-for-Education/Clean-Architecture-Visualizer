@@ -1,12 +1,5 @@
 // biome-ignore-all lint/suspicious/noExplicitAny: these tests reach the Interactor's private members until it is split up (#269)
-import {
-  afterEach,
-  beforeEach,
-  describe,
-  expect,
-  it,
-  jest,
-} from '@jest/globals';
+import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { CleanArchAccess } from '../../../src/data_access/cleanArchInfoAccess.js';
 import { FileAccess } from '../../../src/data_access/fileAccess.js';
 import type { FileAccessInterface } from '../../../src/data_access/fileAccessInterface.js';
@@ -422,34 +415,34 @@ class MockFileAccess implements FileAccessInterface {
   async getProjectName(): Promise<string> {
     return 'MockProject';
   }
-  async getFileContent(path: string): Promise<string> {
+  async getFileContent(_path: string): Promise<string> {
     return '';
   }
   async getFileSnippet(
-    filePath: string,
-    target?: string
+    _filePath: string,
+    _target?: string
   ): Promise<string | undefined> {
     return undefined;
   }
   async getLineNumber(
-    filePath: string,
-    target: string
+    _filePath: string,
+    _target: string
   ): Promise<number | undefined> {
     return undefined;
   }
-  async createDirectory(filePath: string): Promise<void> {
+  async createDirectory(_filePath: string): Promise<void> {
     return;
   }
   async getCurrentPath(): Promise<string> {
     return '/mock/path';
   }
-  async bfsFindDir(curr: string, target: string): Promise<string | null> {
+  async bfsFindDir(_curr: string, _target: string): Promise<string | null> {
     return null;
   }
-  async exists(path: string): Promise<boolean> {
+  async exists(_path: string): Promise<boolean> {
     return false;
   }
-  async createFile(filePath: string, content: string = ''): Promise<void> {
+  async createFile(_filePath: string, _content: string = ''): Promise<void> {
     return;
   }
 }
@@ -2146,7 +2139,7 @@ describe('Relationship types are passed through to edge storage', () => {
   });
 
   it('resolves Java package-path imports to files in the same use case', async () => {
-    const files: Array<[string, string]> = [
+    const files: [string, string][] = [
       [
         'LoginPresenter.java',
         '/mock/interface_adapter/login/LoginPresenter.java',
@@ -2236,8 +2229,8 @@ describe('Relationship types are passed through to edge storage', () => {
 
 describe('Clean Architecture rules', () => {
   const verify = async (
-    edges: Array<[cleanNode, cleanNode]>
-  ): Promise<Array<[cleanNode, cleanNode]>> => {
+    edges: [cleanNode, cleanNode][]
+  ): Promise<[cleanNode, cleanNode][]> => {
     const uc = new useCaseGraph('rules');
     for (const [from, to] of edges) uc.setNodeNeighbour(from, to);
     const interactor = new GraphVerificationInteractor(

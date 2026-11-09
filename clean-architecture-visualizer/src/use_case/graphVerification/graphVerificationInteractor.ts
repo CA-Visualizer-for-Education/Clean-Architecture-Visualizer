@@ -2,7 +2,7 @@ import type { CleanArchInfoAccessInterface } from '../../data_access/cleanArchIn
 import type { FileAccessInterface } from '../../data_access/fileAccessInterface.js';
 import type { SessionDBAccessInterface } from '../../data_access/sessionDBAccessInterface.js';
 import { useCaseGraph } from '../../entity/useCaseGraph.js';
-import type { cleanLayer } from '../../types/cleanLayer.js';
+import type { cleanLayer } from '../../types/clean-layer.js';
 import type { cleanNode } from '../../types/cleanNode.js';
 import type { RelationshipType } from '../../types/relationship.js';
 import type {
@@ -11,7 +11,7 @@ import type {
   NodeStorage,
 } from '../../types/sessionData.js';
 import type { GraphVerificationInputBoundary } from './graphVerificationInputBoundary.js';
-import { GraphVerificationInputData } from './graphVerificationInputData.js';
+import type { GraphVerificationInputData } from './graphVerificationInputData.js';
 import type { GraphVerificationOutputBoundary } from './graphVerificationOutputBoundary.js';
 import { GraphVerificationOutputData } from './graphVerificationOutputData.js';
 
@@ -33,7 +33,7 @@ export class GraphVerificationInteractor
   // The node of files <File Name, Node>
   private readonly externalNodes: Record<string, cleanNode> = {};
 
-  private crossUseCaseEdges: Array<[cleanNode, cleanNode]>[] = [];
+  private crossUseCaseEdges: [cleanNode, cleanNode][][] = [];
   private crossUseCaseFiles = new Set<string>();
   private outputData: GraphVerificationOutputData;
 
@@ -43,18 +43,15 @@ export class GraphVerificationInteractor
     private readonly db: SessionDBAccessInterface,
     private readonly presenter: GraphVerificationOutputBoundary,
     private readonly useCaseGraphList: useCaseGraph[] = [],
-    outputData: GraphVerificationOutputData = new GraphVerificationOutputData(),
-    private readonly inputData: GraphVerificationInputData = new GraphVerificationInputData(
-      false
-    )
+    outputData: GraphVerificationOutputData = new GraphVerificationOutputData()
   ) {
     this.outputData = outputData;
   }
 
-  async execute(): Promise<void> {
+  async execute(inputData: GraphVerificationInputData): Promise<void> {
     // restart db
     this.db.resetDB();
-    const formatForCLI = this.inputData.isToCommandLine();
+    const formatForCLI = inputData.isToCommandLine();
 
     // main use case logic
     await this.buildFilePaths();
@@ -130,7 +127,7 @@ export class GraphVerificationInteractor
       externalFilesToUseCaseGraphs.set(filePath, new Set<string>());
     }
     // allEdges will store all of the edges in the form of (fromNodePath, toNodePath, relationshipType)
-    const allEdges: Array<[string, string, RelationshipType]> = [];
+    const allEdges: [string, string, RelationshipType][] = [];
     // map use case graph names to graphs
     const useCaseGraphNamesToGraph = new Map<string, useCaseGraph>();
     let useCaseIndex = 0;
@@ -728,7 +725,7 @@ export class GraphVerificationInteractor
     }
     this.outputData.setOutputData(lines, lineColours);
   }
-  getCrossUseCaseEdges(): Array<[cleanNode, cleanNode]>[] {
+  getCrossUseCaseEdges(): [cleanNode, cleanNode][][] {
     return structuredClone(this.crossUseCaseEdges);
   }
 }
