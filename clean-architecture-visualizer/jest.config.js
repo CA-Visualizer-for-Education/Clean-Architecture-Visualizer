@@ -8,6 +8,7 @@ export default {
       'ts-jest',
       {
         tsconfig: 'tsconfig.test.json',
+        // biome-ignore lint/style/useNamingConvention: ts-jest defines useESM
         useESM: true,
       },
     ],
