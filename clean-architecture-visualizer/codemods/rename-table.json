@@ -27,7 +27,7 @@
     {
       "file": "src/types/neighbourMap.ts",
       "from": "neighbourMap",
-      "to": "NeighbourMap"
+      "to": "NeighborMap"
     },
     {
       "file": "src/entity/useCaseGraph.ts",

@@ -1,6 +1,6 @@
 import type { CleanLayer } from './clean-layer.js';
 import type { CleanNode } from './cleanNode.js';
-import type { NeighbourMap } from './neighbourMap.js';
+import type { NeighborMap } from './neighbourMap.js';
 
 export type SessionData = {
   projectName: string;
@@ -9,7 +9,7 @@ export type SessionData = {
   useCases: Array<{
     id: string;
     name: string;
-    outNeighbours: NeighbourMap;
+    outNeighbours: NeighborMap;
     fileKeys: string[]; // refers to the files map
     violationEdges: [CleanNode, CleanNode][];
     missingNodes: CleanNode[];

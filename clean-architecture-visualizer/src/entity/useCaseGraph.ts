@@ -1,10 +1,10 @@
 import type { CleanNode } from '../types/cleanNode.js';
-import type { NeighbourMap } from '../types/neighbourMap.js';
+import type { NeighborMap } from '../types/neighbourMap.js';
 import type { RelationshipType } from '../types/relationship.js';
 
 export class UseCaseGraph {
   private readonly name: string;
-  private readonly outNeighbours: NeighbourMap;
+  private readonly outNeighbours: NeighborMap;
   private violationEdges: [CleanNode, CleanNode][] = [];
   private readonly files = new Map<string, string>();
   private readonly edgeTypes = new Map<string, RelationshipType>();
@@ -14,7 +14,7 @@ export class UseCaseGraph {
     this.outNeighbours = UseCaseGraph.createEmptyNeighbourMap();
   }
 
-  private static createEmptyNeighbourMap(): NeighbourMap {
+  private static createEmptyNeighbourMap(): NeighborMap {
     return {
       controller: [],
       presenter: [],
@@ -98,7 +98,7 @@ export class UseCaseGraph {
     this.violationEdges = [];
   }
 
-  getNeighbourMap(): NeighbourMap {
+  getNeighbourMap(): NeighborMap {
     return this.outNeighbours;
   }
 

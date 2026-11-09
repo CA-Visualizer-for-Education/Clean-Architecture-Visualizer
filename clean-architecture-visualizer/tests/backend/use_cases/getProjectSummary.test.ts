@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it } from '@jest/globals';
 import { SessionDbAccess } from '../../../src/data_access/sessionDBAccess.js';
 import { UseCaseGraph } from '../../../src/entity/useCaseGraph.js';
 import type { CleanNode } from '../../../src/types/cleanNode.js';
-import type { NeighbourMap } from '../../../src/types/neighbourMap.js';
+import type { NeighborMap } from '../../../src/types/neighbourMap.js';
 import type { SessionData } from '../../../src/types/sessionData.js';
 import { GetProjectSummaryInteractor } from '../../../src/use_case/getProjectSummary/getProjectSummaryInteractor.js';
 import type {
@@ -96,7 +96,7 @@ describe('GetProjectSummaryInteractor', () => {
         {
           id: 'uc-1',
           name: 'Sign in',
-          outNeighbours: {} as NeighbourMap,
+          outNeighbours: {} as NeighborMap,
           fileKeys: [],
           violationEdges: [],
           missingNodes: [],
@@ -104,7 +104,7 @@ describe('GetProjectSummaryInteractor', () => {
         {
           id: 'uc-2',
           name: 'Sign out',
-          outNeighbours: {} as NeighbourMap,
+          outNeighbours: {} as NeighborMap,
           fileKeys: [],
           violationEdges: [],
           missingNodes: [],
@@ -112,7 +112,7 @@ describe('GetProjectSummaryInteractor', () => {
         {
           id: 'uc-3',
           name: 'Create user',
-          outNeighbours: {} as NeighbourMap,
+          outNeighbours: {} as NeighborMap,
           fileKeys: [],
           violationEdges: [],
           missingNodes: [],
