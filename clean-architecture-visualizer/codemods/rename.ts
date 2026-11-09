@@ -207,10 +207,15 @@ function renameFiles(
   }
 }
 
+// Object literal keys don't count: after `{ file_path }` becomes
+// `{ file_path: filePath }`, the old name survives as a key, and a second run
+// must not rename it.
 function isDeclarationName(identifier: Node): boolean {
   const parent = identifier.getParent();
   return (
     parent !== undefined &&
+    !Node.isPropertyAssignment(parent) &&
+    !Node.isShorthandPropertyAssignment(parent) &&
     Node.hasName(parent) &&
     parent.getNameNode() === identifier
   );

@@ -239,6 +239,26 @@ describe('applyRenames', () => {
     );
   });
 
+  it('changes nothing when run again after renaming a local used as a shorthand property', () => {
+    write(
+      'src/data/node.ts',
+      "const file_path = 'a.ts';\nexport const node = { file_path };\n"
+    );
+    const table = {
+      files: [],
+      identifiers: [
+        { file: 'src/data/node.ts', from: 'file_path', to: 'filePath' },
+      ],
+    };
+    applyRenames(root, table, [{ tsconfig: 'tsconfig.json' }]);
+
+    applyRenames(root, table, [{ tsconfig: 'tsconfig.json' }]);
+
+    expect(read('src/data/node.ts')).toBe(
+      "const filePath = 'a.ts';\nexport const node = { file_path: filePath };\n"
+    );
+  });
+
   it('finds an identifier in a file renamed by the same table', () => {
     applyRenames(
       root,
