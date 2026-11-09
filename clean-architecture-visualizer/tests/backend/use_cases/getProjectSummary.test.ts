@@ -31,7 +31,7 @@ function mockUseCaseGraphList(
   for (const [name, numViolationEdges] of namesToNumViolationEdges) {
     const ucGraph = new UseCaseGraph(name);
     for (let i = 0; i < numViolationEdges; i++) {
-      // "view" and "controller" are arbitrary cleanNode values and can be modified
+      // "view" and "controller" are arbitrary CleanNode values and can be modified
       ucGraph.setViolation(['view', 'controller'] as [CleanNode, CleanNode]);
     }
     result.push(ucGraph);
@@ -81,7 +81,7 @@ describe('GetProjectSummaryInteractor', () => {
         outputData
       );
 
-      // Assuming these are set in your genericDBAccess or mocked
+      // Assuming these are set in your genericDbAccess or mocked
       await interactor.getProjectSummary();
 
       expect(outputData.result).toHaveProperty('project_name');
@@ -146,7 +146,7 @@ describe('GetProjectSummaryInteractor', () => {
       ]);
       const mockUseCases: UseCaseGraph[] = mockUseCaseGraphList(mockUseCaseMap);
 
-      // compute violation count from the useCaseGraph list
+      // compute violation count from the UseCaseGraph list
       let violationCount = 0;
 
       mockUseCases.forEach((useCase) => {
@@ -162,7 +162,7 @@ describe('GetProjectSummaryInteractor', () => {
       );
       await interactor.getProjectSummary();
 
-      // compute violation count from the useCaseGraph map
+      // compute violation count from the UseCaseGraph map
       const totalViolations = [...mockUseCaseMap.values()].reduce(
         (accumulator, numViolations) => accumulator + numViolations,
         0

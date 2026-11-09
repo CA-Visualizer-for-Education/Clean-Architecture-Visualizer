@@ -1,5 +1,5 @@
 // This file contains all the logic for displaying the CA Diagram, including fetching the data and handling loading/error states.
-// The actual rendering of the diagram is delegated to CADiagramView, which is a pure presentational component that receives all
+// The actual rendering of the diagram is delegated to CaDiagramView, which is a pure presentational component that receives all
 // the data it needs as props.
 
 import { CircularProgress, Container, Typography } from '@mui/material';
@@ -72,12 +72,12 @@ const getNodeByType = (nodes: CaNode[], type: CAComponentType): CaNode => {
  * Converts node and edge data from backend to frontend types
  *
  * Specifically:
- * - `cleanNode` to `CAComponentType`
- * - `cleanLayer` to `CALayer`
+ * - `CleanNode` to `CAComponentType`
+ * - `CleanLayer` to `CaLayer`
  *
  * Note: `data` is actually not an `InteractionDetail` object since `data.nodes[number].type`
- * is really of type `cleanNode` (backend type) rather than `CAComponentType` (frontend type).
- * Likewise, `data.nodes[number].layer` is really of type `cleanLayer` rather than `CALayer`.
+ * is really of type `CleanNode` (backend type) rather than `CAComponentType` (frontend type).
+ * Likewise, `data.nodes[number].layer` is really of type `CleanLayer` rather than `CaLayer`.
  *
  * However `useInteractor`, the hook that makes the API call to retrieve `data` from the
  * backend, has return type declared (incorrectly) as `InteractionDetail`. Thus to avoid

@@ -51,7 +51,7 @@ export class UseCaseGraph {
 
   /**
    * Get the list of out-neighbours from node.
-   * @param node is a cleanNode type.
+   * @param node is a CleanNode type.
    * @returns an array of cleanNodes.
    */
   getNodeNeighbours(node: CleanNode): CleanNode[] {
@@ -60,10 +60,10 @@ export class UseCaseGraph {
 
   /**
    * Set a node as an out neighbour with a directed edge starting at from and ending at to.
-   * This function will not add a pre-existing cleanNode, nor will it allow a node to reference
+   * This function will not add a pre-existing CleanNode, nor will it allow a node to reference
    * itself.
-   * @param from is of a cleanNode type.
-   * @param to is of a cleanNode type.
+   * @param from is of a CleanNode type.
+   * @param to is of a CleanNode type.
    */
   setNodeNeighbour(from: CleanNode, to: CleanNode): void {
     if (from === to) {
@@ -106,8 +106,8 @@ export class UseCaseGraph {
    * Record the relationship type of the edge from -> to. Several files can map
    * onto the same pair of nodes, so an implements/extends relationship is never
    * downgraded back to a plain dependency.
-   * @param from is of a cleanNode type.
-   * @param to is of a cleanNode type.
+   * @param from is of a CleanNode type.
+   * @param to is of a CleanNode type.
    * @param type the relationship between the two nodes.
    */
   setEdgeType(from: CleanNode, to: CleanNode, type: RelationshipType): void {

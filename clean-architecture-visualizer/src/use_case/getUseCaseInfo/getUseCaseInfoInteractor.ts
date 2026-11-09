@@ -75,7 +75,7 @@ export class GetUseCaseInfoInteractor implements GetUseCaseInfoInputBoundary {
       result.push(this.formatNode(node));
     }
 
-    // Missing nodes — one entry per missing cleanNode type
+    // Missing nodes — one entry per missing CleanNode type
     for (const missingType of useCase.missingNodes) {
       const existing = this.db
         .getNodesByStatus('MISSING')

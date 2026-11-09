@@ -94,7 +94,7 @@ export class GraphVerificationInteractor
   }
 
   /**
-   * Create a useCaseGraph for each use case, and assign files to that use case.
+   * Create a UseCaseGraph for each use case, and assign files to that use case.
    */
   private async buildUseCaseGraphs(): Promise<void> {
     const useCases = await this.fileAccess.getUseCases();
