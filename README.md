@@ -2,32 +2,6 @@
 
 Imagine an app that allows exploration of an application using a CA engine-like diagram where each use case interaction is in a different layer.
 
-## Mobile navigation
-
-On small screens, use the menu button to open Home, Checker, Start, and Learn.
-Learn opens the external learning site in a new tab. Selecting an internal page
-closes the menu; pressing Escape also closes it and returns focus to the menu
-button. The home page adapts to narrow screens, and the diagram violations panel
-uses a drawer on mobile.
-
-The screenshots below show the home page at a 390-pixel viewport width.
-
-| Menu closed | Menu open |
-| --- | --- |
-| ![Mobile home page with navigation collapsed](resources/screenshots/mobile-home.png) | ![Mobile navigation expanded with Home, Checker, Start, and Learn links](resources/screenshots/mobile-menu.png) |
-
-### Laptop screenshots
-
-The screenshots below show the interface in normal and narrow laptop windows.
-
-**Normal window**
-
-![Laptop interface in a normal-width window](resources/screenshots/laptop-normal-window-view.png)
-
-**Narrow window**
-
-![Laptop interface in a narrow window](resources/screenshots/laptop-thin-window-view.png)
-
 ## Background
 
 Students finish first year having learned Python, including OOP and testing and the regular baby data structures (stacks queues trees linked lists recursion). Most have never written a large program from scratch, and most assignments are run-once rather than interactive.
