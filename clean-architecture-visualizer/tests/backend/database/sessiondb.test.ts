@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it } from '@jest/globals';
 import { SESSION_FILE, SessionDb } from '../../../src/database/sessionDb.js';
 import type { SessionData } from '../../../src/types/sessionData.js';
 
-describe('SessionDB', () => {
+describe('SessionDb', () => {
   let db: SessionDb<SessionData>;
 
   beforeEach(() => {

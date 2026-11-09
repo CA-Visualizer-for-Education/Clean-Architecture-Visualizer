@@ -83,7 +83,7 @@ export default defineConfig({
     reuseExistingServer: !process.env.CI,
     cwd: './',
     env: {
-      // biome-ignore lint/style/useNamingConvention: Vite environment variables are CONSTANT_CASE
+      // biome-ignore lint/style/useNamingConvention: Vite defines VITE_ environment keys in CONSTANT_CASE
       VITE_TEST_MODE: 'true',
     },
   },

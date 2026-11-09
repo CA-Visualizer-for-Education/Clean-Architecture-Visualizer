@@ -52,7 +52,7 @@ export class UseCaseGraph {
   /**
    * Get the list of out-neighbours from node.
    * @param node is a CleanNode type.
-   * @returns an array of cleanNodes.
+   * @returns an array of CleanNodes.
    */
   getNodeNeighbours(node: CleanNode): CleanNode[] {
     return this.outNeighbours[node];
@@ -130,7 +130,7 @@ export class UseCaseGraph {
    *
    * It is assumed that this use case graph's outneighbour map has been fully developed.
    *
-   * @returns a list of cleanNodes, those that are missing from this use case.
+   * @returns a list of CleanNodes, those that are missing from this use case.
    */
   getMissingNodes(): CleanNode[] {
     let verificationList = Object.keys(this.outNeighbours) as CleanNode[];

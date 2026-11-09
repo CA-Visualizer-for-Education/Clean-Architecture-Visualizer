@@ -50,7 +50,7 @@ export class AppBuilder {
   private requireDeps() {
     if (!this.fileAccess || !this.cleanArchAccess || !this.db) {
       throw new Error(
-        'FileAccess, CleanArchAccess, and SessionDBAccess must be set'
+        'FileAccess, CleanArchAccess, and SessionDbAccess must be set'
       );
     }
     return {

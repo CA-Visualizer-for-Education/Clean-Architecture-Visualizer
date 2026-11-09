@@ -23,7 +23,9 @@ changes nothing.
   `.js` extensions, and frontend `@/` imports stay `@/`.
 - **Identifiers** are renamed at their declaration and every use, in the
   backend and the frontend. `file` is the file that declares the identifier,
-  at its path after the file renames.
+  at its path after the file renames. A local used as a shorthand property
+  keeps the property's name: `{ file_path }` becomes `{ file_path: filePath }`,
+  and a second run leaves the key alone.
 
 To run it (needs Node 24.2 or later, which runs TypeScript directly):
 
