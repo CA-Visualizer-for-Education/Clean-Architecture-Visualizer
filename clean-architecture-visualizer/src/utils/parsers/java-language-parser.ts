@@ -11,7 +11,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 /**
- * Java AST parser implementation using Tree-sitter WASM.
+ * Java AST parser implementation using Tree-sitter WASM with declarative Queries.
  */
 export class JavaLanguageParser implements LanguageParser {
   public readonly supportedExtensions = ['.java'] as const;
@@ -19,6 +19,38 @@ export class JavaLanguageParser implements LanguageParser {
   private parser: Parser | null = null;
   private javaLanguage: Parser.Language | null = null;
   private isInitialized = false;
+
+  private packageQuery: Parser.Query | null = null;
+  private hierarchyQuery: Parser.Query | null = null;
+  private importQuery: Parser.Query | null = null;
+  private usedTypesQuery: Parser.Query | null = null;
+
+  private isSupportedFile(file: string): boolean {
+    return this.supportedExtensions.some((ext) => file.endsWith(ext));
+  }
+
+  private getClassName(file: string): string {
+    return path.basename(file, path.extname(file));
+  }
+
+  /**
+   * Resolves the primary base type identifier from a hierarchy type node,
+   * cleanly stripping out generic type arguments (e.g. Base<T> -> Base).
+   */
+  private resolveBaseTypeName(node: Parser.SyntaxNode): string | undefined {
+    if (node.type === 'type_identifier') {
+      return node.text;
+    }
+    if (node.type === 'generic_type') {
+      const typeNode = node.namedChildren[0];
+      return typeNode ? this.resolveBaseTypeName(typeNode) : undefined;
+    }
+    if (node.type === 'scoped_type_identifier') {
+      const classNode = node.namedChildren.at(-1);
+      return classNode?.text;
+    }
+    return undefined;
+  }
 
   async init(): Promise<void> {
     if (this.isInitialized) return;
@@ -34,6 +66,26 @@ export class JavaLanguageParser implements LanguageParser {
     this.parser = new Parser();
     this.javaLanguage = await Parser.Language.load(javaWasmPath);
     this.parser.setLanguage(this.javaLanguage);
+
+    this.packageQuery = this.javaLanguage.query(`
+      (package_declaration [(identifier) (scoped_identifier)] @pkg)
+    `);
+
+    this.hierarchyQuery = this.javaLanguage.query(`
+      (superclass) @extends_container
+      (extends_interfaces) @extends_container
+      (super_interfaces) @implements_container
+    `);
+
+    this.importQuery = this.javaLanguage.query(`
+      (import_declaration (scoped_identifier) @import (asterisk)? @wildcard)
+    `);
+
+    this.usedTypesQuery = this.javaLanguage.query(`
+      (type_identifier) @used_type
+      (scoped_type_identifier) @used_scoped_type
+    `);
+
     this.isInitialized = true;
   }
 
@@ -42,153 +94,138 @@ export class JavaLanguageParser implements LanguageParser {
     filePath: string,
     projectFiles: readonly string[]
   ): Promise<Relationship[]> {
-    if (!this.parser || !this.javaLanguage) {
+    if (
+      !this.parser ||
+      !this.javaLanguage ||
+      !this.packageQuery ||
+      !this.hierarchyQuery ||
+      !this.importQuery ||
+      !this.usedTypesQuery
+    ) {
       throw new Error('Java AST Parser has not been initialized.');
     }
 
     const tree = this.parser.parse(sourceCode);
     const rootNode = tree.rootNode;
 
-    const specificImports = new Set<string>();
-    const wildcardPackages = new Set<string>();
-    const extendsSet = new Set<string>();
-    const implementsSet = new Set<string>();
+    // 1. Extract hierarchy relationship names
+    const extendsNames = new Set<string>();
+    const implementsNames = new Set<string>();
 
-    // 1. Traverse top-level AST declarations
-    for (const child of rootNode.namedChildren) {
-      if (child.type === 'import_declaration') {
-        const hasAsterisk = child.namedChildren.some(
-          (c) => c.type === 'asterisk'
+    for (const capture of this.hierarchyQuery.captures(rootNode)) {
+      const container = capture.node;
+      const typeList =
+        container.namedChildren.find((c) => c.type === 'type_list') ??
+        container;
+
+      for (const childNode of typeList.namedChildren) {
+        const typeName = this.resolveBaseTypeName(childNode);
+        if (!typeName) continue;
+
+        if (capture.name === 'extends_container') {
+          extendsNames.add(typeName);
+        } else if (capture.name === 'implements_container') {
+          implementsNames.add(typeName);
+        }
+      }
+    }
+
+    // 2. Extract single and wildcard imports
+    const importedSingleClasses = new Set<string>();
+    const importedWildcardPackages = new Set<string>();
+
+    for (const match of this.importQuery.matches(rootNode)) {
+      const isWildcard = match.captures.some((c) => c.name === 'wildcard');
+      const importCapture = match.captures.find((c) => c.name === 'import');
+      if (!importCapture) continue;
+
+      if (isWildcard) {
+        importedWildcardPackages.add(importCapture.node.text);
+      } else {
+        const classNode = importCapture.node.namedChildren.at(-1);
+        importedSingleClasses.add(
+          classNode ? classNode.text : importCapture.node.text
         );
-        if (hasAsterisk) {
-          // Wildcard on-demand import (JLS Section 7.5.2)
-          const pkgNode = child.namedChildren.find(
-            (c) => c.type === 'identifier' || c.type === 'scoped_identifier'
-          );
-          if (pkgNode) {
-            wildcardPackages.add(pkgNode.text);
-          }
-        } else {
-          // Single-type import (JLS Section 7.5.1)
-          const targetNode = child.namedChildren.find(
-            (c) => c.type === 'scoped_identifier' || c.type === 'identifier'
-          );
-          if (targetNode) {
-            const className = targetNode.text.split('.').at(-1);
-            if (className) {
-              specificImports.add(className);
-            }
-          }
-        }
-      }
-
-      if (child.type === 'class_declaration') {
-        for (const subChild of child.namedChildren) {
-          if (subChild.type === 'superclass') {
-            for (const idNode of subChild.namedChildren) {
-              if (idNode.type === 'type_identifier') {
-                extendsSet.add(idNode.text);
-              }
-            }
-          }
-          if (subChild.type === 'super_interfaces') {
-            for (const typeList of subChild.namedChildren) {
-              for (const idNode of typeList.namedChildren) {
-                if (idNode.type === 'type_identifier') {
-                  implementsSet.add(idNode.text);
-                }
-              }
-              if (typeList.type === 'type_identifier') {
-                implementsSet.add(typeList.text);
-              }
-            }
-          }
-        }
       }
     }
 
-    // 2. Collect used identifiers within class/interface bodies (excluding package/import headers)
-    const usedSymbols = new Set<string>();
-    const traverse = (node: Parser.SyntaxNode) => {
-      if (node.type === 'type_identifier' || node.type === 'identifier') {
-        usedSymbols.add(node.text);
-      }
-      for (const nextChild of node.namedChildren) {
-        traverse(nextChild);
-      }
-    };
+    // 3. Extract types used within class/interface bodies
+    const bodyUsedSimpleTypes = new Set<string>();
+    const bodyUsedScopedNodes: Parser.SyntaxNode[] = [];
 
-    for (const child of rootNode.namedChildren) {
+    for (const capture of this.usedTypesQuery.captures(rootNode)) {
+      const parentType = capture.node.parent?.type;
       if (
-        child.type !== 'import_declaration' &&
-        child.type !== 'package_declaration'
+        parentType === 'import_declaration' ||
+        parentType === 'package_declaration'
       ) {
-        traverse(child);
+        continue;
+      }
+
+      if (capture.name === 'used_type') {
+        bodyUsedSimpleTypes.add(capture.node.text);
+      } else if (capture.name === 'used_scoped_type') {
+        bodyUsedScopedNodes.push(capture.node);
       }
     }
 
-    // 3. Resolve same-package sibling classes (JLS Section 7.4 / Section 7.5) and wildcard classes in memory
-    const currentDirNormalized = path
-      .dirname(filePath)
-      .replace(/\\/g, '/')
-      .toLowerCase();
-    const currentFileName = path.basename(filePath);
+    // 4. Assemble available symbol pool
+    const availableSymbols = new Set<string>();
 
-    const samePackageClasses = new Set<string>();
+    for (const singleClass of importedSingleClasses) {
+      availableSymbols.add(singleClass);
+    }
+
+    const allKnownProjectClasses = new Set<string>();
+    const currentClassName = this.getClassName(filePath);
+
     for (const pf of projectFiles) {
-      const pfNormalized = pf.replace(/\\/g, '/');
-      if (
-        path.dirname(pfNormalized).toLowerCase() === currentDirNormalized &&
-        path.basename(pfNormalized) !== currentFileName &&
-        pfNormalized.endsWith('.java')
-      ) {
-        samePackageClasses.add(path.basename(pfNormalized, '.java'));
+      if (this.isSupportedFile(pf)) {
+        allKnownProjectClasses.add(this.getClassName(pf));
       }
     }
 
-    const wildcardResolvedClasses = new Set<string>();
-    for (const pkg of wildcardPackages) {
-      const pkgPathFragment = `/${pkg.replace(/\./g, '/')}/`;
-      for (const pf of projectFiles) {
-        const pfNormalized = pf.replace(/\\/g, '/');
-        const withLeadingSlash = pfNormalized.startsWith('/')
-          ? pfNormalized
-          : `/${pfNormalized}`;
-        if (
-          withLeadingSlash.includes(pkgPathFragment) &&
-          pfNormalized.endsWith('.java')
-        ) {
-          wildcardResolvedClasses.add(path.basename(pfNormalized, '.java'));
+    for (const projectClass of allKnownProjectClasses) {
+      if (projectClass !== currentClassName) {
+        availableSymbols.add(projectClass);
+      }
+    }
+
+    // 5. Cross-check used types against available symbols and project classes
+    const confirmedDependencies = new Set<string>();
+
+    for (const typeName of bodyUsedSimpleTypes) {
+      if (availableSymbols.has(typeName)) {
+        confirmedDependencies.add(typeName);
+      }
+    }
+
+    for (const scopedNode of bodyUsedScopedNodes) {
+      const classNode = scopedNode.namedChildren.at(-1);
+      if (classNode) {
+        const className = classNode.text;
+        if (allKnownProjectClasses.has(className)) {
+          confirmedDependencies.add(className);
         }
       }
     }
 
-    // 4. Map to official Relationship records
+    // 6. Map into official Relationship records
     const resultMap = new Map<string, RelationshipType>();
 
-    for (const baseClass of extendsSet) {
-      resultMap.set(baseClass, 'extends');
+    for (const name of extendsNames) {
+      resultMap.set(name, 'extends');
     }
 
-    for (const iface of implementsSet) {
-      resultMap.set(iface, 'implements');
-    }
-
-    for (const importedClass of specificImports) {
-      if (usedSymbols.has(importedClass) && !resultMap.has(importedClass)) {
-        resultMap.set(importedClass, 'dependency');
+    for (const name of implementsNames) {
+      if (!resultMap.has(name)) {
+        resultMap.set(name, 'implements');
       }
     }
 
-    for (const siblingClass of samePackageClasses) {
-      if (usedSymbols.has(siblingClass) && !resultMap.has(siblingClass)) {
-        resultMap.set(siblingClass, 'dependency');
-      }
-    }
-
-    for (const pkgClass of wildcardResolvedClasses) {
-      if (usedSymbols.has(pkgClass) && !resultMap.has(pkgClass)) {
-        resultMap.set(pkgClass, 'dependency');
+    for (const name of confirmedDependencies) {
+      if (!resultMap.has(name)) {
+        resultMap.set(name, 'dependency');
       }
     }
 

@@ -18,15 +18,16 @@ export async function preloadDependencies(
   const fa = fileAccess ?? new FileAccess();
   const allProjectFiles = await fa.getAllSourceFiles(projectRoot);
 
-  const javaFiles = allProjectFiles.filter((filePath) =>
-    filePath.endsWith('.java')
-  );
-  if (javaFiles.length === 0) return;
-
   const parser = new JavaLanguageParser();
+  const targetFiles = allProjectFiles.filter((filePath) =>
+    parser.supportedExtensions.some((ext) => filePath.endsWith(ext))
+  );
+
+  if (targetFiles.length === 0) return;
+
   await parser.init();
 
-  for (const filePath of javaFiles) {
+  for (const filePath of targetFiles) {
     try {
       const sourceCode = await fa.getFileContent(filePath);
       const relationships = await parser.extractDependencies(
