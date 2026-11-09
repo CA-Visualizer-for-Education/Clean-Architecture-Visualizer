@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { StrictMode } from 'react';
-import ReactDOM from 'react-dom/client';
+import { createRoot } from 'react-dom/client';
 import App from './App';
 import './globals.css';
 import './index.css';
@@ -41,7 +41,7 @@ if (!rootElement) {
 }
 
 enableMocking().then(() => {
-  ReactDOM.createRoot(rootElement).render(
+  createRoot(rootElement).render(
     <StrictMode>
       <QueryClientProvider client={queryClient}>
         <App />
