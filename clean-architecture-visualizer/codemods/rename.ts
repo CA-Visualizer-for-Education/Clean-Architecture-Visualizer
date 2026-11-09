@@ -140,13 +140,15 @@ function renameIdentifiers(
       if (!declaration) {
         continue;
       }
+      // With prefix and suffix text, a shorthand property keeps its name:
+      // `{ file_path }` becomes `{ file_path: filePath }`.
       for (const location of project
         .getLanguageService()
-        .findRenameLocations(declaration)) {
+        .findRenameLocations(declaration, { usePrefixAndSuffixText: true })) {
         const span = location.getTextSpan();
         edits.add(location.getSourceFile().getFilePath(), span.getStart(), {
           length: span.getLength(),
-          text: to,
+          text: `${location.getPrefixText() ?? ''}${to}${location.getSuffixText() ?? ''}`,
         });
       }
     }
