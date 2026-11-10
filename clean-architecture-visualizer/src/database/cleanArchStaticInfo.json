@@ -25,16 +25,16 @@
       "outNeighbours": []
     },
     "inputBoundary": {
-      "outNeighbours": []
+      "outNeighbours": ["inputData"]
     },
     "outputData": {
       "outNeighbours": []
     },
     "outputBoundary": {
-      "outNeighbours": []
+      "outNeighbours": ["outputData"]
     },
     "dataAccessInterface": {
-      "outNeighbours": []
+      "outNeighbours": ["entities"]
     },
     "useCaseInteractor": {
       "outNeighbours": [
