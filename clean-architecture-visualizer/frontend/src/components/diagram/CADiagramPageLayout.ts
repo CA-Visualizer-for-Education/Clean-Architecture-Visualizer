@@ -10,14 +10,18 @@ export const PageContainer = styled(Box)({
   overflow: 'hidden',
 });
 
-export const Workspace = styled(Box)({
+export const Workspace = styled(Box)(({ theme }) => ({
   display: 'flex',
   flexGrow: 1,
   overflow: 'hidden',
-});
+  [theme.breakpoints.down('md')]: {
+    flexDirection: 'column',
+  },
+}));
 
 export const MainViewContainer = styled('main')(({ theme }) => ({
   flexGrow: 1,
+  minWidth: 0,
   height: '100%',
   display: 'flex',
   flexDirection: 'column',
