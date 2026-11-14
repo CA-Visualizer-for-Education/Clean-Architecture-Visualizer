@@ -3,7 +3,7 @@ import type { GetViolationsOutputData } from '../../use_case/getViolations/GetVi
 
 export class GetViolationsPresenter implements GetViolationsOutputBoundary {
   constructor(private readonly outputData: GetViolationsOutputData) {}
-  getOutputData(): object {
+  getOutputData(): object | undefined {
     return this.outputData.getOutputData();
   }
 }

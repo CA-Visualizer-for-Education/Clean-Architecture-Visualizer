@@ -3,7 +3,7 @@ import type { GetUseCaseInfoOutputData } from '../../use_case/getUseCaseInfo/get
 
 export class GetUseCaseInfoPresenter implements GetUseCaseInfoOutputBoundary {
   constructor(private readonly outputData: GetUseCaseInfoOutputData) {}
-  getOutputData(): object {
+  getOutputData(): object | undefined {
     return this.outputData.getOutputData();
   }
 }
