@@ -66,7 +66,9 @@ export class GetUseCaseInfoInteractor implements GetUseCaseInfoInputBoundary {
     const allNodes = this.db.getAllNodes();
 
     for (const fileKey of useCase.fileKeys) {
-      const nodeFromDB = allNodes.find((n) => n.filePath?.includes(fileKey));
+      const nodeFromDB = allNodes.find(
+        (n) => n.type != null && n.filePath?.includes(fileKey)
+      );
 
       if (nodeFromDB !== undefined) fileNodes.push(nodeFromDB);
     }
@@ -113,6 +115,7 @@ export class GetUseCaseInfoInteractor implements GetUseCaseInfoInputBoundary {
   }
 
   private formatNodeName(node: NodeStorage): string {
+    if (!node.type) return node.filePath ?? 'Unknown';
     // convert from camelCase to PascalCase and add spaces between words
     // e.g. "dataAccessInterface" -> "Data Access Interface"
     const nodeNamePascalCase =
