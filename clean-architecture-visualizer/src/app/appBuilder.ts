@@ -26,6 +26,7 @@ import { InitModuleProjectInteractor } from '../use_case/initModuleProject/initM
 import { InitModuleProjectOutputData } from '../use_case/initModuleProject/initModuleProjectOutputData.js';
 import { InitProjectInteractor } from '../use_case/initProject/initProjectInteractor.js';
 import { InitProjectOutputData } from '../use_case/initProject/initProjectOutputData.js';
+import { preloadDependencies } from '../utils/ast-preload.js';
 
 export class AppBuilder {
   private fileAccess?: FileAccess;
@@ -69,6 +70,7 @@ export class AppBuilder {
 
   async runGraphVerification(): Promise<void> {
     const { fileAccess, cleanArchAccess, db } = this.requireDeps();
+    await preloadDependencies(process.cwd(), fileAccess);
     const outputData = new GraphVerificationOutputData();
     const presenter = new GraphVerificationPresenter(outputData);
     const interactor = new GraphVerificationInteractor(
@@ -94,6 +96,7 @@ export class AppBuilder {
 
   async runCLIGraphVerification(): Promise<void> {
     const { fileAccess, cleanArchAccess, db } = this.requireDeps();
+    await preloadDependencies(process.cwd(), fileAccess);
     const outputData = new GraphVerificationOutputData();
     const presenter = new GraphVerificationPresenter(outputData);
     const interactor = new GraphVerificationInteractor(
