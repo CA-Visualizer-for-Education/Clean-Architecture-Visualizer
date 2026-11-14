@@ -21,8 +21,12 @@ export class GetUseCaseInfoInteractor implements GetUseCaseInfoInputBoundary {
 
     if (!useCase) return;
 
-    const nodes = this.buildNodes(useCase);
+    console.log('useCase:', JSON.stringify(useCase, null, 2));
+
+    // Edges are built first so buildNodes can make sure every edge endpoint
+    // (including external nodes such as view, entities, database) has a node.
     const edges = this.buildEdges(useCase);
+    const nodes = this.buildNodes(useCase, edges);
 
     const result: UseCaseInfoResponse = {
       interaction_name: useCase.name,
@@ -30,8 +34,6 @@ export class GetUseCaseInfoInteractor implements GetUseCaseInfoInputBoundary {
       edges: edges,
       decoupling: false,
     };
-
-    // const allNodes = this.db.getAllNodes();
 
     /**
      * Checking for sub use case.
@@ -51,44 +53,59 @@ export class GetUseCaseInfoInteractor implements GetUseCaseInfoInputBoundary {
   }
 
   /**
-   * Build the node list for a use case.
-   * - VALID / VIOLATION nodes come from NodeStorage entries whose filePath
-   *   is referenced by the use case's fileKeys.
+   * Build the node list for a use case, one node per node type.
+   * - Nodes come from NodeStorage entries whose filePath matches the use
+   *   case's fileKeys.
+   * - Any node that an edge points to or from is added too, which is what
+   *   brings external nodes (view, entities, database, ...) into the graph.
    * - MISSING nodes come from the use case's missingNodes list.
+   * Rows belonging to this use case are preferred, since status
+   * (VALID / VIOLATION) is stored per use case.
    */
   private buildNodes(
-    useCase: ReturnType<SessionDBAccessInterface['getUseCaseById']> & {}
+    useCase: ReturnType<SessionDBAccessInterface['getUseCaseById']> & {},
+    edges: UseCaseEdgeResponse[]
   ): UseCaseNodeResponse[] {
-    const result: UseCaseNodeResponse[] = [];
-
-    // useCase file keys that correspond to actual files in the DB
-    const fileNodes: NodeStorage[] = [];
     const allNodes = this.db.getAllNodes();
+    const suffix = `-${useCase.name}`;
+    const byType = new Map<string, UseCaseNodeResponse>();
 
+    const pick = (candidates: NodeStorage[]): NodeStorage | undefined =>
+      candidates.find((n) => n.id.endsWith(suffix)) ?? candidates[0];
+
+    const add = (node: NodeStorage | undefined): void => {
+      if (!node?.type || byType.has(node.type)) return;
+      byType.set(node.type, this.formatNode(node));
+    };
+
+    // 1. Nodes from the use case's files
     for (const fileKey of useCase.fileKeys) {
-      const nodeFromDB = allNodes.find(
-        (n) => n.type != null && n.filePath?.includes(fileKey)
-      );
-
-      if (nodeFromDB !== undefined) fileNodes.push(nodeFromDB);
+      const typed = allNodes.filter((n) => n.type);
+      const exact = typed.filter((n) => n.filePath?.endsWith(fileKey));
+      const candidates =
+        exact.length > 0
+          ? exact
+          : typed.filter((n) => n.filePath?.includes(fileKey));
+      add(pick(candidates));
     }
 
-    for (const node of fileNodes) {
-      result.push(this.formatNode(node));
-    }
-
-    // Missing nodes — one entry per missing cleanNode type
-    for (const missingType of useCase.missingNodes) {
-      const existing = this.db
-        .getNodesByStatus('MISSING')
-        .find((n) => n.type === missingType);
-
-      if (existing) {
-        result.push(this.formatNode(existing));
+    // 2. Any node an edge points to or from
+    for (const edge of edges) {
+      for (const type of [edge.source, edge.target]) {
+        if (byType.has(type)) continue;
+        add(pick(allNodes.filter((n) => n.type === type)));
       }
     }
 
-    return result;
+    // 3. Missing nodes — one entry per missing cleanNode type
+    for (const missingType of useCase.missingNodes) {
+      if (byType.has(missingType)) continue;
+      add(
+        this.db.getNodesByStatus('MISSING').find((n) => n.type === missingType)
+      );
+    }
+
+    return [...byType.values()];
   }
 
   /**
