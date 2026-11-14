@@ -19,8 +19,13 @@ export class GraphVerificationInteractor
   implements GraphVerificationInputBoundary
 {
   private readonly internalDirectories = ['use_case', 'interface_adapter'];
+  // Both singular and plural spellings are listed because projects differ
+  // (e.g. `view` vs `views`, `entity` vs `entities`). A directory that does
+  // not exist simply contributes no files.
   private readonly externalDirectories = [
     'entity',
+    'entities',
+    'view',
     'views',
     'data_access',
     'database',
@@ -112,6 +117,12 @@ export class GraphVerificationInteractor
   /**
    * Build the outneighbourmaps in each use case using the information from the
    * paths.
+   *
+   * External files (entity, view, data_access, database) are assigned to a use
+   * case only when they are connected to it:
+   *   1. an internal file of the use case imports them, or
+   *   2. they import an internal file of the use case, or
+   *   3. they are connected (through other external files) to a file from 1 or 2.
    */
   private async developOutNeighbours(): Promise<void> {
     const externalFileNames = [...this.externalFilePaths.keys()].map((name) =>
@@ -130,6 +141,9 @@ export class GraphVerificationInteractor
     const allEdges: [string, string, RelationshipType][] = [];
     // map use case graph names to graphs
     const useCaseGraphNamesToGraph = new Map<string, useCaseGraph>();
+    for (const graph of this.useCaseGraphList) {
+      useCaseGraphNamesToGraph.set(graph.getName(), graph);
+    }
     let useCaseIndex = 0;
     for (const graph of this.useCaseGraphList) {
       this.crossUseCaseEdges.push([]);
@@ -173,10 +187,13 @@ export class GraphVerificationInteractor
           } else {
             graph.setNodeNeighbour(fromNode, toNode);
             graph.setEdgeType(fromNode, toNode, importPath.relationshipType);
-            // Only attach the external file when the import names it exactly (e.g. 'entity1.java;')
-            const modifiedImportPath = importPath.fileName.replace(/;$/, '');
-            if (this.externalFilePaths.has(modifiedImportPath)) {
-              graph.addFile(modifiedImportPath, target.filePath);
+            // If the resolved target is an external file, assign it to this use case.
+            // This uses the resolved target rather than the raw import string, so it
+            // works for relative paths and Java package imports as well as exact names.
+            if (
+              this.externalFilePaths.get(target.fileName) === target.filePath
+            ) {
+              graph.addFile(target.fileName, target.filePath);
               // Adds the use case graph name to the set of use case graphs that the external file belongs to
               externalFilesToUseCaseGraphs
                 .get(target.filePath)
@@ -197,17 +214,18 @@ export class GraphVerificationInteractor
       // Get all use case graphs that import this file, add them to externalFilePathToUseCaseGraphs
       // We only set neighbour if it is an internal file and both paths resolve to clean nodes
       // There is probably room to optimize since we iterate #graphs * #imports * #internal_files
+      //
+      // NOTE: external files are intentionally NOT added to every graph here. They are
+      // added only when they are connected to the use case (see the doc comment above).
       for (const graph of this.useCaseGraphList) {
-        useCaseGraphNamesToGraph.set(graph.getName(), graph);
-        // Want to add all external files to all use case graphs
-        graph.addFile(fileName, filePath);
         for (const importPath of imports) {
-          for (const targetFileName of graph.getFiles().keys()) {
+          for (const targetFileName of [...graph.getFiles().keys()]) {
+            if (!this.internalFilePaths.has(targetFileName)) continue;
             const base = targetFileName.toLowerCase().replace(/\.[^.]+$/, '');
             const res = importPath.fileName.toLowerCase().includes(base);
             if (res) {
               const importNode = this.resolveNode(importPath.fileName);
-              if (importNode && this.internalFilePaths.has(targetFileName)) {
+              if (importNode) {
                 // We need to set node neighbour and add file now
                 // When we do dsu, we only look at external->external edges
                 graph.setNodeNeighbour(fromNode, importNode);
@@ -381,9 +399,19 @@ export class GraphVerificationInteractor
     if (importPath.includes('access')) return 'dataAccess';
     if (importPath.includes('controller')) return 'controller';
     if (importPath.includes('presenter')) return 'presenter';
-    if (importPath.includes('inputboundary')) return 'inputBoundary';
+    // 'InputDataBoundary' / 'OutputDataBoundary' must be checked before
+    // 'inputdata' / 'outputdata', which they also contain
+    if (
+      importPath.includes('inputboundary') ||
+      importPath.includes('inputdataboundary')
+    )
+      return 'inputBoundary';
     if (importPath.includes('inputdata')) return 'inputData';
-    if (importPath.includes('outputboundary')) return 'outputBoundary';
+    if (
+      importPath.includes('outputboundary') ||
+      importPath.includes('outputdataboundary')
+    )
+      return 'outputBoundary';
     if (importPath.includes('outputdata')) return 'outputData';
     if (importPath.includes('interactor')) return 'useCaseInteractor';
     return null;
