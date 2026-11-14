@@ -367,12 +367,17 @@ export class GraphVerificationInteractor
       return null;
     }
     importPath = importPath.toLowerCase().replace(/_/g, '');
-    if (importPath.includes('viewmodel') || importPath.includes('viewmanager')) return 'viewModel'; // must be verified before 'view'
+    if (importPath.includes('viewmodel') || importPath.includes('viewmanager'))
+      return 'viewModel'; // must be verified before 'view'
     if (importPath.includes('view')) return 'view';
     if (importPath.includes('database')) return 'database';
     if (importPath.includes('entity') || importPath.includes('entities'))
       return 'entities';
-    if (importPath.includes('accessinterface') || importPath.includes('accessobject')) return 'dataAccessInterface'; // must be verified before 'dataAccess'
+    if (
+      importPath.includes('accessinterface') ||
+      importPath.includes('accessobject')
+    )
+      return 'dataAccessInterface'; // must be verified before 'dataAccess'
     if (importPath.includes('access')) return 'dataAccess';
     if (importPath.includes('controller')) return 'controller';
     if (importPath.includes('presenter')) return 'presenter';
@@ -391,13 +396,17 @@ export class GraphVerificationInteractor
    */
   private resolveLayer(importPath: string): cleanLayer | undefined {
     importPath = importPath.toLowerCase().replace(/_/g, '');
-    if (importPath.includes('viewmodel') || importPath.includes('viewmanager')) return 'interfaceAdapters'; // must be verified before 'view'
+    if (importPath.includes('viewmodel') || importPath.includes('viewmanager'))
+      return 'interfaceAdapters'; // must be verified before 'view'
     if (importPath.includes('view')) return 'frameworksAndDrivers';
     if (importPath.includes('database')) return 'frameworksAndDrivers';
     // if (importPath.includes('entities')) return 'enterpriseBusinessRules';
     if (importPath.includes('entity') || importPath.includes('entities'))
       return 'enterpriseBusinessRules';
-    if (importPath.includes('accessinterface') || importPath.includes('accessobject'))
+    if (
+      importPath.includes('accessinterface') ||
+      importPath.includes('accessobject')
+    )
       return 'applicationBusinessRules'; // must be verified before 'dataAccess'
     if (importPath.includes('access')) return 'frameworksAndDrivers';
     if (importPath.includes('controller')) return 'interfaceAdapters';
@@ -736,7 +745,10 @@ export class GraphVerificationInteractor
     return structuredClone(this.crossUseCaseEdges);
   }
 
-  private belongsToOtherUseCase(filePath: string, currentName: string): boolean {
+  private belongsToOtherUseCase(
+    filePath: string,
+    currentName: string
+  ): boolean {
     const lowerPath = filePath.toLowerCase();
     return this.useCaseGraphList.some(
       (g) =>
