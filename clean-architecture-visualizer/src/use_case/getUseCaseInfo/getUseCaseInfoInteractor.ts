@@ -21,8 +21,6 @@ export class GetUseCaseInfoInteractor implements GetUseCaseInfoInputBoundary {
 
     if (!useCase) return;
 
-    console.log('useCase:', JSON.stringify(useCase, null, 2));
-
     // Edges are built first so buildNodes can make sure every edge endpoint
     // (including external nodes such as view, entities, database) has a node.
     const edges = this.buildEdges(useCase);
