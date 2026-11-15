@@ -3,6 +3,7 @@ import type { AddressInfo } from 'node:net';
 import chalk from 'chalk';
 
 import type { JavaParserCliAccessInterface } from '../data_access/JavaParserCliAccessInterface.js';
+import type { PatternsAccessInterface } from '../data_access/PatternsAccessInterface.js';
 import type { SessionDBAccessInterface } from '../data_access/sessionDBAccessInterface.js';
 import { startServer, stopServer } from './server.js';
 
@@ -10,11 +11,13 @@ export async function startCommand(options: {
   backendOnly: boolean;
   db: SessionDBAccessInterface;
   javaParserCliAccess: JavaParserCliAccessInterface;
+  patternsAccess: PatternsAccessInterface;
 }): Promise<void> {
   const devServer = await startServer(
     options.backendOnly,
     options.db,
-    options.javaParserCliAccess
+    options.javaParserCliAccess,
+    options.patternsAccess
   );
   const { port } = devServer.address() as AddressInfo;
 
