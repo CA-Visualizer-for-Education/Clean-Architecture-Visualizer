@@ -1,5 +1,5 @@
+import type { AddressInfo } from 'node:net';
 import { afterEach, beforeEach, describe, expect, it } from '@jest/globals';
-import type { AddressInfo } from 'net';
 import { SessionDBAccess } from '../../../src/data_access/sessionDBAccess.js';
 import { useCaseGraph } from '../../../src/entity/useCaseGraph.js';
 import { startServer, stopServer } from '../../../src/server/server.js';
@@ -49,18 +49,21 @@ describe('analysis routes', () => {
     });
   });
 
-  // The routes' 404 branches never run: an unknown id gets 200 with {} (#264).
-  it('answers an unknown use case id with 200 and an empty object', async () => {
+  it('answers an unknown use case id with 404', async () => {
     const res = await fetch(`${baseUrl}/analysis/interaction/uc-999`);
 
-    expect(res.status).toBe(200);
-    expect(await res.json()).toEqual({});
+    expect(res.status).toBe(404);
+    expect(await res.json()).toEqual({
+      error: "Interaction 'uc-999' not found.",
+    });
   });
 
-  it('answers violations for an unknown use case id with 200 and an empty object', async () => {
+  it('answers violations for an unknown use case id with 404', async () => {
     const res = await fetch(`${baseUrl}/analysis/violations/uc-999`);
 
-    expect(res.status).toBe(200);
-    expect(await res.json()).toEqual({});
+    expect(res.status).toBe(404);
+    expect(await res.json()).toEqual({
+      error: "Interaction 'uc-999' not found.",
+    });
   });
 });

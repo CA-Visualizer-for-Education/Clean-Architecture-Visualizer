@@ -1,6 +1,5 @@
 import type { FileAccessInterface } from '../../data_access/fileAccessInterface.js';
 import type { SessionDBAccessInterface } from '../../data_access/sessionDBAccessInterface.js';
-import { useCaseGraph } from '../../entity/useCaseGraph.js';
 import type { cleanNode } from '../../types/cleanNode.js';
 import type { GetViolationsInputBoundary } from './GetViolationsInputBoundary.js';
 import type { GetViolationsInputData } from './GetViolationsInputData.js';

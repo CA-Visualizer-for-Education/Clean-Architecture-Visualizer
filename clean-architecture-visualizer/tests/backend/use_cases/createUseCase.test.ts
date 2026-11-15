@@ -41,7 +41,7 @@ describe('CreateUseCaseInteractor', () => {
       .mockResolvedValueOnce(null)
       .mockResolvedValueOnce('root/src/java');
     mockFileAccess.bfsFindDir.mockImplementation(
-      async (path, dirName) => `/root/src/${dirName}`
+      async (_path, dirName) => `/root/src/${dirName}`
     );
 
     // Act
@@ -78,7 +78,7 @@ describe('CreateUseCaseInteractor', () => {
     mockFileAccess.getCurrentPath.mockResolvedValue('/root');
     mockFileAccess.bfsFindDir.mockResolvedValueOnce('root/src/python');
     mockFileAccess.bfsFindDir.mockImplementation(
-      async (path, dirName) => `/root/src/${dirName}`
+      async (_path, dirName) => `/root/src/${dirName}`
     );
 
     // Act
@@ -118,7 +118,7 @@ describe('CreateUseCaseInteractor', () => {
       .mockResolvedValueOnce(null)
       .mockResolvedValueOnce('root/src/javascript');
     mockFileAccess.bfsFindDir.mockImplementation(
-      async (path, dirName) => `/root/src/${dirName}`
+      async (_path, dirName) => `/root/src/${dirName}`
     );
 
     // Act
@@ -159,7 +159,7 @@ describe('CreateUseCaseInteractor', () => {
       .mockResolvedValueOnce(null)
       .mockResolvedValueOnce('root/src/typescript');
     mockFileAccess.bfsFindDir.mockImplementation(
-      async (path, dirName) => `/root/src/${dirName}`
+      async (_path, dirName) => `/root/src/${dirName}`
     );
 
     // Act
@@ -215,7 +215,7 @@ describe('CreateUseCaseInteractor', () => {
     mockFileAccess.getCurrentPath.mockResolvedValue('/root');
     mockFileAccess.bfsFindDir.mockResolvedValueOnce('/root/src/python');
     mockFileAccess.bfsFindDir.mockImplementation(
-      async (path, dirName) => `/root/src/${dirName}`
+      async (_path, dirName) => `/root/src/${dirName}`
     );
     // Simulate already existing directory
     mockFileAccess.exists.mockResolvedValue(true);

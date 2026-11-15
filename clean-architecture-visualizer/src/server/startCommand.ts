@@ -1,6 +1,6 @@
+import { exec } from 'node:child_process';
+import type { AddressInfo } from 'node:net';
 import chalk from 'chalk';
-import { exec } from 'child_process';
-import type { AddressInfo } from 'net';
 
 import type { JavaParserCliAccessInterface } from '../data_access/JavaParserCliAccessInterface.js';
 import type { SessionDBAccessInterface } from '../data_access/sessionDBAccessInterface.js';

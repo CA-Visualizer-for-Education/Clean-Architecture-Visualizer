@@ -7,7 +7,16 @@
     "home": "Home",
     "checker": "Checker",
     "learn": "Learn",
-    "start": "Start"
+    "start": "Start",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
+  },
+  "sidebar": {
+    "title": "Violations",
+    "open": "View violations",
+    "close": "Close violations",
+    "collapse": "Collapse sidebar",
+    "expand": "Expand sidebar"
   },
   "navigation": {
     "pages": {

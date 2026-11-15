@@ -32,9 +32,9 @@ export class GetUseCaseInfoOutputData {
     this.apiOutputData = outputData;
   }
 
-  // An empty object when nothing was set, such as for an unknown use case id.
-  getOutputData(): UseCaseInfoResponse | Record<string, never> {
+  // Undefined when nothing was set, such as for an unknown use case id.
+  getOutputData(): UseCaseInfoResponse | undefined {
     if (this.apiOutputData) return this.apiOutputData;
-    return {};
+    return undefined;
   }
 }

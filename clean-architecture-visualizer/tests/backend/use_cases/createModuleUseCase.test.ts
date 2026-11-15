@@ -45,7 +45,7 @@ describe('CreateFeatureInteractor', () => {
       .mockImplementationOnce(
         async (_, dirName) => `/root/src/features/${dirName}`
       )
-      .mockImplementationOnce(async (_, dirName) => null);
+      .mockImplementationOnce(async (_, _dirName) => null);
     await runInteractor('newFeature', 'newUseCase');
 
     expect(mockFileAccess.createDirectory).toHaveBeenCalledWith(
@@ -79,7 +79,7 @@ describe('CreateFeatureInteractor', () => {
       .mockImplementationOnce(
         async (_, dirName) => `/root/src/features/${dirName}`
       )
-      .mockImplementationOnce(async (_, dirName) => null);
+      .mockImplementationOnce(async (_, _dirName) => null);
     await runInteractor('newFeature', 'newUseCase');
 
     expect(mockFileAccess.createDirectory).toHaveBeenCalledWith(
@@ -116,7 +116,7 @@ describe('CreateFeatureInteractor', () => {
       .mockImplementationOnce(
         async (_, dirName) => `/root/src/features/${dirName}`
       )
-      .mockImplementationOnce(async (_, dirName) => null);
+      .mockImplementationOnce(async (_, _dirName) => null);
     await runInteractor('newFeature', 'newUseCase');
 
     expect(mockFileAccess.createDirectory).toHaveBeenCalledWith(
@@ -154,7 +154,7 @@ describe('CreateFeatureInteractor', () => {
       .mockImplementationOnce(
         async (_, dirName) => `/root/src/features/${dirName}`
       )
-      .mockImplementationOnce(async (_, dirName) => null);
+      .mockImplementationOnce(async (_, _dirName) => null);
     await runInteractor('newFeature', 'newUseCase');
 
     expect(mockFileAccess.createDirectory).toHaveBeenCalledWith(
@@ -203,7 +203,7 @@ describe('CreateFeatureInteractor', () => {
 
     mockFileAccess.bfsFindDir
       .mockImplementationOnce(async (_, dirName) => `/root/src/${dirName}`)
-      .mockImplementationOnce(async (_, dirName) => null);
+      .mockImplementationOnce(async (_, _dirName) => null);
     await runInteractor('newFeature', 'newUseCase');
     expect(mockPresenter.showSuccessView).not.toHaveBeenCalled();
     expect(mockPresenter.showFailView).toHaveBeenCalledWith(
@@ -255,7 +255,7 @@ describe('CreateFeatureInteractor', () => {
       .mockImplementationOnce(
         async (_, dirName) => `/root/src/features/${dirName}`
       )
-      .mockImplementationOnce(async (_, dirName) => null);
+      .mockImplementationOnce(async (_, _dirName) => null);
     mockFileAccess.createDirectory.mockRejectedValue(new Error('Disk Full'));
     await runInteractor('newFeature', 'newUseCase');
     expect(mockPresenter.showSuccessView).not.toHaveBeenCalled();
@@ -271,7 +271,7 @@ describe('CreateFeatureInteractor', () => {
       .mockImplementationOnce(
         async (_, dirName) => `/root/src/features/${dirName}`
       )
-      .mockImplementationOnce(async (_, dirName) => null);
+      .mockImplementationOnce(async (_, _dirName) => null);
     mockFileAccess.createFile.mockRejectedValue(
       new Error('Failed to create directory.')
     );
