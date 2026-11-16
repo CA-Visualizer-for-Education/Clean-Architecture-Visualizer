@@ -5,6 +5,8 @@ export class CreateFeatureController {
   constructor(private readonly inputBoundary: CreateFeatureInputBoundary) {}
 
   async execute(feature: string): Promise<void> {
+    feature = feature.split(' ').join('');
+
     const inputData = new CreateFeatureInputData(feature);
     await this.inputBoundary.execute(inputData);
   }

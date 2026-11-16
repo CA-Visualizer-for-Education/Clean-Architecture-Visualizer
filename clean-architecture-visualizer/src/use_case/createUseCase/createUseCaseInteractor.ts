@@ -14,7 +14,7 @@ export class CreateUseCaseInteractor implements CreateUseCaseInputBoundary {
 
   async execute(inputData: CreateUseCaseInputData): Promise<void> {
     try {
-      const useCaseName = inputData.getUseCaseName().split(' ').join('');
+      const useCaseName = inputData.getUseCaseName();
       const currPath = await this.fileAccess.getCurrentPath();
 
       // Find the language directory -- makes assumption only one directory is named after language

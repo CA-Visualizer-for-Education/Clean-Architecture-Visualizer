@@ -29,7 +29,7 @@ describe('InitModuleProjectInteractor', () => {
   it('Creates CA directory that is packaged by module (src exists) in java.', async () => {
     mockFileAccess.getCurrentPath.mockResolvedValue(ROOT_PATH);
     mockFileAccess.exists.mockResolvedValue(true);
-    await runInteractor('Java');
+    await runInteractor('java');
 
     const expectedDirs = [
       `${ROOT_PATH}/src/main/java`,

@@ -103,7 +103,7 @@ describe('InitProjectInteractor', () => {
     mockFileAccess.exists.mockResolvedValue(true);
 
     // Act
-    await runInteractor('Javascript');
+    await runInteractor('javascript');
 
     // Assert
     const expectedDirs = [
