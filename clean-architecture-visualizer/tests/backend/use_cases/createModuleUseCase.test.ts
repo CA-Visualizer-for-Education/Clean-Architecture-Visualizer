@@ -35,6 +35,28 @@ describe('CreateFeatureInteractor', () => {
     );
   }
 
+  it('rejects invalid feature names before creating files', async () => {
+    await runInteractor('../Login', 'Login');
+
+    expect(mockPresenter.showFailView).toHaveBeenCalledWith(
+      expect.stringContaining('use letters and digits, starting with a letter')
+    );
+    expect(mockPresenter.showSuccessView).not.toHaveBeenCalled();
+    expect(mockFileAccess.createDirectory).not.toHaveBeenCalled();
+    expect(mockFileAccess.createFile).not.toHaveBeenCalled();
+  });
+
+  it('rejects invalid use case names before creating files', async () => {
+    await runInteractor('Accounts', '../Login');
+
+    expect(mockPresenter.showFailView).toHaveBeenCalledWith(
+      expect.stringContaining('use letters and digits, starting with a letter')
+    );
+    expect(mockPresenter.showSuccessView).not.toHaveBeenCalled();
+    expect(mockFileAccess.createDirectory).not.toHaveBeenCalled();
+    expect(mockFileAccess.createFile).not.toHaveBeenCalled();
+  });
+
   it('Successfully creates files in specified directories in specified use case in specified feature in java.', async () => {
     mockFileAccess.getCurrentPath.mockResolvedValue('/root');
     mockFileAccess.bfsFindDir
@@ -46,7 +68,7 @@ describe('CreateFeatureInteractor', () => {
         async (_, dirName) => `/root/src/features/${dirName}`
       )
       .mockImplementationOnce(async (_, _dirName) => null);
-    await runInteractor('newFeature', 'newUseCase');
+    await runInteractor('new Feature', 'new UseCase');
 
     expect(mockFileAccess.createDirectory).toHaveBeenCalledWith(
       '/root/src/features/newFeature/newUseCase/interface_adapter'
