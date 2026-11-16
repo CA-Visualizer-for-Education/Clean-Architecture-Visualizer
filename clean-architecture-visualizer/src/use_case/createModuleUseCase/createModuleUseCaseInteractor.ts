@@ -1,5 +1,6 @@
 import path from 'node:path';
 import type { FileAccessInterface } from '../../data_access/fileAccessInterface.js';
+import { UseCaseName } from '../../entity/useCaseName.js';
 import type { CreateModuleUseCaseInputBoundary } from './createModuleUseCaseInputBoundary.js';
 import type { CreateModuleUseCaseInputData } from './createModuleUseCaseInputData.js';
 import type { CreateModuleUseCaseOutputBoundary } from './createModuleUseCaseOutputBoundary.js';
@@ -17,8 +18,8 @@ export class CreateModuleUseCaseInteractor
   async execute(inputData: CreateModuleUseCaseInputData): Promise<void> {
     try {
       // remove all spaces from use case name and feature name
-      const feature = inputData.getFeatureName().split(' ').join('');
-      const usecase = inputData.getUseCaseName().split(' ').join('');
+      const feature = new UseCaseName(inputData.getFeatureName()).value;
+      const usecase = new UseCaseName(inputData.getUseCaseName()).value;
       const currPath = await this.fileAccess.getCurrentPath();
       // Find the language directory -- makes assumption only one directory is named after language
       let extension: string | undefined;

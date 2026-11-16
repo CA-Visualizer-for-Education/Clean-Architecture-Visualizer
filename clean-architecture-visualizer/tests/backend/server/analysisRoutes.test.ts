@@ -13,7 +13,8 @@ describe('analysis routes', () => {
     db.resetDB();
 
     const server = await startServer(true, db);
-    const { port } = server.address() as AddressInfo;
+    const { port, address } = server.address() as AddressInfo;
+    expect(address).toBe('127.0.0.1');
     baseUrl = `http://localhost:${port}/api`;
   });
 
