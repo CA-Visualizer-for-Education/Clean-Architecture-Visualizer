@@ -1,0 +1,60 @@
+{
+  "name": "cave-vscode",
+  "displayName": "CAVE: Clean Architecture Verifier",
+  "description": "Check that your project follows Clean Architecture, with each violation shown on the import line that breaks a dependency rule.",
+  "version": "0.1.0",
+  "publisher": "CA-Visualizer-for-Education",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/CA-Visualizer-for-Education/Clean-Architecture-Visualizer.git",
+    "directory": "vscode-extension"
+  },
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Linters",
+    "Education"
+  ],
+  "main": "./dist/extension.js",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "cave.verify",
+        "title": "Verify Clean Architecture",
+        "category": "CAVE"
+      }
+    ],
+    "configuration": {
+      "title": "CAVE",
+      "properties": {
+        "cave.projectRoot": {
+          "type": "string",
+          "default": "",
+          "scope": "resource",
+          "markdownDescription": "Folder to analyse, absolute or relative to the workspace folder. Leave empty to analyse the workspace folder itself."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "typecheck": "tsc --noEmit",
+    "test": "jest",
+    "package": "npm run build && vsce package --no-dependencies"
+  },
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "@types/node": "^20.0.0",
+    "@types/vscode": "~1.85.0",
+    "@vscode/vsce": "^3.2.0",
+    "esbuild": "^0.25.0",
+    "jest": "^30.2.0",
+    "ts-jest": "^29.4.6",
+    "typescript": "^5.9.3"
+  }
+}

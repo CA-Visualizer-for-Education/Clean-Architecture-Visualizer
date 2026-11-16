@@ -35,8 +35,27 @@ program
   .description(
     'Verify whether the use cases found in child directories adhere to Clean Architeccture'
   )
-  .action(async () => {
-    await app.runCLIGraphVerification();
+  .option(
+    '--json',
+    'Print a machine-readable violation report to stdout (used by the VSCode extension)',
+    false
+  )
+  .action(async (options) => {
+    if (!options.json) {
+      await app.runCLIGraphVerification();
+      return;
+    }
+    // stdout must contain only the JSON report, but the engine logs progress
+    // messages (e.g. "Directory views not found") with console.log.
+    // Send those to stderr instead.
+    console.log = (...args: unknown[]) => console.error(...args);
+    try {
+      const report = await app.runJSONVerification();
+      process.stdout.write(`${JSON.stringify(report)}\n`);
+    } catch (err) {
+      console.error(err instanceof Error ? (err.stack ?? err.message) : err);
+      process.exitCode = 1;
+    }
   });
 
 program

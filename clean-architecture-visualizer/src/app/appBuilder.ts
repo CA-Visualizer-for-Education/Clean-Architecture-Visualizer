@@ -8,10 +8,16 @@ import { CreateFeatureController } from '../interface_adapter/createFeature/crea
 import { CreateFeaturePresenter } from '../interface_adapter/createFeature/createFeaturePresenter.js';
 import { CreateUseCaseController } from '../interface_adapter/createUseCase/createUseCaseController.js';
 import { CreateUseCasePresenter } from '../interface_adapter/createUseCase/createUseCasePresenter.js';
+import { GetViolationsController } from '../interface_adapter/getViolations/getViolationsController.js';
+import { GetViolationsPresenter } from '../interface_adapter/getViolations/getViolationsPresenter.js';
 import { GraphVerificationController } from '../interface_adapter/graphVerification/graphVerificationController.js';
 import { GraphVerificationPresenter } from '../interface_adapter/graphVerification/graphVerificationPresenter.js';
 import { InitModuleProjectController } from '../interface_adapter/initModuleProject/initModuleProjectController.js';
 import { InitProjectController } from '../interface_adapter/initProject/initProjectController.js';
+import {
+  buildVerifyJsonReport,
+  type VerifyJsonReport,
+} from '../interface_adapter/verifyJson/verifyJsonPresenter.js';
 import { stopServer } from '../server/server.js';
 import { startCommand } from '../server/startCommand.js';
 import { CreateFeatureInputData } from '../use_case/createFeature/createFeatureInputData.js';
@@ -23,6 +29,12 @@ import { CreateModuleUseCaseOutputData } from '../use_case/createModuleUseCase/c
 import { CreateUseCaseInputData } from '../use_case/createUseCase/createUseCaseInputData.js';
 import { CreateUseCaseInteractor } from '../use_case/createUseCase/createUseCaseInteractor.js';
 import { CreateUseCaseOutputData } from '../use_case/createUseCase/createUseCaseOutputData.js';
+import { GetViolationsInputData } from '../use_case/getViolations/GetViolationsInputData.js';
+import {
+  GetViolationsInteractor,
+  type ViolationEntry,
+} from '../use_case/getViolations/GetViolationsInteractor.js';
+import { GetViolationsOutputData } from '../use_case/getViolations/GetViolationsOutputData.js';
 import { GraphVerificationInputData } from '../use_case/graphVerification/graphVerificationInputData.js';
 import { GraphVerificationInteractor } from '../use_case/graphVerification/graphVerificationInteractor.js';
 import { GraphVerificationOutputData } from '../use_case/graphVerification/graphVerificationOutputData.js';
@@ -108,6 +120,36 @@ export class AppBuilder {
       inputData
     );
     await new GraphVerificationController(interactor).execute();
+  }
+
+  /**
+   * Analyse the project rooted at process.cwd() and return a structured report
+   * of every incorrect-dependency violation, for `cave verify --json`.
+   */
+  async runJSONVerification(): Promise<VerifyJsonReport> {
+    const { fileAccess, cleanArchAccess, db } = this.requireDeps();
+    await this.runGraphVerification();
+
+    const useCases = [];
+    for (const useCase of db.getAllUseCases()) {
+      const outputData = new GetViolationsOutputData();
+      const interactor = new GetViolationsInteractor(
+        db,
+        fileAccess,
+        new GetViolationsInputData(useCase.id),
+        outputData,
+        cleanArchAccess
+      );
+      await new GetViolationsController(interactor).execute();
+      const violations = new GetViolationsPresenter(outputData).getOutputData();
+      useCases.push({
+        name: useCase.name,
+        violations: Array.isArray(violations)
+          ? (violations as ViolationEntry[])
+          : [],
+      });
+    }
+    return buildVerifyJsonReport(process.cwd(), useCases);
   }
 
   async runInitProject(language: string): Promise<void> {

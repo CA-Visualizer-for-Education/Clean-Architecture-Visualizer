@@ -29,6 +29,34 @@ jobs:
       - name: Run jest
         run: npm test
 
+  vscode-extension:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # The extension build bundles the engine from source, so it needs the
+      # engine's dependencies too.
+      - uses: ./.github/actions/setup-node-env
+        with:
+          working-directory: ./clean-architecture-visualizer
+
+      - uses: ./.github/actions/setup-node-env
+        with:
+          working-directory: ./vscode-extension
+
+      - name: Type check
+        run: npm run typecheck
+        working-directory: ./vscode-extension
+
+      - name: Unit tests
+        run: npm test
+        working-directory: ./vscode-extension
+
+      - name: Package .vsix
+        run: npm run package
+        working-directory: ./vscode-extension
+
   frontend-validation:
     runs-on: ubuntu-latest
     steps:

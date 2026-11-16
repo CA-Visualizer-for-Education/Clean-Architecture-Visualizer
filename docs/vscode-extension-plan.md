@@ -9,8 +9,7 @@ whether their code adheres to Clean Architecture — with each violation pointin
 the exact import line that breaks a dependency rule, and a plain-English explanation
 of the rule.
 
-Primary user: **the student**, self-checking as they build (not an instructor grading
-submissions — that's a parked stretch item).
+Primary user: **the student**, self-checking as they build.
 
 ## 2. What it does (MVP)
 
@@ -27,7 +26,7 @@ submissions — that's a parked stretch item).
      *"`LoginController` imports `User` (entities) — a controller may only depend on
      input boundaries / input data."*
 4. On a clean run, an explicit **"✓ Project adheres to Clean Architecture"**
-   notification (not silent).
+   notification.
 5. If no recognizable Clean Architecture layout is found, a single **guidance
    message** instead of a flood of false violations.
 
@@ -37,7 +36,7 @@ submissions — that's a parked stretch item).
 |---|----------|-----------|
 | Audience | Student self-checking | Tone is teaching ("here's the rule you broke"), not pass/fail scoring. |
 | Engine | Reuse the existing `cave` verification engine | Don't reimplement Clean Architecture checks; the engine already exists. |
-| Core output | Actionable per-violation list | What a student can act on; any aggregate score is secondary, parked. |
+| Core output | Actionable per-violation list | What a student can act on. |
 | Surface (Q5) | **Inline diagnostics + Problems panel** | Actionable in-editor, reuses native VSCode UI, matches teaching goal. A terminal dump just restates the existing CLI. |
 | Trigger (Q6) | **Manual command** | Engine scans the whole project per run; manual trigger keeps the editor responsive. On-save is a later upgrade. |
 | Languages (Q7) | **Language-agnostic**, Java documented as best-supported | Engine is already multi-language; the heuristic parser is the real limiter, not a language gate. |

@@ -1,3 +1,5 @@
+import path from 'node:path';
+import type { CleanArchInfoAccessInterface } from '../../data_access/cleanArchInfoAccessInterface.js';
 import type { FileAccessInterface } from '../../data_access/fileAccessInterface.js';
 import type { SessionDBAccessInterface } from '../../data_access/sessionDBAccessInterface.js';
 import { useCaseGraph } from '../../entity/useCaseGraph.js';
@@ -10,7 +12,7 @@ export type ViolationResponse = {
   violations: ViolationEntry[];
 };
 
-type ViolationEntry = {
+export type ViolationEntry = {
   id: string;
   type: 'INCORRECT_DEPENDENCY';
   message: string;
@@ -20,8 +22,11 @@ type ViolationEntry = {
   file_context?: FileContext;
 };
 
-type FileContext = {
+export type FileContext = {
+  /** Basename of the offending file (kept for the web frontend). */
   file: string;
+  /** Path of the offending file, relative to the analysed project root. */
+  path: string;
   line_number?: number;
   snippet?: string;
 };
@@ -31,7 +36,8 @@ export class GetViolationsInteractor implements GetViolationsInputBoundary {
     private readonly db: SessionDBAccessInterface,
     private readonly fileAccess: FileAccessInterface,
     private readonly inputData: GetViolationsInputData,
-    private readonly outputData: GetViolationsOutputData
+    private readonly outputData: GetViolationsOutputData,
+    private readonly cleanArchInfo?: CleanArchInfoAccessInterface
   ) {}
 
   async execute(): Promise<void> {
@@ -39,6 +45,9 @@ export class GetViolationsInteractor implements GetViolationsInputBoundary {
 
     const useCase = this.db.getUseCaseById(interactionId);
     if (!useCase) return undefined;
+    const validOutNeighbours = this.cleanArchInfo
+      ? await this.cleanArchInfo.getValidOutNeighbours()
+      : undefined;
     const violations: ViolationEntry[] = await Promise.all(
       useCase.violationEdges.map(async ([from, to], index) => {
         const edgeId = `${from}->${to}`;
@@ -58,7 +67,12 @@ export class GetViolationsInteractor implements GetViolationsInputBoundary {
         return {
           id: `v-${index}`,
           type: 'INCORRECT_DEPENDENCY',
-          message: '',
+          message: buildViolationMessage(
+            from,
+            to,
+            validOutNeighbours?.[from],
+            fileContext?.file
+          ),
           suggestion: '',
           related_node_ids: relatedNodeIds,
           related_edge_id: edgeId,
@@ -135,6 +149,10 @@ export class GetViolationsInteractor implements GetViolationsInputBoundary {
       if (snippet && line_number) {
         return {
           file: fileName,
+          path: path
+            .relative(process.cwd(), matchingNode.filePath as string)
+            .split(path.sep)
+            .join('/'),
           ...(snippet && { snippet }),
           ...(line_number && { line_number }),
         };
@@ -158,4 +176,53 @@ export class GetViolationsInteractor implements GetViolationsInputBoundary {
       .slice(nodeId.length - useCaseName.length)
       .includes(useCaseName);
   }
+}
+
+/**
+ * Turns a camelCase clean node name into plain words,
+ * e.g. "useCaseInteractor" -> "use case interactor".
+ */
+function describeNode(node: cleanNode): string {
+  return node.replace(/([A-Z])/g, ' $1').toLowerCase();
+}
+
+/** Adds an indefinite article ("a"/"an"), except for the plural "entities". */
+function withArticle(node: cleanNode): string {
+  const words = describeNode(node);
+  if (node === 'entities') return words;
+  // "use" sounds like "you", so it takes "a" ("a use case interactor").
+  return /^[aeio]/.test(words) ? `an ${words}` : `a ${words}`;
+}
+
+function joinWithOr(items: string[]): string {
+  if (items.length <= 1) return items.join('');
+  return `${items.slice(0, -1).join(', ')} or ${items.at(-1)}`;
+}
+
+/**
+ * Builds a student-facing explanation of an incorrect dependency, e.g.
+ * "EnrollStudentController (controller) depends on entities. In Clean
+ * Architecture, a controller may only depend on input data or input boundary."
+ * @param from the node type that owns the offending import.
+ * @param to the node type it should not depend on.
+ * @param allowed the node types `from` may depend on, if known.
+ * @param fileName the offending file's name, if known.
+ */
+export function buildViolationMessage(
+  from: cleanNode,
+  to: cleanNode,
+  allowed?: cleanNode[],
+  fileName?: string
+): string {
+  const className = fileName?.split('.').at(0);
+  const subject = className
+    ? `${className} (${describeNode(from)})`
+    : describeNode(from).replace(/^./, (c) => c.toUpperCase());
+  const problem = `${subject} depends on ${describeNode(to)}.`;
+  if (!allowed) return problem;
+  const rule =
+    allowed.length === 0
+      ? `In Clean Architecture, ${withArticle(from)} must not depend on any other Clean Architecture component.`
+      : `In Clean Architecture, ${withArticle(from)} may only depend on ${joinWithOr(allowed.map(describeNode))}.`;
+  return `${problem} ${rule}`;
 }

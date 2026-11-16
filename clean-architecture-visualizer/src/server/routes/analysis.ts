@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { CleanArchAccess } from '../../data_access/cleanArchInfoAccess.js';
 import { FileAccess } from '../../data_access/fileAccess.js';
 import type { SessionDBAccessInterface } from '../../data_access/sessionDBAccessInterface.js';
 import { GetFilesWithViolationsController } from '../../interface_adapter/getFilesWithViolations/getFilesWithViolationsController.js';
@@ -30,6 +31,7 @@ export function createAnalysisRouter(
 ): Router {
   const router = Router();
   const fileAccess = new FileAccess();
+  const cleanArchAccess = new CleanArchAccess();
 
   router.get('/analysis/summary', (_req, res) => {
     const outputData = new GetProjectSummaryOutputData();
@@ -81,7 +83,8 @@ export function createAnalysisRouter(
       dbAccess,
       fileAccess,
       inputData,
-      outputData
+      outputData,
+      cleanArchAccess
     );
     const controller = new GetViolationsController(interactor);
     const presenter = new GetViolationsPresenter(outputData);

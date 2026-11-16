@@ -16,3 +16,5 @@ clean-architecture-visualizer/frontend/public/
 
 # Local task tracking
 tasks/
+# VSCode extension packages
+*.vsix

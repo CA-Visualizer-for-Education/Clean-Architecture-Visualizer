@@ -24,3 +24,10 @@ The `--json` output is now an API contract between the engine and the extension 
 shape (and the added full file path / populated `message`) must stay stable or be
 versioned deliberately. The engine stays `cwd`-driven: the extension sets the child
 process `cwd` to the resolved project root.
+
+The contract as implemented: stdout is a single JSON object
+`{ schema_version, status: "clean" | "violations" | "no_layout", project_root,
+use_cases, violations }`; the exit code is 0 whenever analysis ran and non-zero only
+on a crash. Each violation's `file_context.path` is relative to the project root
+(`file` remains the basename the web frontend uses). Bump `schema_version` on any
+breaking change; the extension refuses versions it doesn't know.

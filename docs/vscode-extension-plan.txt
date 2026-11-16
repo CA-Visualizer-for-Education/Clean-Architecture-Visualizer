@@ -1,5 +1,5 @@
 VSCODE EXTENSION PLAN — CLEAN ARCHITECTURE VERIFICATION FOR STUDENTS
-Status: Planning (MVP scoped)  ·  Date: 2026-11-09
+Status: MVP implemented (see vscode-extension-plan.md)  ·  Date: 2026-11-09
 
 
 1. GOAL
