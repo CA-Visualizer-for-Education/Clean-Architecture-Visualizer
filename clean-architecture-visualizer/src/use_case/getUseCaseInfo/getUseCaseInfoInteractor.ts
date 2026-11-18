@@ -95,7 +95,7 @@ export class GetUseCaseInfoInteractor implements GetUseCaseInfoInputBoundary {
       }
     }
 
-    // 3. Missing nodes — one entry per missing cleanNode type
+    // 3. Missing nodes — one entry per missing CleanNode type
     for (const missingType of useCase.missingNodes) {
       if (byType.has(missingType)) continue;
       add(

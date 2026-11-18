@@ -1,7 +1,7 @@
 import { describe, expect, it } from '@jest/globals';
 import { UseCaseGraph } from '../../../src/entity/useCaseGraph.js';
 
-describe('useCaseGraph edge types', () => {
+describe('UseCaseGraph edge types', () => {
   it('defaults to dependency when no type was set', () => {
     const graph = new UseCaseGraph('login');
     expect(graph.getEdgeType('controller', 'inputBoundary')).toBe('dependency');

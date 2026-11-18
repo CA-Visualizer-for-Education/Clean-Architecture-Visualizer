@@ -575,7 +575,7 @@ describe('Imports across use cases are caught and seperate from normal violation
   });
 });
 
-describe('useCaseGraph edge type storage', () => {
+describe('UseCaseGraph edge type storage', () => {
   it('stores and retrieves edge types', () => {
     const graph = new UseCaseGraph('test');
     graph.setNodeNeighbour('controller', 'inputBoundary');
