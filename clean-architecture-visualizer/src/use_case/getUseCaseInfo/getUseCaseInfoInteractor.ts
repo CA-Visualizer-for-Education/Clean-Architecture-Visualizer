@@ -61,7 +61,7 @@ export class GetUseCaseInfoInteractor implements GetUseCaseInfoInputBoundary {
    * (VALID / VIOLATION) is stored per use case.
    */
   private buildNodes(
-    useCase: ReturnType<SessionDBAccessInterface['getUseCaseById']> & {},
+    useCase: ReturnType<SessionDbAccessInterface['getUseCaseById']> & {},
     edges: UseCaseEdgeResponse[]
   ): UseCaseNodeResponse[] {
     const allNodes = this.db.getAllNodes();

@@ -140,7 +140,7 @@ export class GraphVerificationInteractor
     // allEdges will store all of the edges in the form of (fromNodePath, toNodePath, relationshipType)
     const allEdges: [string, string, RelationshipType][] = [];
     // map use case graph names to graphs
-    const useCaseGraphNamesToGraph = new Map<string, useCaseGraph>();
+    const useCaseGraphNamesToGraph = new Map<string, UseCaseGraph>();
     for (const graph of this.useCaseGraphList) {
       useCaseGraphNamesToGraph.set(graph.getName(), graph);
     }
