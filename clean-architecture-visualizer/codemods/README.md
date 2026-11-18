@@ -41,3 +41,8 @@ and reverted on its own.
 
 After merging `main` into a branch that predates a rename, run the codemod
 again to update the branch's new imports.
+
+A rerun does not rename identifiers in merged code. The codemod finds an
+identifier's uses through its declaration, and once the declaration has the
+new name, a use of the old name points at nothing. `npm run verify --prefix ..`
+reports each one as "Cannot find name"; rename them by hand.
