@@ -11,11 +11,14 @@ Welcome to the Cave developer docs! Follow the steps below to get your local env
 First, fork the main repository on GitHub, then clone your fork and set up the remotes:
 
 ```bash
-# Clone your fork
-git clone https://github.com/CA-Visualizer-for-Education/Clean-Architecture-Visualizer.git
+# Clone your fork (replace <your-username> with your GitHub username)
+git clone https://github.com/<your-username>/Clean-Architecture-Visualizer.git
 
 # Navigate into the project
 cd Clean-Architecture-Visualizer
+
+# Add the main repository as `upstream`, so you can bring in its changes later
+git remote add upstream https://github.com/CA-Visualizer-for-Education/Clean-Architecture-Visualizer.git
 ```
 
 ## 2. Working with Branches and Rebasing
@@ -34,11 +37,8 @@ git checkout -b my-feature-branch
 git push origin my-feature-branch
 ```
 
-**Pull the latest changes from the main repo:**
-
-```bash
-git pull main
-```
+To bring in the latest changes from the main repository, see
+[Updating your branch from `main`](#3-updating-your-branch-from-main).
 
 To keep a readable and linear commit history we use [conventional commits](https://gist.github.com/qoomon/5dfcdf8eec66a051ecd85625518cfd13). Each commit should be a task that can be summarized by its commit to make the lives of reviewers easier.
 
@@ -119,20 +119,78 @@ fixup a3 commit3
 
 Then we will only have one commit left on the branch named conventionally.
 
-## 3. Navigate into the Project
+## 3. Updating your branch from `main`
+
+`main` keeps moving while you work. Bring its changes into your branch before you ask for
+a review, and again whenever a PR that your work depends on has merged. Commit your work
+first: git won't merge over uncommitted changes.
+
+```bash
+git fetch upstream
+git merge upstream/main
+```
+
+Once your PR is open, merge rather than rebase: a merge keeps the commits your reviewers
+have already seen, and your PR is squashed into one commit when it merges anyway.
+
+If git reports conflicts, open each file it lists. Each conflict sits between markers: your
+version is between `<<<<<<<` and `=======`, and `main`'s is between `=======` and `>>>>>>>`.
+Decide what the code should be. Often that means keeping both changes, but if you both
+changed the same lines, you may need one side, the other, or a mix of the two. Delete the
+markers, then `git add` those files and run `git merge --continue`. To start over instead,
+`git merge --abort` puts your branch back the way it was before the merge.
+
+### After a rename
+
+Some PRs rename files and identifiers across the codebase, to bring it in line with the
+[style guide](./Style-Guide.md). If you've just merged one of them, code you wrote on your
+branch may still use the old names. Fix them before you check and push:
+
+1. Update imports of renamed files with the rename codemod:
+
+   ```bash
+   cd clean-architecture-visualizer
+   npm run codemod:rename
+   cd ..
+   ```
+
+   The codemod needs Node 24.2 or later, which is newer than the rest of the repo needs.
+   Check your version with `node --version`.
+
+2. Fix old identifier names by hand. `npm run verify` reports each one as a type error,
+   such as `has no exported member 'CANode'`, `Cannot find name 'CANode'`, or
+   `Property 'resetDB' does not exist`. Look up the old name in
+   `clean-architecture-visualizer/codemods/rename-table.json`, which each rename PR adds
+   its renames to, and use its `to` name.
+
+If the PR also made a lint rule an error, `npm run verify` lists the lines in your code that
+break it. `npm run check:fix` fixes many of them for you; the [style guide](./Style-Guide.md)
+explains the rest.
+
+### Check and push
+
+Before you push, run every check that CI runs, from the repository root:
+
+```bash
+npm run verify
+```
+
+Then push to your fork with `git push origin my-feature-branch`.
+
+## 4. Navigate into the Project
 
 ```bash
 cd clean-architecture-visualizer
 ```
 
-## 4. Install Dependencies & Set Up the Project
+## 5. Install Dependencies & Set Up the Project
 
 ```bash
 npm install
 npm run setup
 ```
 
-## 5. Post Setup
+## 6. Post Setup
 
 You should now be able to run all tests within the directory with:
 
@@ -152,7 +210,7 @@ CI also type-checks the backend's source and tests. To run the same check locall
 npm run type-check
 ```
 
-## 6. Working on the Docs
+## 7. Working on the Docs
 
 The docs site in `docs/` uses npm, like the rest of the repo. From the repo root:
 

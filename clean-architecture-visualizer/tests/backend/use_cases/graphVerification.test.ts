@@ -406,6 +406,9 @@ class MockFileAccess implements FileAccessInterface {
       });
     }
   }
+  async getAllSourceFiles(_curr?: string): Promise<string[]> {
+    return [];
+  }
   async getFileImports(path: string): Promise<Relationship[]> {
     return this.contents.get(path) ?? [];
   }

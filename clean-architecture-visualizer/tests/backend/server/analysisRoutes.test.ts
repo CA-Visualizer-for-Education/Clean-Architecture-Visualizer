@@ -13,7 +13,8 @@ describe('analysis routes', () => {
     db.resetDb();
 
     const server = await startServer(true, db);
-    const { port } = server.address() as AddressInfo;
+    const { port, address } = server.address() as AddressInfo;
+    expect(address).toBe('127.0.0.1');
     baseUrl = `http://localhost:${port}/api`;
   });
 
@@ -49,18 +50,21 @@ describe('analysis routes', () => {
     });
   });
 
-  // The routes' 404 branches never run: an unknown id gets 200 with {} (#264).
-  it('answers an unknown use case id with 200 and an empty object', async () => {
+  it('answers an unknown use case id with 404', async () => {
     const res = await fetch(`${baseUrl}/analysis/interaction/uc-999`);
 
-    expect(res.status).toBe(200);
-    expect(await res.json()).toEqual({});
+    expect(res.status).toBe(404);
+    expect(await res.json()).toEqual({
+      error: "Interaction 'uc-999' not found.",
+    });
   });
 
-  it('answers violations for an unknown use case id with 200 and an empty object', async () => {
+  it('answers violations for an unknown use case id with 404', async () => {
     const res = await fetch(`${baseUrl}/analysis/violations/uc-999`);
 
-    expect(res.status).toBe(200);
-    expect(await res.json()).toEqual({});
+    expect(res.status).toBe(404);
+    expect(await res.json()).toEqual({
+      error: "Interaction 'uc-999' not found.",
+    });
   });
 });
