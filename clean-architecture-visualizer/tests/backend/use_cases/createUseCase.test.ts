@@ -32,7 +32,16 @@ describe('CreateUseCaseInteractor', () => {
     return interactor.execute(new CreateUseCaseInputData(name));
   }
 
-  // TODO: Add a separate test case checking if use case names with spaces wer properly sanitized
+  it('rejects invalid names before creating files', async () => {
+    await runInteractor('../Login');
+
+    expect(mockPresenter.showFailView).toHaveBeenCalledWith(
+      expect.stringContaining('use letters and digits, starting with a letter')
+    );
+    expect(mockPresenter.showSuccessView).not.toHaveBeenCalled();
+    expect(mockFileAccess.createDirectory).not.toHaveBeenCalled();
+    expect(mockFileAccess.createFile).not.toHaveBeenCalled();
+  });
 
   it('successfully creates directories and files for a valid use case name in java', async () => {
     // Arrange

@@ -70,7 +70,7 @@ export async function startServer(
   }
 
   return new Promise((resolve, reject) => {
-    const localServer = app.listen(0, () => {
+    const localServer = app.listen(0, '127.0.0.1', () => {
       const { port } = localServer.address() as AddressInfo;
 
       console.log(chalk.green(`Server running at http://localhost:${port}`));
