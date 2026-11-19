@@ -15,6 +15,24 @@ import type { GraphVerificationInputData } from './graphVerificationInputData.js
 import type { GraphVerificationOutputBoundary } from './graphVerificationOutputBoundary.js';
 import { GraphVerificationOutputData } from './graphVerificationOutputData.js';
 
+/**
+ * Recognized source file extensions across supported languages.
+ * Used to distinguish dot-delimited package imports (e.g. `entity.User`)
+ * from relative file paths that carry a known extension (e.g. `./User.ts`).
+ */
+const KNOWN_CODE_EXTENSIONS: readonly string[] = [
+  '.java',
+  '.ts',
+  '.tsx',
+  '.mts',
+  '.cts',
+  '.js',
+  '.jsx',
+  '.mjs',
+  '.cjs',
+  '.py',
+] as const;
+
 export class GraphVerificationInteractor
   implements GraphVerificationInputBoundary
 {
@@ -481,13 +499,10 @@ export class GraphVerificationInteractor
       targetName = clean.slice(lastSlash + 1);
     } else {
       const lastDot = clean.lastIndexOf('.');
-      if (
-        lastDot !== -1 &&
-        !clean.endsWith('.java') &&
-        !clean.endsWith('.ts') &&
-        !clean.endsWith('.js') &&
-        !clean.endsWith('.py')
-      ) {
+      const hasKnownExtension = KNOWN_CODE_EXTENSIONS.some((ext) =>
+        clean.endsWith(ext)
+      );
+      if (lastDot !== -1 && !hasKnownExtension) {
         targetName = clean.slice(lastDot + 1);
       }
     }
