@@ -219,26 +219,23 @@ export class GraphVerificationInteractor
       // added only when they are connected to the use case (see the doc comment above).
       for (const graph of this.useCaseGraphList) {
         for (const importPath of imports) {
-          for (const targetFileName of [...graph.getFiles().keys()]) {
-            if (!this.internalFilePaths.has(targetFileName)) continue;
-            const base = targetFileName.toLowerCase().replace(/\.[^.]+$/, '');
-            const res = importPath.fileName.toLowerCase().includes(base);
-            if (res) {
-              const importNode = this.resolveNode(importPath.fileName);
-              if (importNode) {
-                // We need to set node neighbour and add file now
-                // When we do dsu, we only look at external->external edges
-                graph.setNodeNeighbour(fromNode, importNode);
-                graph.setEdgeType(
-                  fromNode,
-                  importNode,
-                  importPath.relationshipType
-                );
-                graph.addFile(fileName, filePath);
-                externalFilesToUseCaseGraphs
-                  .get(filePath)
-                  ?.add(graph.getName());
-              }
+          const targetFileName = this.resolveImportToFileName(
+            this.internalFilePaths,
+            importPath.fileName
+          );
+          if (targetFileName && graph.getFiles().has(targetFileName)) {
+            const importNode = this.resolveNode(importPath.fileName);
+            if (importNode) {
+              // We need to set node neighbour and add file now
+              // When we do dsu, we only look at external->external edges
+              graph.setNodeNeighbour(fromNode, importNode);
+              graph.setEdgeType(
+                fromNode,
+                importNode,
+                importPath.relationshipType
+              );
+              graph.addFile(fileName, filePath);
+              externalFilesToUseCaseGraphs.get(filePath)?.add(graph.getName());
             }
           }
         }
@@ -461,16 +458,44 @@ export class GraphVerificationInteractor
     nodeType: Map<string, string>,
     importPath: string
   ): string | undefined {
-    const entries = [...nodeType.entries()].sort(
-      (a, b) => b[0].length - a[0].length
-    );
-    for (const [fileName] of entries) {
-      const fileType = fileName.toLowerCase().replace(/\.[^.]+$/, '');
-      if (!fileType) continue;
-      if (importPath.toLowerCase().includes(fileType)) {
-        return fileName;
+    // 0. Clean trailing semicolons, quotes, and whitespace from raw import strings
+    const clean = importPath
+      .trim()
+      .replace(/^['"]|['"]$/g, '')
+      .replace(/;$/, '');
+
+    // 1. Direct hit on key or filePath (supports bare names and full paths in mock tests)
+    if (nodeType.has(clean)) return clean;
+    for (const [fileName, filePath] of nodeType.entries()) {
+      if (clean === filePath) return fileName;
+    }
+
+    // 2. Direct match with .java extension
+    const directJava = `${clean}.java`;
+    if (nodeType.has(directJava)) return directJava;
+
+    // 3. Extract terminal segment from relative paths or dot-separated package strings
+    const lastSlash = Math.max(clean.lastIndexOf('/'), clean.lastIndexOf('\\'));
+    let targetName = clean;
+    if (lastSlash !== -1) {
+      targetName = clean.slice(lastSlash + 1);
+    } else {
+      const lastDot = clean.lastIndexOf('.');
+      if (
+        lastDot !== -1 &&
+        !clean.endsWith('.java') &&
+        !clean.endsWith('.ts') &&
+        !clean.endsWith('.js') &&
+        !clean.endsWith('.py')
+      ) {
+        targetName = clean.slice(lastDot + 1);
       }
     }
+
+    if (nodeType.has(targetName)) return targetName;
+    const targetJava = `${targetName}.java`;
+    if (nodeType.has(targetJava)) return targetJava;
+
     return undefined;
   }
 
