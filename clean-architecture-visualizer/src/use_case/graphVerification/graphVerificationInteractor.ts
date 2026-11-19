@@ -219,26 +219,26 @@ export class GraphVerificationInteractor
       // added only when they are connected to the use case (see the doc comment above).
       for (const graph of this.useCaseGraphList) {
         for (const importPath of imports) {
-          for (const targetFileName of [...graph.getFiles().keys()]) {
-            if (!this.internalFilePaths.has(targetFileName)) continue;
-            const base = targetFileName.toLowerCase().replace(/\.[^.]+$/, '');
-            const res = importPath.fileName.toLowerCase().includes(base);
-            if (res) {
-              const importNode = this.resolveNode(importPath.fileName);
-              if (importNode) {
-                // We need to set node neighbour and add file now
-                // When we do dsu, we only look at external->external edges
-                graph.setNodeNeighbour(fromNode, importNode);
-                graph.setEdgeType(
-                  fromNode,
-                  importNode,
-                  importPath.relationshipType
-                );
-                graph.addFile(fileName, filePath);
-                externalFilesToUseCaseGraphs
-                  .get(filePath)
-                  ?.add(graph.getName());
-              }
+          const targetFileName = this.resolveImportToFileName(
+            this.internalFilePaths,
+            importPath.fileName
+          );
+          if (targetFileName && graph.getFiles().has(targetFileName)) {
+            const targetFilePath = this.internalFilePaths.get(targetFileName);
+            const importNode =
+              (targetFilePath ? this.resolveNode(targetFilePath) : null) ??
+              this.resolveNode(importPath.fileName);
+            if (importNode) {
+              // We need to set node neighbour and add file now
+              // When we do dsu, we only look at external->external edges
+              graph.setNodeNeighbour(fromNode, importNode);
+              graph.setEdgeType(
+                fromNode,
+                importNode,
+                importPath.relationshipType
+              );
+              graph.addFile(fileName, filePath);
+              externalFilesToUseCaseGraphs.get(filePath)?.add(graph.getName());
             }
           }
         }
@@ -449,28 +449,92 @@ export class GraphVerificationInteractor
 
   /**
    * Given a raw import path, find the file name (map key) it refers to within
-   * the given file map. Import paths come straight from the source line (still
-   * containing quotes/relative-path segments and a possibly different
-   * extension), so this matches on the file's basename with its extension
-   * stripped rather than requiring an exact key match.
+   * the given file map.
+   *
+   * Resolves Java imports by package path and class name, relative paths by
+   * normalized path segments, or unqualified names by exact basename equality,
+   * avoiding false substring matches (e.g. Student vs EnrollStudent).
+   *
    * @param nodeType a map from file name to file path.
-   * @param importPath a raw import path.
+   * @param importPath a raw import path or fully qualified name.
    * @returns the matching file name, or undefined if none match.
    */
   private resolveImportToFileName(
     nodeType: Map<string, string>,
     importPath: string
   ): string | undefined {
-    const entries = [...nodeType.entries()].sort(
-      (a, b) => b[0].length - a[0].length
-    );
-    for (const [fileName] of entries) {
-      const fileType = fileName.toLowerCase().replace(/\.[^.]+$/, '');
-      if (!fileType) continue;
-      if (importPath.toLowerCase().includes(fileType)) {
+    if (!importPath) return undefined;
+    importPath = importPath
+      .trim()
+      .replace(/^['"]|['"]$/g, '')
+      .replace(/;$/, '');
+    if (!importPath) return undefined;
+
+    // File path matching (contains '/' or '\')
+    if (importPath.includes('/') || importPath.includes('\\')) {
+      const normalizedImport = importPath
+        .replace(/\\/g, '/')
+        .replace(/^(\.\.?\/)+/, '')
+        .replace(/\.[^.]+$/, '')
+        .toLowerCase();
+
+      for (const [fileName, filePath] of nodeType) {
+        const normalizedFilePath = filePath.replace(/\\/g, '/').toLowerCase();
+        const pathWithoutExt = normalizedFilePath.replace(/\.[^.]+$/, '');
+
+        if (
+          pathWithoutExt === normalizedImport ||
+          pathWithoutExt.endsWith(`/${normalizedImport}`)
+        ) {
+          return fileName;
+        }
+      }
+
+      // If directory structure didn't match, check exact basename
+      const targetBase = (importPath.split(/[/\\]/).at(-1) ?? '')
+        .replace(/\.[^.]+$/, '')
+        .toLowerCase();
+      for (const [fileName] of nodeType) {
+        const fileBase = fileName.toLowerCase().replace(/\.[^.]+$/, '');
+        if (fileBase === targetBase) {
+          return fileName;
+        }
+      }
+
+      return undefined;
+    }
+
+    // Strip optional file extension before checking Java package structure
+    const importWithoutExt = importPath.replace(/\.(java|ts|js|tsx|jsx)$/i, '');
+
+    // Java fully qualified name matching (package path + class name, e.g. a.b.C)
+    if (/^[A-Za-z_$][\w$]*(\.[A-Za-z_$][\w$]*)+$/.test(importWithoutExt)) {
+      const javaPath = importWithoutExt.replace(/\./g, '/').toLowerCase();
+
+      for (const [fileName, filePath] of nodeType) {
+        const normalizedFilePath = filePath.replace(/\\/g, '/').toLowerCase();
+        const pathWithoutExt = normalizedFilePath.replace(/\.[^.]+$/, '');
+
+        if (
+          pathWithoutExt === javaPath ||
+          pathWithoutExt.endsWith(`/${javaPath}`)
+        ) {
+          return fileName;
+        }
+      }
+      return undefined;
+    }
+
+    // Unqualified name matching: exact basename equality
+    const targetBaseName = importWithoutExt.toLowerCase();
+
+    for (const [fileName] of nodeType) {
+      const fileBaseName = fileName.toLowerCase().replace(/\.[^.]+$/, '');
+      if (fileBaseName === targetBaseName) {
         return fileName;
       }
     }
+
     return undefined;
   }
 

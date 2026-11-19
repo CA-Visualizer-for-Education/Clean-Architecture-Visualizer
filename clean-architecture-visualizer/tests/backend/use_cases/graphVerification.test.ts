@@ -2258,3 +2258,104 @@ describe('Clean Architecture rules', () => {
     ]);
   });
 });
+
+describe('Import substring safety (Issue #267)', () => {
+  it('does not resolve substring file names when one is part of another', () => {
+    const paths = new Map<string, string>([
+      ['Student.java', '/mock/src/entity/Student.java'],
+      [
+        'EnrollStudentViewModel.java',
+        '/mock/src/interface_adapter/EnrollStudent/EnrollStudentViewModel.java',
+      ],
+      [
+        'EnrollStudent.java',
+        '/mock/src/interface_adapter/EnrollStudent/EnrollStudent.java',
+      ],
+    ]);
+    const interactor = new GraphVerificationInteractor(
+      new MockFileAccess(new Map(), paths),
+      genericNeighbourAccess,
+      new SessionDBAccess(),
+      new GraphVerificationPresenter(new GraphVerificationOutputData()),
+      []
+    );
+
+    // Qualified package matching resolves to the exact file
+    expect(
+      (interactor as any).resolveImportToFileName(
+        paths,
+        'interface_adapter.EnrollStudent.EnrollStudentViewModel'
+      )
+    ).toBe('EnrollStudentViewModel.java');
+
+    // Before #262, incomplete package "interface_adapter.EnrollStudent" falsely resolved
+    // to Student.java due to substring matching. Now it resolves to undefined.
+    expect(
+      (interactor as any).resolveImportToFileName(
+        paths,
+        'interface_adapter.EnrollStudent'
+      )
+    ).toBeUndefined();
+
+    // Exact unqualified name matching avoids substring confusion
+    expect((interactor as any).resolveImportToFileName(paths, 'Student')).toBe(
+      'Student.java'
+    );
+    expect(
+      (interactor as any).resolveImportToFileName(paths, 'EnrollStudent')
+    ).toBe('EnrollStudent.java');
+
+    // Substrings that are not exact matches do not resolve
+    expect(
+      (interactor as any).resolveImportToFileName(paths, 'rollStudent')
+    ).toBeUndefined();
+  });
+
+  it('resolves outputData to viewModel without false entities violation', async () => {
+    const fileMockPaths = new Map<string, string>([
+      [
+        'EnrollStudentOutputData.java',
+        '/mock/src/use_case/EnrollStudent/EnrollStudentOutputData.java',
+      ],
+      [
+        'EnrollStudentViewModel.java',
+        '/mock/src/interface_adapter/EnrollStudent/EnrollStudentViewModel.java',
+      ],
+      ['Student.java', '/mock/src/entity/Student.java'],
+    ]);
+
+    const fileMockContents = new Map<string, Relationship[]>([
+      [
+        '/mock/src/use_case/EnrollStudent/EnrollStudentOutputData.java',
+        [
+          {
+            fileName: 'interface_adapter.EnrollStudent.EnrollStudentViewModel',
+            relationshipType: 'dependency',
+          },
+        ],
+      ],
+    ]);
+
+    const uc = new useCaseGraph('EnrollStudent');
+    for (const [name, filePath] of fileMockPaths) {
+      uc.addFile(name, filePath);
+    }
+
+    const dbAccess = new SessionDBAccess();
+    const interactor = new GraphVerificationInteractor(
+      new MockFileAccess(fileMockContents, fileMockPaths),
+      genericNeighbourAccess,
+      dbAccess,
+      new GraphVerificationPresenter(new GraphVerificationOutputData()),
+      [uc]
+    );
+
+    await (interactor as any).buildFilePaths();
+    await (interactor as any).developOutNeighbours();
+    await (interactor as any).verifyOutNeighbours();
+
+    // outputData should depend on viewModel, NOT entities
+    expect(uc.getNodeNeighbours('outputData')).toContain('viewModel');
+    expect(uc.getNodeNeighbours('outputData')).not.toContain('entities');
+  });
+});
