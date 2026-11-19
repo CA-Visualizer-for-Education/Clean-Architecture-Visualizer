@@ -453,28 +453,40 @@ describe('Imports across use cases are caught and seperate from normal violation
 
   const externalInOrder: useCaseGraph[] = [];
   const firstUseCase = new useCaseGraph('first');
-  firstUseCase.addFile('firstInteractor', '/mock/path/firstInteractor.ts');
-  firstUseCase.addFile('firstOutputData', '/mock/path/firstOutputData.ts');
+  firstUseCase.addFile(
+    'firstInteractor',
+    '/mock/path/use_case/first/firstInteractor.ts'
+  );
+  firstUseCase.addFile(
+    'firstOutputData',
+    '/mock/path/use_case/first/firstOutputData.ts'
+  );
   externalInOrder.push(firstUseCase);
 
   const secondUseCase = new useCaseGraph('second');
-  secondUseCase.addFile('secondInteractor', '/mock/path/secondInteractor.ts');
-  secondUseCase.addFile('secondOutputData', '/mock/path/secondOutputData.ts');
+  secondUseCase.addFile(
+    'secondInteractor',
+    '/mock/path/use_case/second/secondInteractor.ts'
+  );
+  secondUseCase.addFile(
+    'secondOutputData',
+    '/mock/path/use_case/second/secondOutputData.ts'
+  );
   externalInOrder.push(secondUseCase);
 
-  fileMockContents.set('/mock/path/firstInteractor.ts', [
+  fileMockContents.set('/mock/path/use_case/first/firstInteractor.ts', [
     {
-      fileName: '/mock/path/firstOutputData.ts',
+      fileName: '/mock/path/use_case/first/firstOutputData.ts',
       relationshipType: 'dependency',
     },
   ]);
-  fileMockContents.set('/mock/path/secondInteractor.ts', [
+  fileMockContents.set('/mock/path/use_case/second/secondInteractor.ts', [
     {
-      fileName: '/mock/path/secondOutputData.ts',
+      fileName: '/mock/path/use_case/second/secondOutputData.ts',
       relationshipType: 'dependency',
     },
     {
-      fileName: '/mock/path/firstOutputData.ts',
+      fileName: '/mock/path/use_case/first/firstOutputData.ts',
       relationshipType: 'dependency',
     },
   ]);
@@ -484,43 +496,61 @@ describe('Imports across use cases are caught and seperate from normal violation
   //  but this is an easier implementation, and will work for fewer test cases.
   const externalOutOfOrder: useCaseGraph[] = [];
   const thirdUseCase = new useCaseGraph('third');
-  thirdUseCase.addFile('thirdInteractor', '/mock/path/thirdInteractor.ts');
-  thirdUseCase.addFile('thirdOutputData', '/mock/path/thirdOutputData.ts');
+  thirdUseCase.addFile(
+    'thirdInteractor',
+    '/mock/path/use_case/third/thirdInteractor.ts'
+  );
+  thirdUseCase.addFile(
+    'thirdOutputData',
+    '/mock/path/use_case/third/thirdOutputData.ts'
+  );
   externalOutOfOrder.push(thirdUseCase);
 
   const fourthUseCase = new useCaseGraph('fourth');
-  fourthUseCase.addFile('fourthInteractor', '/mock/path/fourthInteractor.ts');
-  fourthUseCase.addFile('fourthOutputData', '/mock/path/fourthOutputData.ts');
+  fourthUseCase.addFile(
+    'fourthInteractor',
+    '/mock/path/use_case/fourth/fourthInteractor.ts'
+  );
+  fourthUseCase.addFile(
+    'fourthOutputData',
+    '/mock/path/use_case/fourth/fourthOutputData.ts'
+  );
   externalOutOfOrder.push(fourthUseCase);
 
-  fileMockContents.set('/mock/path/thirdInteractor.ts', [
+  fileMockContents.set('/mock/path/use_case/third/thirdInteractor.ts', [
     {
-      fileName: '/mock/path/thirdOutputData.ts',
+      fileName: '/mock/path/use_case/third/thirdOutputData.ts',
       relationshipType: 'dependency',
     },
   ]);
-  fileMockContents.set('/mock/path/fourthInteractor.ts', [
+  fileMockContents.set('/mock/path/use_case/fourth/fourthInteractor.ts', [
     {
-      fileName: '/mock/path/fourthOutputData.ts',
+      fileName: '/mock/path/use_case/fourth/fourthOutputData.ts',
       relationshipType: 'dependency',
     },
   ]);
-  fileMockContents.set('/mock/path/fourthOutputData.ts', [
+  fileMockContents.set('/mock/path/use_case/fourth/fourthOutputData.ts', [
     {
-      fileName: '/mock/path/thirdInteractor.ts',
+      fileName: '/mock/path/use_case/third/thirdInteractor.ts',
       relationshipType: 'dependency',
     },
   ]);
 
   const normalViolation: useCaseGraph[] = [];
   const normalUseCase = new useCaseGraph('normal');
-  normalUseCase.addFile('normalInteractor', '/mock/path/normalInteractor.ts');
-  normalUseCase.addFile('normalOutputData', '/mock/path/normalOutputData.ts');
+  normalUseCase.addFile(
+    'normalInteractor',
+    '/mock/path/use_case/normal/normalInteractor.ts'
+  );
+  normalUseCase.addFile(
+    'normalOutputData',
+    '/mock/path/use_case/normal/normalOutputData.ts'
+  );
   normalViolation.push(normalUseCase);
 
-  fileMockContents.set('/mock/path/normalOutputData.ts', [
+  fileMockContents.set('/mock/path/use_case/normal/normalOutputData.ts', [
     {
-      fileName: '/mock/path/normalInteractor.ts',
+      fileName: '/mock/path/use_case/normal/normalInteractor.ts',
       relationshipType: 'dependency',
     },
   ]);
@@ -2255,6 +2285,169 @@ describe('Clean Architecture rules', () => {
       ['entities', 'controller'],
       ['inputBoundary', 'outputData'],
       ['dataAccessInterface', 'dataAccess'],
+    ]);
+  });
+});
+
+describe('Files belong to a use case by their folder, not by the rest of their path', () => {
+  // The clone folder 'ca-login' contains the use case name 'login'.
+  const root = '/home/student/ca-login/src/main/java';
+
+  const verify = async (
+    useCases: string[],
+    files: string[],
+    imports: Record<string, string[]>,
+    projectRoot = root
+  ): Promise<GraphVerificationInteractor> => {
+    const fileAccess = {
+      getUseCases: jest.fn<any>().mockResolvedValue(useCases),
+      getFileImports: jest.fn<any>(async (filePath: string) =>
+        (imports[filePath] ?? []).map((fileName) => ({
+          fileName,
+          relationshipType: 'dependency',
+        }))
+      ),
+    } as any;
+    const interactor = new GraphVerificationInteractor(
+      fileAccess,
+      genericNeighbourAccess,
+      new SessionDBAccess(),
+      new GraphVerificationPresenter(new GraphVerificationOutputData())
+    );
+    for (const file of files) {
+      const filePath = `${projectRoot}/${file}`;
+      (interactor as any).internalFilePaths.set(
+        filePath.split('/').at(-1),
+        filePath
+      );
+    }
+    await (interactor as any).buildUseCaseGraphs();
+    await (interactor as any).developOutNeighbours();
+    await (interactor as any).verifyOutNeighbours();
+    return interactor;
+  };
+
+  const fileNamesInUseCase = (
+    interactor: GraphVerificationInteractor,
+    name: string
+  ) =>
+    [
+      ...(interactor as any).useCaseGraphList
+        .find((g: useCaseGraph) => g.getName() === name)
+        .getFiles()
+        .keys(),
+    ].sort();
+
+  it('assigns files to their own use case when the clone folder contains a use case name', async () => {
+    const interactor = await verify(
+      ['login', 'logout'],
+      [
+        'use_case/login/LoginInteractor.java',
+        'use_case/logout/LogoutInteractor.java',
+        'interface_adapter/logout/LogoutPresenter.java',
+        'interface_adapter/ViewManagerModel.java',
+      ],
+      {
+        [`${root}/interface_adapter/logout/LogoutPresenter.java`]: [
+          'interface_adapter.ViewManagerModel',
+        ],
+      }
+    );
+
+    expect(fileNamesInUseCase(interactor, 'login')).toEqual([
+      'LoginInteractor.java',
+    ]);
+    expect(fileNamesInUseCase(interactor, 'logout')).toEqual([
+      'LogoutInteractor.java',
+      'LogoutPresenter.java',
+    ]);
+    expect(interactor.getCrossUseCaseEdges()).toEqual([[], []]);
+  });
+
+  it("allows a presenter to import another use case's view model", async () => {
+    const interactor = await verify(
+      ['login', 'logout'],
+      [
+        'interface_adapter/login/LoginViewModel.java',
+        'interface_adapter/logout/LogoutPresenter.java',
+      ],
+      {
+        [`${root}/interface_adapter/logout/LogoutPresenter.java`]: [
+          'interface_adapter.login.LoginViewModel',
+        ],
+      }
+    );
+
+    expect(interactor.getCrossUseCaseEdges()).toEqual([[], []]);
+    expect((interactor as any).crossUseCaseFiles.size).toBe(0);
+  });
+
+  it("still flags a controller that imports another use case's file", async () => {
+    const interactor = await verify(
+      ['login', 'logout'],
+      [
+        'use_case/login/LoginInputData.java',
+        'interface_adapter/logout/LogoutController.java',
+      ],
+      {
+        [`${root}/interface_adapter/logout/LogoutController.java`]: [
+          'use_case.login.LoginInputData',
+        ],
+      }
+    );
+
+    expect(interactor.getCrossUseCaseEdges()).toEqual([
+      [],
+      [['controller', 'inputData']],
+    ]);
+  });
+
+  it('assigns files to their use case when a folder above the project is named features', async () => {
+    const interactor = await verify(
+      ['login'],
+      ['use_case/login/LoginInteractor.java'],
+      {},
+      '/home/student/features/proj/src/main/java'
+    );
+
+    expect(fileNamesInUseCase(interactor, 'login')).toEqual([
+      'LoginInteractor.java',
+    ]);
+  });
+
+  it('assigns files to their use case when packaging by module', async () => {
+    const interactor = await verify(
+      ['EnrollStudent', 'DropStudent'],
+      [
+        'features/Enrollment/EnrollStudent/use_case/EnrollStudentInteractor.java',
+        'features/Enrollment/EnrollStudent/interface_adapter/EnrollStudentController.java',
+        'features/Enrollment/DropStudent/use_case/DropStudentInteractor.java',
+      ],
+      {}
+    );
+
+    expect(fileNamesInUseCase(interactor, 'EnrollStudent')).toEqual([
+      'EnrollStudentController.java',
+      'EnrollStudentInteractor.java',
+    ]);
+    expect(fileNamesInUseCase(interactor, 'DropStudent')).toEqual([
+      'DropStudentInteractor.java',
+    ]);
+  });
+
+  it('matches use case folders regardless of case', async () => {
+    const interactor = await verify(
+      ['Login'],
+      [
+        'use_case/Login/LoginInteractor.java',
+        'interface_adapter/login/LoginController.java',
+      ],
+      {}
+    );
+
+    expect(fileNamesInUseCase(interactor, 'Login')).toEqual([
+      'LoginController.java',
+      'LoginInteractor.java',
     ]);
   });
 });

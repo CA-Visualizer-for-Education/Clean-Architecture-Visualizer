@@ -19,6 +19,7 @@ export class GraphVerificationInteractor
   implements GraphVerificationInputBoundary
 {
   private readonly internalDirectories = ['use_case', 'interface_adapter'];
+  private readonly featuresDirectory = 'features';
   // Both singular and plural spellings are listed because projects differ
   // (e.g. `view` vs `views`, `entity` vs `entities`). A directory that does
   // not exist simply contributes no files.
@@ -79,9 +80,12 @@ export class GraphVerificationInteractor
   private async buildFilePaths(): Promise<void> {
     // Must now account for packaging by module -- if features exists, packaging by module
     const currPath = process.cwd();
-    if (await this.fileAccess.bfsFindDir(currPath, 'features')) {
+    if (await this.fileAccess.bfsFindDir(currPath, this.featuresDirectory)) {
       await Promise.all([
-        this.fileAccess.getFilePaths('features', this.internalFilePaths),
+        this.fileAccess.getFilePaths(
+          this.featuresDirectory,
+          this.internalFilePaths
+        ),
         ...this.externalDirectories.map((dir) =>
           this.fileAccess.getFilePaths(dir, this.externalFilePaths)
         ),
@@ -106,7 +110,7 @@ export class GraphVerificationInteractor
     for (const useCase of useCases) {
       const graph = new useCaseGraph(useCase);
       for (const [fileName, filePath] of this.internalFilePaths) {
-        if (filePath.toLowerCase().includes(useCase.toLowerCase())) {
+        if (this.isInUseCase(filePath, useCase)) {
           graph.addFile(fileName, filePath);
         }
       }
@@ -171,10 +175,11 @@ export class GraphVerificationInteractor
             .replace(/\.[^.]+$/, '')
             .toLowerCase();
 
-          const targetIsShared = !this.belongsToOtherUseCase(
-            target.filePath,
-            graph.getName()
-          );
+          // A presenter may update any use case's view model, for example to
+          // switch screens, since both are in the interface adapters layer.
+          const targetIsShared =
+            (fromNode === 'presenter' && toNode === 'viewModel') ||
+            !this.belongsToOtherUseCase(target.filePath, graph.getName());
 
           //Check if the imported file is an external file path
           if (
@@ -777,11 +782,41 @@ export class GraphVerificationInteractor
     filePath: string,
     currentName: string
   ): boolean {
-    const lowerPath = filePath.toLowerCase();
     return this.useCaseGraphList.some(
       (g) =>
-        g.getName() !== currentName &&
-        lowerPath.includes(g.getName().toLowerCase())
+        g.getName() !== currentName && this.isInUseCase(filePath, g.getName())
     );
+  }
+
+  /**
+   * Check whether a file is in a use case's folder, ignoring case, since a
+   * project may write `use_case/Login/` but `interface_adapter/login/`.
+   * @param filePath the path to a file.
+   * @param useCase the name of a use case.
+   * @returns true if the file's use case folder has that name.
+   */
+  private isInUseCase(filePath: string, useCase: string): boolean {
+    return (
+      this.useCaseFolderOf(filePath)?.toLowerCase() === useCase.toLowerCase()
+    );
+  }
+
+  /**
+   * Find the name of the use case folder a file is in: the folder after
+   * `features/<feature>/` when packaging by module, otherwise the folder
+   * after `use_case/` or `interface_adapter/`. Only folders below the source
+   * root count, so the result does not depend on where the project was cloned.
+   * @param filePath the path to a file.
+   * @returns the folder name, or undefined if the file is not in one.
+   */
+  private useCaseFolderOf(filePath: string): string | undefined {
+    const allFolders = filePath.split(/[\\/]/).slice(0, -1);
+    const folders = allFolders.slice(allFolders.lastIndexOf('src') + 1);
+    const featuresIndex = folders.lastIndexOf(this.featuresDirectory);
+    if (featuresIndex !== -1) return folders[featuresIndex + 2];
+    const layerFolderIndex = Math.max(
+      ...this.internalDirectories.map((dir) => folders.lastIndexOf(dir))
+    );
+    return layerFolderIndex === -1 ? undefined : folders[layerFolderIndex + 1];
   }
 }
