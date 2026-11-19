@@ -23,7 +23,7 @@ export class JavaLanguageParser implements LanguageParser {
   private packageQuery: Parser.Query | null = null;
   private hierarchyQuery: Parser.Query | null = null;
   private importQuery: Parser.Query | null = null;
-  private usedTypesQuery: Parser.Query | null = null;
+  private usedSymbolsQuery: Parser.Query | null = null;
 
   private isSupportedFile(file: string): boolean {
     return this.supportedExtensions.some((ext) => file.endsWith(ext));
@@ -81,9 +81,10 @@ export class JavaLanguageParser implements LanguageParser {
       (import_declaration (scoped_identifier) @import (asterisk)? @wildcard)
     `);
 
-    this.usedTypesQuery = this.javaLanguage.query(`
-      (type_identifier) @used_type
-      (scoped_type_identifier) @used_scoped_type
+    this.usedSymbolsQuery = this.javaLanguage.query(`
+      (type_identifier) @used_symbol
+      (scoped_type_identifier) @used_scoped_symbol
+      (identifier) @used_symbol
     `);
 
     this.isInitialized = true;
@@ -100,7 +101,7 @@ export class JavaLanguageParser implements LanguageParser {
       !this.packageQuery ||
       !this.hierarchyQuery ||
       !this.importQuery ||
-      !this.usedTypesQuery
+      !this.usedSymbolsQuery
     ) {
       throw new Error('Java AST Parser has not been initialized.');
     }
@@ -130,83 +131,75 @@ export class JavaLanguageParser implements LanguageParser {
       }
     }
 
-    // 2. Extract single and wildcard imports
-    const importedSingleClasses = new Set<string>();
-    const importedWildcardPackages = new Set<string>();
-
-    for (const match of this.importQuery.matches(rootNode)) {
-      const isWildcard = match.captures.some((c) => c.name === 'wildcard');
-      const importCapture = match.captures.find((c) => c.name === 'import');
-      if (!importCapture) continue;
-
-      if (isWildcard) {
-        importedWildcardPackages.add(importCapture.node.text);
-      } else {
-        const classNode = importCapture.node.namedChildren.at(-1);
-        importedSingleClasses.add(
-          classNode ? classNode.text : importCapture.node.text
-        );
-      }
-    }
-
-    // 3. Extract types used within class/interface bodies
-    const bodyUsedSimpleTypes = new Set<string>();
-    const bodyUsedScopedNodes: Parser.SyntaxNode[] = [];
-
-    for (const capture of this.usedTypesQuery.captures(rootNode)) {
-      const parentType = capture.node.parent?.type;
-      if (
-        parentType === 'import_declaration' ||
-        parentType === 'package_declaration'
-      ) {
-        continue;
-      }
-
-      if (capture.name === 'used_type') {
-        bodyUsedSimpleTypes.add(capture.node.text);
-      } else if (capture.name === 'used_scoped_type') {
-        bodyUsedScopedNodes.push(capture.node);
-      }
-    }
-
-    // 4. Assemble available symbol pool
-    const availableSymbols = new Set<string>();
-
-    for (const singleClass of importedSingleClasses) {
-      availableSymbols.add(singleClass);
-    }
-
+    // 2. Assemble available symbol pool from project classes
+    const availableSymbols = new Map<string, string>();
     const allKnownProjectClasses = new Set<string>();
     const currentClassName = this.getClassName(filePath);
 
     for (const pf of projectFiles) {
       if (this.isSupportedFile(pf)) {
-        allKnownProjectClasses.add(this.getClassName(pf));
+        const className = this.getClassName(pf);
+        allKnownProjectClasses.add(className);
+        if (className !== currentClassName) {
+          availableSymbols.set(className, className);
+        }
       }
     }
 
-    for (const projectClass of allKnownProjectClasses) {
-      if (projectClass !== currentClassName) {
-        availableSymbols.add(projectClass);
-      }
-    }
-
-    // 5. Cross-check used types against available symbols and project classes
+    // 3. Extract imports (merging regular and static imports)
     const confirmedDependencies = new Set<string>();
 
-    for (const typeName of bodyUsedSimpleTypes) {
-      if (availableSymbols.has(typeName)) {
-        confirmedDependencies.add(typeName);
+    for (const child of rootNode.children) {
+      if (child.type !== 'import_declaration') continue;
+
+      const isStatic = child.children.some((c) => c.type === 'static');
+      const isWildcard = child.children.some((c) => c.type === 'asterisk');
+      const scopedId = child.children.find(
+        (c) => c.type === 'scoped_identifier'
+      );
+      if (!scopedId) continue;
+
+      const scopeNode = scopedId.childForFieldName('scope');
+      const classNode =
+        isStatic && !isWildcard
+          ? (scopeNode?.childForFieldName('name') ?? scopeNode)
+          : (scopedId.childForFieldName('name') ?? scopedId);
+
+      const targetClass = classNode?.text;
+      if (!targetClass) continue;
+
+      if (isStatic && isWildcard) {
+        confirmedDependencies.add(targetClass);
+      } else {
+        const trigger = scopedId.childForFieldName('name')?.text ?? targetClass;
+        availableSymbols.set(trigger, targetClass);
       }
     }
 
-    for (const scopedNode of bodyUsedScopedNodes) {
-      const classNode = scopedNode.namedChildren.at(-1);
-      if (classNode) {
-        const className = classNode.text;
-        if (allKnownProjectClasses.has(className)) {
-          confirmedDependencies.add(className);
+    // 4. Cross-check used symbols in body against available symbols
+    for (const capture of this.usedSymbolsQuery.captures(rootNode)) {
+      let current: Parser.SyntaxNode | null = capture.node.parent;
+      let isHeader = false;
+      while (current) {
+        if (
+          current.type === 'package_declaration' ||
+          current.type === 'import_declaration'
+        ) {
+          isHeader = true;
+          break;
         }
+        current = current.parent;
+      }
+      if (isHeader) continue;
+
+      const symbolText =
+        capture.node.type === 'scoped_type_identifier'
+          ? (capture.node.namedChildren.at(-1)?.text ?? capture.node.text)
+          : capture.node.text;
+
+      const targetClass = availableSymbols.get(symbolText);
+      if (targetClass && targetClass !== currentClassName) {
+        confirmedDependencies.add(targetClass);
       }
     }
 

@@ -229,4 +229,108 @@ describe('JavaLanguageParser AST Dependency Extraction', () => {
       { fileName: 'User', relationshipType: 'dependency' },
     ]);
   });
+
+  it('Scenario: Static Member Import (import static ...Presenter.formatStudentName;)', async () => {
+    const presenterFile = path.join(
+      tempDir,
+      'interface_adapter',
+      'EnrollStudentPresenter.java'
+    );
+    const thisFile = path.join(tempDir, 'entity', 'Student.java');
+    const code = `
+      package entity;
+      import static interface_adapter.EnrollStudentPresenter.formatStudentName;
+      public class Student {
+        public void setName(String name) {
+          formatStudentName(name);
+        }
+      }
+    `;
+    const result = await parser.extractDependencies(code, thisFile, [
+      thisFile,
+      presenterFile,
+    ]);
+
+    expect(result).toEqual([
+      { fileName: 'EnrollStudentPresenter', relationshipType: 'dependency' },
+    ]);
+  });
+
+  it('Scenario: Unused Static Member Import Exclusion', async () => {
+    const presenterFile = path.join(
+      tempDir,
+      'interface_adapter',
+      'EnrollStudentPresenter.java'
+    );
+    const thisFile = path.join(tempDir, 'entity', 'Student.java');
+    const code = `
+      package entity;
+      import static interface_adapter.EnrollStudentPresenter.unusedMethod;
+      public class Student {
+        public void doNothing() {}
+      }
+    `;
+    const result = await parser.extractDependencies(code, thisFile, [
+      thisFile,
+      presenterFile,
+    ]);
+
+    expect(result).toEqual([]);
+  });
+
+  it('Scenario: Static Wildcard Import (import static ...Presenter.*;)', async () => {
+    const presenterFile = path.join(
+      tempDir,
+      'interface_adapter',
+      'EnrollStudentPresenter.java'
+    );
+    const thisFile = path.join(tempDir, 'entity', 'Student.java');
+    const code = `
+      package entity;
+      import static interface_adapter.EnrollStudentPresenter.*;
+      public class Student {
+        public void doNothing() {}
+      }
+    `;
+    const result = await parser.extractDependencies(code, thisFile, [
+      thisFile,
+      presenterFile,
+    ]);
+
+    expect(result).toEqual([
+      { fileName: 'EnrollStudentPresenter', relationshipType: 'dependency' },
+    ]);
+  });
+
+  it('Scenario: Class-Qualified Member Call and Field Access', async () => {
+    const presenterFile = path.join(
+      tempDir,
+      'interface_adapter',
+      'EnrollStudentPresenter.java'
+    );
+    const configFile = path.join(tempDir, 'app', 'Config.java');
+    const thisFile = path.join(tempDir, 'entity', 'Student.java');
+    const code = `
+      package entity;
+      public class Student {
+        public void run(String name) {
+          EnrollStudentPresenter.formatStudentName(name);
+          int max = Config.MAX;
+        }
+      }
+    `;
+    const result = await parser.extractDependencies(code, thisFile, [
+      thisFile,
+      presenterFile,
+      configFile,
+    ]);
+
+    expect(result).toEqual(
+      expect.arrayContaining([
+        { fileName: 'EnrollStudentPresenter', relationshipType: 'dependency' },
+        { fileName: 'Config', relationshipType: 'dependency' },
+      ])
+    );
+    expect(result.length).toBe(2);
+  });
 });
