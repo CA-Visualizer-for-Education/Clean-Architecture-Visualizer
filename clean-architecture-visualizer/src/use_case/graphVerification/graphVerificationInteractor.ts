@@ -1,3 +1,4 @@
+import path from 'node:path';
 import type { CleanArchInfoAccessInterface } from '../../data_access/cleanArchInfoAccessInterface.js';
 import type { FileAccessInterface } from '../../data_access/fileAccessInterface.js';
 import type { SessionDBAccessInterface } from '../../data_access/sessionDBAccessInterface.js';
@@ -804,18 +805,24 @@ export class GraphVerificationInteractor
   /**
    * Find the name of the use case folder a file is in: the folder after
    * `features/<feature>/` when packaging by module, otherwise the folder
-   * after `use_case/` or `interface_adapter/`. Only folders below the source
-   * root count, so the result does not depend on where the project was cloned.
+   * after `use_case/` or `interface_adapter/`. The path is read from the
+   * project folder down, so folders above the project are skipped, and the
+   * first match is taken, so a use case may share a name with a layer folder.
    * @param filePath the path to a file.
    * @returns the folder name, or undefined if the file is not in one.
    */
   private useCaseFolderOf(filePath: string): string | undefined {
-    const allFolders = filePath.split(/[\\/]/).slice(0, -1);
-    const folders = allFolders.slice(allFolders.lastIndexOf('src') + 1);
-    const featuresIndex = folders.lastIndexOf(this.featuresDirectory);
+    const fromProject = path.relative(process.cwd(), filePath);
+    const projectPath =
+      fromProject.startsWith('..') || path.isAbsolute(fromProject)
+        ? filePath
+        : fromProject;
+    const allFolders = projectPath.split(/[\\/]/).slice(0, -1);
+    const folders = allFolders.slice(allFolders.indexOf('src') + 1);
+    const featuresIndex = folders.indexOf(this.featuresDirectory);
     if (featuresIndex !== -1) return folders[featuresIndex + 2];
-    const layerFolderIndex = Math.max(
-      ...this.internalDirectories.map((dir) => folders.lastIndexOf(dir))
+    const layerFolderIndex = folders.findIndex((folder) =>
+      this.internalDirectories.includes(folder)
     );
     return layerFolderIndex === -1 ? undefined : folders[layerFolderIndex + 1];
   }

@@ -1,5 +1,12 @@
 // biome-ignore-all lint/suspicious/noExplicitAny: these tests reach the Interactor's private members until it is split up (#269)
-import { beforeEach, describe, expect, it, jest } from '@jest/globals';
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  jest,
+} from '@jest/globals';
 import { CleanArchAccess } from '../../../src/data_access/cleanArchInfoAccess.js';
 import { FileAccess } from '../../../src/data_access/fileAccess.js';
 import type { FileAccessInterface } from '../../../src/data_access/fileAccessInterface.js';
@@ -2291,14 +2298,21 @@ describe('Clean Architecture rules', () => {
 
 describe('Files belong to a use case by their folder, not by the rest of their path', () => {
   // The clone folder 'ca-login' contains the use case name 'login'.
-  const root = '/home/student/ca-login/src/main/java';
+  const project = '/home/student/ca-login';
+  const root = `${project}/src/main/java`;
 
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  // Runs cave verify from the project folder, as a student would.
   const verify = async (
     useCases: string[],
     files: string[],
     imports: Record<string, string[]>,
-    projectRoot = root
+    projectFolder = project
   ): Promise<GraphVerificationInteractor> => {
+    jest.spyOn(process, 'cwd').mockReturnValue(projectFolder);
     const fileAccess = {
       getUseCases: jest.fn<any>().mockResolvedValue(useCases),
       getFileImports: jest.fn<any>(async (filePath: string) =>
@@ -2315,7 +2329,7 @@ describe('Files belong to a use case by their folder, not by the rest of their p
       new GraphVerificationPresenter(new GraphVerificationOutputData())
     );
     for (const file of files) {
-      const filePath = `${projectRoot}/${file}`;
+      const filePath = `${projectFolder}/src/main/java/${file}`;
       (interactor as any).internalFilePaths.set(
         filePath.split('/').at(-1),
         filePath
@@ -2407,7 +2421,7 @@ describe('Files belong to a use case by their folder, not by the rest of their p
       ['login'],
       ['use_case/login/LoginInteractor.java'],
       {},
-      '/home/student/features/proj/src/main/java'
+      '/home/student/features/proj'
     );
 
     expect(fileNamesInUseCase(interactor, 'login')).toEqual([
@@ -2447,6 +2461,72 @@ describe('Files belong to a use case by their folder, not by the rest of their p
 
     expect(fileNamesInUseCase(interactor, 'Login')).toEqual([
       'LoginController.java',
+      'LoginInteractor.java',
+    ]);
+  });
+
+  it('assigns files to their use case when a folder above the project is named src', async () => {
+    const interactor = await verify(
+      ['login'],
+      ['use_case/login/LoginInteractor.java'],
+      {},
+      '/home/student/src/proj'
+    );
+
+    expect(fileNamesInUseCase(interactor, 'login')).toEqual([
+      'LoginInteractor.java',
+    ]);
+  });
+
+  it('assigns files to a use case named src', async () => {
+    const interactor = await verify(
+      ['src', 'login'],
+      [
+        'use_case/src/SrcInputData.java',
+        'interface_adapter/src/SrcController.java',
+        'use_case/login/LoginInteractor.java',
+      ],
+      {}
+    );
+
+    expect(fileNamesInUseCase(interactor, 'src')).toEqual([
+      'SrcController.java',
+      'SrcInputData.java',
+    ]);
+  });
+
+  it('assigns files to use cases named after layer folders', async () => {
+    const interactor = await verify(
+      ['use_case', 'interface_adapter'],
+      [
+        'use_case/use_case/UseCaseInteractor.java',
+        'interface_adapter/interface_adapter/InterfaceAdapterController.java',
+      ],
+      {}
+    );
+
+    expect(fileNamesInUseCase(interactor, 'use_case')).toEqual([
+      'UseCaseInteractor.java',
+    ]);
+    expect(fileNamesInUseCase(interactor, 'interface_adapter')).toEqual([
+      'InterfaceAdapterController.java',
+    ]);
+  });
+
+  it('assigns files to a use case named features when packaging by module', async () => {
+    const interactor = await verify(
+      ['features', 'Login'],
+      [
+        'features/Auth/features/use_case/FeaturesInteractor.java',
+        'features/Auth/Login/use_case/LoginInteractor.java',
+      ],
+      {}
+    );
+
+    expect(fileNamesInUseCase(interactor, 'features')).toEqual([
+      'FeaturesInteractor.java',
+    ]);
+    expect(fileNamesInUseCase(interactor, 'Login')).toEqual([
       'LoginInteractor.java',
     ]);
   });
