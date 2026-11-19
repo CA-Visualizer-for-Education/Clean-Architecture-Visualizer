@@ -43,9 +43,10 @@ export class CreateModuleUseCaseInteractor
         return;
       }
 
-      // check if features directory exists
+      // check if features directory exists in the main source
+      const sourcePath = (await this.fileAccess.getSourcePath()) ?? currPath;
       const featuresDirectory = await this.fileAccess.bfsFindDir(
-        currPath,
+        sourcePath,
         'features'
       );
       if (!featuresDirectory) {

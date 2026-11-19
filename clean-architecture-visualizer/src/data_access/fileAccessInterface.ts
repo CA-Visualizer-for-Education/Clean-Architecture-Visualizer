@@ -14,6 +14,7 @@ export interface FileAccessInterface {
   getLineNumber(filePath: string, target: string): Promise<number | undefined>;
   createDirectory(filePath: string): Promise<void>;
   getCurrentPath(): Promise<string>;
+  getSourcePath(): Promise<string | null>;
   bfsFindDir(curr: string, target: string): Promise<string | null>;
   exists(path: string): Promise<boolean>;
   createFile(filePath: string, content?: string): Promise<void>;
