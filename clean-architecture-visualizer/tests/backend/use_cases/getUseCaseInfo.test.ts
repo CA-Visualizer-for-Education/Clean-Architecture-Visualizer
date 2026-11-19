@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from '@jest/globals';
-import { SessionDBAccess } from '../../../src/data_access/sessionDBAccess.js';
+import { SessionDbAccess } from '../../../src/data_access/sessionDBAccess.js';
 import type { GetUseCaseInfoInputData } from '../../../src/use_case/getUseCaseInfo/getUseCaseInfoInputData.js';
 import { GetUseCaseInfoInteractor } from '../../../src/use_case/getUseCaseInfo/getUseCaseInfoInteractor.js';
 import type {
@@ -9,7 +9,7 @@ import type {
 import { RecordingOutputData } from '../doubles/recording-output-data.js';
 import { makeStoredUseCase } from '../fixtures/stored-use-case.js';
 
-const genericDBAccess = new SessionDBAccess();
+const genericDbAccess = new SessionDbAccess();
 
 function makeInputData(id: string): GetUseCaseInfoInputData {
   return {
@@ -26,13 +26,13 @@ function makeOutputData(): GetUseCaseInfoOutputData &
 
 describe('GetUseCaseInfoInteractor', () => {
   beforeEach(() => {
-    genericDBAccess.resetDB();
+    genericDbAccess.resetDb();
   });
 
   it('returns nothing if the use case ID does not exist', async () => {
     const outputData = makeOutputData();
     const interactor = new GetUseCaseInfoInteractor(
-      genericDBAccess,
+      genericDbAccess,
       outputData
     );
 
@@ -45,7 +45,7 @@ describe('GetUseCaseInfoInteractor', () => {
     const filePath = 'src/entities/User.java';
 
     // 1. Setup a node in the DB
-    genericDBAccess.upsertNode({
+    genericDbAccess.upsertNode({
       id: 'node-1',
       name: 'User',
       type: 'entities',
@@ -62,11 +62,11 @@ describe('GetUseCaseInfoInteractor', () => {
       missingNodes: [],
       outNeighbours: {},
     });
-    genericDBAccess.upsertUseCase(mockUseCase);
+    genericDbAccess.upsertUseCase(mockUseCase);
 
     const outputData = makeOutputData();
     const interactor = new GetUseCaseInfoInteractor(
-      genericDBAccess,
+      genericDbAccess,
       outputData
     );
 
@@ -81,7 +81,7 @@ describe('GetUseCaseInfoInteractor', () => {
 
   it('includes missing nodes based on the use case missingNodes list', async () => {
     // Setup a "MISSING" status node in the DB
-    genericDBAccess.upsertNode({
+    genericDbAccess.upsertNode({
       id: 'missing-controller',
       type: 'controller',
       layer: 'interfaceAdapters',
@@ -95,11 +95,11 @@ describe('GetUseCaseInfoInteractor', () => {
       missingNodes: ['controller'],
       outNeighbours: {},
     });
-    genericDBAccess.upsertUseCase(mockUseCase);
+    genericDbAccess.upsertUseCase(mockUseCase);
 
     const outputData = makeOutputData();
     const interactor = new GetUseCaseInfoInteractor(
-      genericDBAccess,
+      genericDbAccess,
       outputData
     );
 
@@ -118,7 +118,7 @@ describe('GetUseCaseInfoInteractor', () => {
     const edgeId = `${sourceId}->${targetId}`;
 
     // Setup the edge in the DB
-    genericDBAccess.upsertEdge({
+    genericDbAccess.upsertEdge({
       id: edgeId,
       source: sourceId,
       target: targetId,
@@ -135,11 +135,11 @@ describe('GetUseCaseInfoInteractor', () => {
         [sourceId]: [targetId],
       },
     });
-    genericDBAccess.upsertUseCase(mockUseCase);
+    genericDbAccess.upsertUseCase(mockUseCase);
 
     const outputData = makeOutputData();
     const interactor = new GetUseCaseInfoInteractor(
-      genericDBAccess,
+      genericDbAccess,
       outputData
     );
 
@@ -157,7 +157,7 @@ describe('GetUseCaseInfoInteractor', () => {
     const edgeId = `${sourceId}->${targetId}`;
 
     // Setup the edge in the DB
-    genericDBAccess.upsertEdge({
+    genericDbAccess.upsertEdge({
       id: edgeId,
       source: sourceId,
       target: targetId,
@@ -174,11 +174,11 @@ describe('GetUseCaseInfoInteractor', () => {
         [sourceId]: [targetId],
       },
     });
-    genericDBAccess.upsertUseCase(mockUseCase);
+    genericDbAccess.upsertUseCase(mockUseCase);
 
     const outputData = makeOutputData();
     const interactor = new GetUseCaseInfoInteractor(
-      genericDBAccess,
+      genericDbAccess,
       outputData
     );
 

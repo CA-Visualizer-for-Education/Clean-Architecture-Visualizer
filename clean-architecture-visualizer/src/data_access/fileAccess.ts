@@ -462,8 +462,8 @@ export class FileAccess implements FileAccessInterface {
       return importLines.length > 0 ? importLines.join('\n') : undefined;
     }
 
-    // The getFileSnippet function is only called by the getViolationsInteractor which only ever passes in cleanNode
-    // If the cleanNode is "entities", we will also allow for "entity"
+    // The getFileSnippet function is only called by the getViolationsInteractor which only ever passes in CleanNode
+    // If the CleanNode is "entities", we will also allow for "entity"
     const match = importLines.find(
       (line) =>
         line.toLowerCase().includes(target.toLowerCase()) ||
@@ -492,8 +492,8 @@ export class FileAccess implements FileAccessInterface {
 
     const lines = content.split('\n');
 
-    // The getLineNumber function is only called by the getViolationsInteractor which only ever passes in cleanNode
-    // If the cleanNode is "entities", we will also allow for "entity"
+    // The getLineNumber function is only called by the getViolationsInteractor which only ever passes in CleanNode
+    // If the CleanNode is "entities", we will also allow for "entity"
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
       if (

@@ -23,7 +23,9 @@ changes nothing.
   `.js` extensions, and frontend `@/` imports stay `@/`.
 - **Identifiers** are renamed at their declaration and every use, in the
   backend and the frontend. `file` is the file that declares the identifier,
-  at its path after the file renames.
+  at its path after the file renames. A local used as a shorthand property
+  keeps the property's name: `{ file_path }` becomes `{ file_path: filePath }`,
+  and a second run leaves the key alone.
 
 To run it (needs Node 24.2 or later, which runs TypeScript directly):
 
@@ -39,3 +41,8 @@ and reverted on its own.
 
 After merging `main` into a branch that predates a rename, run the codemod
 again to update the branch's new imports.
+
+A rerun does not rename identifiers in merged code. The codemod finds an
+identifier's uses through its declaration, and once the declaration has the
+new name, a use of the old name points at nothing. `npm run verify --prefix ..`
+reports each one as "Cannot find name"; rename them by hand.

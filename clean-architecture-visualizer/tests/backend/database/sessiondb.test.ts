@@ -1,14 +1,14 @@
 import fs from 'node:fs';
 import { afterEach, beforeEach, describe, expect, it } from '@jest/globals';
-import { SESSION_FILE, SessionDB } from '../../../src/database/sessionDb.js';
+import { SESSION_FILE, SessionDb } from '../../../src/database/sessionDb.js';
 import type { SessionData } from '../../../src/types/sessionData.js';
 
-describe('SessionDB', () => {
-  let db: SessionDB<SessionData>;
+describe('SessionDb', () => {
+  let db: SessionDb<SessionData>;
 
   beforeEach(() => {
     if (fs.existsSync(SESSION_FILE)) fs.unlinkSync(SESSION_FILE);
-    db = new SessionDB<SessionData>();
+    db = new SessionDb<SessionData>();
     db.clear();
   });
 
@@ -59,7 +59,7 @@ describe('SessionDB', () => {
       db.set('projectName', 'CSC207');
       db.set('numUseCases', 10);
 
-      const db2 = new SessionDB<SessionData>();
+      const db2 = new SessionDb<SessionData>();
       db2.load();
 
       expect(db2.get('projectName')).toBe('CSC207');
@@ -77,7 +77,7 @@ describe('SessionDB', () => {
       ];
       db.set('files', files);
 
-      const db2 = new SessionDB<SessionData>();
+      const db2 = new SessionDb<SessionData>();
       db2.load();
 
       expect(db2.get('files')).toEqual(files);
@@ -115,7 +115,7 @@ describe('SessionDB', () => {
       db.set('numUseCases', 20);
       db.set('numViolations', 3);
 
-      const db2 = new SessionDB<SessionData>();
+      const db2 = new SessionDb<SessionData>();
       db2.load();
 
       expect(db2.get('projectName')).toBe('CSC207');

@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { vi } from 'vitest';
 
 vi.mock('react-i18next', () => ({
+  // biome-ignore lint/style/useNamingConvention: react-i18next exports the Trans component
   Trans: ({ children }: { children: ReactNode }) => children,
 
   useTranslation: () => ({

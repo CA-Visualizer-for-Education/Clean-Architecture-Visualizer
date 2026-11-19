@@ -9,7 +9,7 @@ describe('InitProjectInteractor', () => {
   let mockFileAccess: jest.Mocked<FileAccessInterface>;
   let mockOutputData: InitProjectOutputData;
 
-  const ROOT_PATH = '/project/root';
+  const rootPath = '/project/root';
 
   beforeEach(() => {
     // Setup Mocks
@@ -29,7 +29,7 @@ describe('InitProjectInteractor', () => {
 
   it('successfully creates the entire Clean Architecture directory structure in java', async () => {
     // Arrange
-    mockFileAccess.getCurrentPath.mockResolvedValue(ROOT_PATH);
+    mockFileAccess.getCurrentPath.mockResolvedValue(rootPath);
     mockFileAccess.exists.mockResolvedValue(true);
 
     // Act
@@ -37,15 +37,15 @@ describe('InitProjectInteractor', () => {
 
     // Assert
     const expectedDirs = [
-      `${ROOT_PATH}/src/main/java`,
-      `${ROOT_PATH}/src/test/java`,
-      `${ROOT_PATH}/src/main/java/app`,
-      `${ROOT_PATH}/src/main/java/use_case`,
-      `${ROOT_PATH}/src/main/java/entity`,
-      `${ROOT_PATH}/src/main/java/interface_adapter`,
-      `${ROOT_PATH}/src/main/java/data_access`,
-      `${ROOT_PATH}/src/main/java/database`,
-      `${ROOT_PATH}/src/main/java/view`,
+      `${rootPath}/src/main/java`,
+      `${rootPath}/src/test/java`,
+      `${rootPath}/src/main/java/app`,
+      `${rootPath}/src/main/java/use_case`,
+      `${rootPath}/src/main/java/entity`,
+      `${rootPath}/src/main/java/interface_adapter`,
+      `${rootPath}/src/main/java/data_access`,
+      `${rootPath}/src/main/java/database`,
+      `${rootPath}/src/main/java/view`,
     ];
 
     // Check that each directory was called
@@ -64,7 +64,7 @@ describe('InitProjectInteractor', () => {
 
   it('successfully creates the entire Clean Architecture directory structure in python', async () => {
     // Arrange
-    mockFileAccess.getCurrentPath.mockResolvedValue(ROOT_PATH);
+    mockFileAccess.getCurrentPath.mockResolvedValue(rootPath);
     mockFileAccess.exists.mockResolvedValue(true);
 
     // Act
@@ -72,15 +72,15 @@ describe('InitProjectInteractor', () => {
 
     // Assert
     const expectedDirs = [
-      `${ROOT_PATH}/src/main/python`,
-      `${ROOT_PATH}/src/test/python`,
-      `${ROOT_PATH}/src/main/python/app`,
-      `${ROOT_PATH}/src/main/python/use_case`,
-      `${ROOT_PATH}/src/main/python/entity`,
-      `${ROOT_PATH}/src/main/python/interface_adapter`,
-      `${ROOT_PATH}/src/main/python/data_access`,
-      `${ROOT_PATH}/src/main/python/database`,
-      `${ROOT_PATH}/src/main/python/view`,
+      `${rootPath}/src/main/python`,
+      `${rootPath}/src/test/python`,
+      `${rootPath}/src/main/python/app`,
+      `${rootPath}/src/main/python/use_case`,
+      `${rootPath}/src/main/python/entity`,
+      `${rootPath}/src/main/python/interface_adapter`,
+      `${rootPath}/src/main/python/data_access`,
+      `${rootPath}/src/main/python/database`,
+      `${rootPath}/src/main/python/view`,
     ];
 
     // Check that each directory was called
@@ -99,7 +99,7 @@ describe('InitProjectInteractor', () => {
 
   it('successfully creates the entire Clean Architecture directory structure in javascript', async () => {
     // Arrange
-    mockFileAccess.getCurrentPath.mockResolvedValue(ROOT_PATH);
+    mockFileAccess.getCurrentPath.mockResolvedValue(rootPath);
     mockFileAccess.exists.mockResolvedValue(true);
 
     // Act
@@ -107,15 +107,15 @@ describe('InitProjectInteractor', () => {
 
     // Assert
     const expectedDirs = [
-      `${ROOT_PATH}/src/main/javascript`,
-      `${ROOT_PATH}/src/test/javascript`,
-      `${ROOT_PATH}/src/main/javascript/app`,
-      `${ROOT_PATH}/src/main/javascript/use_case`,
-      `${ROOT_PATH}/src/main/javascript/entity`,
-      `${ROOT_PATH}/src/main/javascript/interface_adapter`,
-      `${ROOT_PATH}/src/main/javascript/data_access`,
-      `${ROOT_PATH}/src/main/javascript/database`,
-      `${ROOT_PATH}/src/main/javascript/view`,
+      `${rootPath}/src/main/javascript`,
+      `${rootPath}/src/test/javascript`,
+      `${rootPath}/src/main/javascript/app`,
+      `${rootPath}/src/main/javascript/use_case`,
+      `${rootPath}/src/main/javascript/entity`,
+      `${rootPath}/src/main/javascript/interface_adapter`,
+      `${rootPath}/src/main/javascript/data_access`,
+      `${rootPath}/src/main/javascript/database`,
+      `${rootPath}/src/main/javascript/view`,
     ];
 
     // Check that each directory was called
@@ -134,7 +134,7 @@ describe('InitProjectInteractor', () => {
 
   it('successfully creates the entire Clean Architecture directory structure in typescript', async () => {
     // Arrange
-    mockFileAccess.getCurrentPath.mockResolvedValue(ROOT_PATH);
+    mockFileAccess.getCurrentPath.mockResolvedValue(rootPath);
     mockFileAccess.exists.mockResolvedValue(true);
 
     // Act
@@ -142,15 +142,15 @@ describe('InitProjectInteractor', () => {
 
     // Assert
     const expectedDirs = [
-      `${ROOT_PATH}/src/main/typescript`,
-      `${ROOT_PATH}/src/test/typescript`,
-      `${ROOT_PATH}/src/main/typescript/app`,
-      `${ROOT_PATH}/src/main/typescript/use_case`,
-      `${ROOT_PATH}/src/main/typescript/entity`,
-      `${ROOT_PATH}/src/main/typescript/interface_adapter`,
-      `${ROOT_PATH}/src/main/typescript/data_access`,
-      `${ROOT_PATH}/src/main/typescript/database`,
-      `${ROOT_PATH}/src/main/typescript/view`,
+      `${rootPath}/src/main/typescript`,
+      `${rootPath}/src/test/typescript`,
+      `${rootPath}/src/main/typescript/app`,
+      `${rootPath}/src/main/typescript/use_case`,
+      `${rootPath}/src/main/typescript/entity`,
+      `${rootPath}/src/main/typescript/interface_adapter`,
+      `${rootPath}/src/main/typescript/data_access`,
+      `${rootPath}/src/main/typescript/database`,
+      `${rootPath}/src/main/typescript/view`,
     ];
 
     // Check that each directory was called
@@ -169,7 +169,7 @@ describe('InitProjectInteractor', () => {
 
   it('sets output data to false if the file system fails', async () => {
     // Arrange
-    mockFileAccess.getCurrentPath.mockResolvedValue(ROOT_PATH);
+    mockFileAccess.getCurrentPath.mockResolvedValue(rootPath);
     // Force an error on one of the directory creations
     mockFileAccess.createDirectory.mockRejectedValue(
       new Error('Permission denied')
@@ -196,9 +196,9 @@ describe('InitProjectInteractor', () => {
 
   it('should fail if already initialized', async () => {
     // Arrange
-    mockFileAccess.getCurrentPath.mockResolvedValue(ROOT_PATH);
+    mockFileAccess.getCurrentPath.mockResolvedValue(rootPath);
     mockFileAccess.exists.mockResolvedValue(true);
-    mockFileAccess.bfsFindDir.mockResolvedValue(`${ROOT_PATH}/src/main`);
+    mockFileAccess.bfsFindDir.mockResolvedValue(`${rootPath}/src/main`);
 
     // Act
     await runInteractor('java');
@@ -209,7 +209,7 @@ describe('InitProjectInteractor', () => {
   });
 
   it('Error occurs because src directory does not exist.', async () => {
-    mockFileAccess.getCurrentPath.mockResolvedValue(ROOT_PATH);
+    mockFileAccess.getCurrentPath.mockResolvedValue(rootPath);
     mockFileAccess.exists.mockResolvedValue(false);
     await runInteractor('java');
     expect(mockOutputData.setOutputData).toHaveBeenCalledWith(false);

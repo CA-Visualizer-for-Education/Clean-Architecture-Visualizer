@@ -1,7 +1,7 @@
 import { useTheme } from '@mui/material/styles';
 import type { RefObject } from 'react';
 import { useEffect, useId, useMemo, useState } from 'react';
-import type { ArrowHeadType, CAEdge, CANode } from '../../../lib/types';
+import type { ArrowHeadType, CaEdge, CaNode } from '../../../lib/types';
 import { EdgeSvg } from './styles';
 
 type RectSide = 'left' | 'right' | 'top' | 'bottom';
@@ -30,9 +30,9 @@ export type EdgeRouteHint = {
 };
 
 type EdgeProps = {
-  startNode: CANode;
-  endNode: CANode;
-  status: CAEdge['status'];
+  startNode: CaNode;
+  endNode: CaNode;
+  status: CaEdge['status'];
   arrowHeadType: ArrowHeadType;
   containerRef: RefObject<HTMLElement | null>;
   routeHint?: EdgeRouteHint;

@@ -217,6 +217,70 @@ describe('applyRenames', () => {
     );
   });
 
+  it('keeps the property name when it renames a local used as a shorthand property', () => {
+    write(
+      'src/data/node.ts',
+      "const file_path = 'a.ts';\nexport const node = { file_path };\n"
+    );
+
+    applyRenames(
+      root,
+      {
+        files: [],
+        identifiers: [
+          { file: 'src/data/node.ts', from: 'file_path', to: 'filePath' },
+        ],
+      },
+      [{ tsconfig: 'tsconfig.json' }]
+    );
+
+    expect(read('src/data/node.ts')).toBe(
+      "const filePath = 'a.ts';\nexport const node = { file_path: filePath };\n"
+    );
+  });
+
+  it('changes nothing when run again after renaming a local used as a shorthand property', () => {
+    write(
+      'src/data/node.ts',
+      "const file_path = 'a.ts';\nexport const node = { file_path };\n"
+    );
+    const table = {
+      files: [],
+      identifiers: [
+        { file: 'src/data/node.ts', from: 'file_path', to: 'filePath' },
+      ],
+    };
+    applyRenames(root, table, [{ tsconfig: 'tsconfig.json' }]);
+
+    applyRenames(root, table, [{ tsconfig: 'tsconfig.json' }]);
+
+    expect(read('src/data/node.ts')).toBe(
+      "const filePath = 'a.ts';\nexport const node = { file_path: filePath };\n"
+    );
+  });
+
+  it('renames a name in a local export list without aliasing it', () => {
+    write('src/data/count.ts', 'const foo = 1;\nexport { foo };\n');
+    write(
+      'src/data/user.ts',
+      "import { foo } from './count.js';\nexport const total = foo;\n"
+    );
+
+    applyRenames(
+      root,
+      {
+        files: [],
+        identifiers: [{ file: 'src/data/count.ts', from: 'foo', to: 'bar' }],
+      },
+      [{ tsconfig: 'tsconfig.json' }]
+    );
+
+    expect(read('src/data/count.ts')).toBe('const bar = 1;\nexport { bar };\n');
+    expect(read('src/data/user.ts')).toBe(
+      "import { bar } from './count.js';\nexport const total = bar;\n"
+    );
+  });
+
   it('finds an identifier in a file renamed by the same table', () => {
     applyRenames(
       root,

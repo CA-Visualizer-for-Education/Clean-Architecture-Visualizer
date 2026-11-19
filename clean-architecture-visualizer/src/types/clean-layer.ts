@@ -1,4 +1,4 @@
-export type cleanLayer =
+export type CleanLayer =
   | 'interfaceAdapters'
   | 'frameworksAndDrivers'
   | 'enterpriseBusinessRules'

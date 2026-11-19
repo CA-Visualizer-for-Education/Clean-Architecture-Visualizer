@@ -140,13 +140,29 @@ function renameIdentifiers(
       if (!declaration) {
         continue;
       }
-      for (const location of project
-        .getLanguageService()
-        .findRenameLocations(declaration)) {
-        const span = location.getTextSpan();
-        edits.add(location.getSourceFile().getFilePath(), span.getStart(), {
-          length: span.getLength(),
-          text: to,
+      const service = project.getLanguageService();
+      // Prefix and suffix text keep a shorthand property's name: `{ file_path }`
+      // becomes `{ file_path: filePath }`. Elsewhere they add aliases
+      // (`export { bar as foo }`) and stop the rename at the export, so only
+      // shorthand properties use them.
+      const affixed = new Map(
+        service
+          .findRenameLocations(declaration, { usePrefixAndSuffixText: true })
+          .map((location) => [
+            `${location.getSourceFile().getFilePath()}:${location.getTextSpan().getStart()}`,
+            `${location.getPrefixText() ?? ''}${to}${location.getSuffixText() ?? ''}`,
+          ])
+      );
+      for (const location of service.findRenameLocations(declaration)) {
+        const file = location.getSourceFile();
+        const start = location.getTextSpan().getStart();
+        const shorthand = Node.isShorthandPropertyAssignment(
+          file.getDescendantAtPos(start)?.getParent()
+        );
+        edits.add(file.getFilePath(), start, {
+          length: location.getTextSpan().getLength(),
+          text:
+            (shorthand && affixed.get(`${file.getFilePath()}:${start}`)) || to,
         });
       }
     }
@@ -205,10 +221,15 @@ function renameFiles(
   }
 }
 
+// Object literal keys don't count: after `{ file_path }` becomes
+// `{ file_path: filePath }`, the old name survives as a key, and a second run
+// must not rename it.
 function isDeclarationName(identifier: Node): boolean {
   const parent = identifier.getParent();
   return (
     parent !== undefined &&
+    !Node.isPropertyAssignment(parent) &&
+    !Node.isShorthandPropertyAssignment(parent) &&
     Node.hasName(parent) &&
     parent.getNameNode() === identifier
   );

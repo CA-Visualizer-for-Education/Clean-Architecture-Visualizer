@@ -10,7 +10,7 @@ const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
 
 import { CleanArchAccess } from '../data_access/cleanArchInfoAccess.js';
 import { FileAccess } from '../data_access/fileAccess.js';
-import { SessionDBAccess } from '../data_access/sessionDBAccess.js';
+import { SessionDbAccess } from '../data_access/sessionDBAccess.js';
 import { AppBuilder } from './appBuilder.js';
 
 const program = new Command();
@@ -18,7 +18,7 @@ const program = new Command();
 const app = new AppBuilder()
   .withFileAccess(new FileAccess())
   .withCleanArchAccess(new CleanArchAccess())
-  .withSessionDBAccess(new SessionDBAccess());
+  .withSessionDbAccess(new SessionDbAccess());
 
 program.version(packageJson.version);
 
@@ -36,7 +36,7 @@ program
     'Verify whether the use cases found in child directories adhere to Clean Architecture'
   )
   .action(async () => {
-    await app.runCLIGraphVerification();
+    await app.runCliGraphVerification();
   });
 
 program

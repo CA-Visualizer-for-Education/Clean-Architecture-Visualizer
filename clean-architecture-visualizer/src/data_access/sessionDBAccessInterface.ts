@@ -1,6 +1,6 @@
-import type { useCaseGraph } from '../entity/useCaseGraph.js';
-import type { cleanLayer } from '../types/clean-layer.js';
-import type { cleanNode } from '../types/cleanNode.js';
+import type { UseCaseGraph } from '../entity/useCaseGraph.js';
+import type { CleanLayer } from '../types/clean-layer.js';
+import type { CleanNode } from '../types/cleanNode.js';
 import type {
   EdgeStorage,
   FileStorage,
@@ -8,14 +8,14 @@ import type {
   SessionData,
 } from '../types/sessionData.js';
 
-export interface SessionDBAccessInterface {
+export interface SessionDbAccessInterface {
   // Setters
   setProjectName(name: string): void;
   setNumUseCases(count: number): void;
   setNumViolations(count: number): void;
 
   // Setters — useCases
-  setUseCases(useCaseList: useCaseGraph[], files: FileStorage[]): void;
+  setUseCases(useCaseList: UseCaseGraph[], files: FileStorage[]): void;
   upsertUseCase(entry: SessionData['useCases'][number]): void;
   removeUseCase(id: string): void;
 
@@ -49,14 +49,14 @@ export interface SessionDBAccessInterface {
   getUseCaseViolationEdges(
     id: string
   ): SessionData['useCases'][number]['violationEdges'] | undefined;
-  getUseCaseMissingNodes(id: string): cleanNode[] | undefined;
+  getUseCaseMissingNodes(id: string): CleanNode[] | undefined;
 
   // Getters — files
   getAllFiles(): FileStorage[];
   getFileByPath(filePath: string): FileStorage | undefined;
-  getFilesByLayer(layer: cleanLayer): FileStorage[];
+  getFilesByLayer(layer: CleanLayer): FileStorage[];
   getFilesByType(fileType: FileStorage['fileType']): FileStorage[];
-  getFilesByNode(node: cleanNode): FileStorage[];
+  getFilesByNode(node: CleanNode): FileStorage[];
 
   // Getters — edges
   getAllEdges(): EdgeStorage[];
@@ -68,12 +68,12 @@ export interface SessionDBAccessInterface {
   // Getters — nodes
   getAllNodes(): NodeStorage[];
   getNodeById(id: string): NodeStorage | undefined;
-  getNodesByType(type: cleanNode): NodeStorage[];
-  getNodesByLayer(layer: cleanLayer): NodeStorage[];
+  getNodesByType(type: CleanNode): NodeStorage[];
+  getNodesByLayer(layer: CleanLayer): NodeStorage[];
   getNodesByStatus(status: NodeStorage['status']): NodeStorage[];
   getNodeByFilePath(filePath: string): NodeStorage | undefined;
   getNodeByName(name: string): NodeStorage | undefined;
 
   // reset db
-  resetDB(): undefined;
+  resetDb(): undefined;
 }

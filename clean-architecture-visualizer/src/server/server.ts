@@ -7,7 +7,7 @@ import chalk from 'chalk';
 import express from 'express';
 import type { ViteDevServer } from 'vite';
 
-import type { SessionDBAccessInterface } from '../data_access/sessionDBAccessInterface.js';
+import type { SessionDbAccessInterface } from '../data_access/sessionDBAccessInterface.js';
 import { createAnalysisRouter } from './routes/analysis.js';
 import template from './routes/template.js';
 
@@ -25,7 +25,7 @@ const isProd = process.env.NODE_ENV !== 'development';
 
 export async function startServer(
   backendOnly: boolean,
-  db: SessionDBAccessInterface
+  db: SessionDbAccessInterface
 ): Promise<Server> {
   const app = express();
 

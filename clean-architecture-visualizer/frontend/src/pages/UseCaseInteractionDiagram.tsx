@@ -1,7 +1,7 @@
 import { useParams } from 'react-router-dom';
 import '../i18n/config';
 import Header from '../components/common/Header';
-import { CADiagram, Legend, SideBar } from '../components/diagram';
+import { CaDiagram, Legend, SideBar } from '../components/diagram';
 import {
   MainViewContainer,
   PageContainer,
@@ -23,7 +23,7 @@ export default function UseCaseInteractionDiagram() {
       <Header />
       <Workspace>
         <MainViewContainer>
-          <CADiagram />
+          <CaDiagram />
           <Legend />
         </MainViewContainer>
 

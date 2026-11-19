@@ -7,7 +7,7 @@ export const SESSION_FILE = path.join(
   `clean-arch-cli-session${process.env.JEST_WORKER_ID ? `-${process.env.JEST_WORKER_ID}` : ''}.json`
 );
 
-export class SessionDB<T extends object> {
+export class SessionDb<T extends object> {
   private data: Partial<T> = {};
 
   set<K extends keyof T>(key: K, value: T[K]): void {
