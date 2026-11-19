@@ -458,8 +458,8 @@ describe('Imports across use cases are caught and seperate from normal violation
   const fileMockContents = new Map<string, Relationship[]>();
   const fileMockPaths = new Map<string, string>();
 
-  const externalInOrder: useCaseGraph[] = [];
-  const firstUseCase = new useCaseGraph('first');
+  const externalInOrder: UseCaseGraph[] = [];
+  const firstUseCase = new UseCaseGraph('first');
   firstUseCase.addFile(
     'firstInteractor',
     '/mock/path/use_case/first/firstInteractor.ts'
@@ -470,7 +470,7 @@ describe('Imports across use cases are caught and seperate from normal violation
   );
   externalInOrder.push(firstUseCase);
 
-  const secondUseCase = new useCaseGraph('second');
+  const secondUseCase = new UseCaseGraph('second');
   secondUseCase.addFile(
     'secondInteractor',
     '/mock/path/use_case/second/secondInteractor.ts'
@@ -501,8 +501,8 @@ describe('Imports across use cases are caught and seperate from normal violation
   //This implementation needs to use distinct use case names for the MockFileAccess contents to not overlap
   //  One potential fix could be to re-make the contents in the it.each testing block
   //  but this is an easier implementation, and will work for fewer test cases.
-  const externalOutOfOrder: useCaseGraph[] = [];
-  const thirdUseCase = new useCaseGraph('third');
+  const externalOutOfOrder: UseCaseGraph[] = [];
+  const thirdUseCase = new UseCaseGraph('third');
   thirdUseCase.addFile(
     'thirdInteractor',
     '/mock/path/use_case/third/thirdInteractor.ts'
@@ -513,7 +513,7 @@ describe('Imports across use cases are caught and seperate from normal violation
   );
   externalOutOfOrder.push(thirdUseCase);
 
-  const fourthUseCase = new useCaseGraph('fourth');
+  const fourthUseCase = new UseCaseGraph('fourth');
   fourthUseCase.addFile(
     'fourthInteractor',
     '/mock/path/use_case/fourth/fourthInteractor.ts'
@@ -543,8 +543,8 @@ describe('Imports across use cases are caught and seperate from normal violation
     },
   ]);
 
-  const normalViolation: useCaseGraph[] = [];
-  const normalUseCase = new useCaseGraph('normal');
+  const normalViolation: UseCaseGraph[] = [];
+  const normalUseCase = new UseCaseGraph('normal');
   normalUseCase.addFile(
     'normalInteractor',
     '/mock/path/use_case/normal/normalInteractor.ts'
@@ -2325,7 +2325,7 @@ describe('Files belong to a use case by their folder, not by the rest of their p
     const interactor = new GraphVerificationInteractor(
       fileAccess,
       genericNeighbourAccess,
-      new SessionDBAccess(),
+      new SessionDbAccess(),
       new GraphVerificationPresenter(new GraphVerificationOutputData())
     );
     for (const file of files) {
@@ -2347,7 +2347,7 @@ describe('Files belong to a use case by their folder, not by the rest of their p
   ) =>
     [
       ...(interactor as any).useCaseGraphList
-        .find((g: useCaseGraph) => g.getName() === name)
+        .find((g: UseCaseGraph) => g.getName() === name)
         .getFiles()
         .keys(),
     ].sort();
