@@ -124,11 +124,13 @@ describe('Project folders are found in the main source, not build output or test
     ]);
   });
 
-  it('lists the use cases in src/main/java, not src/test/java, when packaging by layer', async () => {
+  it('lists the use cases in src/main, not src/test, when packaging by layer', async () => {
+    // src/test/use_case is shallower than src/main/java/use_case, so a search
+    // that enters src/test finds it first, whatever order folders are listed in.
     await makeFolders(
       'src/main/java/use_case/login',
       'src/main/java/use_case/logout',
-      'src/test/java/use_case/login'
+      'src/test/use_case/login'
     );
 
     const useCases = await new FileAccess().getUseCases();
