@@ -61,6 +61,11 @@ describe('parseReport', () => {
       parseReport(JSON.stringify(report({ schema_version: 2 })))
     ).toThrow('Unsupported CAVE report version 2');
   });
+  // The engine printed "null" (valid JSON, but not a report).
+  // parseReport should reject it.
+  it('rejects null', () => {
+    expect(() => parseReport('null')).toThrow('unexpected report format');
+  });
 });
 
 describe('planReport', () => {
@@ -116,6 +121,96 @@ describe('planReport', () => {
     expect(plan.kind === 'violations' && plan.diagnostics[0].message).toBe(
       'Incorrect dependency: controller → entities.'
     );
+  });
+
+  // The violation has a line number but an empty file path, so we can't
+  // tell which file. It should go in the "unlocated" list.
+  it('treats missing paths as unlocated', () => {
+    const unlocated = violation({
+      file_context: {
+        file: 'LoginController.java',
+        path: '',
+        line_number: 3,
+      },
+    });
+
+    const plan = planReport(report({ violations: [unlocated] }), root);
+
+    expect(plan.kind).toBe('violations');
+    expect(plan).toMatchObject({
+      diagnostics: [],
+      unlocated: [unlocated],
+    });
+  });
+
+  // The file path is fine, but the line number is 0 or -1. Line numbers
+  // start at 1. Both should go in the "unlocated" list.
+  it('treats invalid line numbers as unlocated', () => {
+    for (const lineNumber of [0, -1]) {
+      const unlocated = violation({
+        file_context: {
+          file: 'LoginController.java',
+          path: 'src/interface_adapter/Login/LoginController.java',
+          line_number: lineNumber,
+        },
+      });
+
+      const plan = planReport(report({ violations: [unlocated] }), root);
+
+      expect(plan.kind).toBe('violations');
+      expect(plan).toMatchObject({
+        diagnostics: [],
+        unlocated: [unlocated],
+      });
+    }
+  });
+
+  // The violation has a file path but no line number at all (it's
+  // `undefined`). It should go in the "unlocated" list.
+  it('treats an undefined line_number as unlocated', () => {
+    const unlocated = violation({
+      file_context: {
+        file: 'LoginController.java',
+        path: 'src/interface_adapter/Login/LoginController.java',
+      },
+    });
+
+    const plan = planReport(report({ violations: [unlocated] }), root);
+
+    expect(plan).toMatchObject({ diagnostics: [], unlocated: [unlocated] });
+  });
+
+  // The path is already a full path (starting from the very top of the
+  // drive), not a short one like `src/...`. planReport should keep it as is.
+  it('keeps an absolute file path when planning diagnostics', () => {
+    const absolutePath = path.resolve(
+      root,
+      'src/interface_adapter/Login/LoginController.java'
+    );
+    const located = violation({
+      file_context: {
+        file: 'LoginController.java',
+        path: absolutePath,
+        line_number: 3,
+      },
+    });
+
+    const plan = planReport(report({ violations: [located] }), root);
+
+    expect(plan.kind).toBe('violations');
+    if (plan.kind === 'violations') {
+      expect(plan.diagnostics[0].absolutePath).toBe(absolutePath);
+    }
+  });
+
+  // The report says "violations" but the list is empty, so nothing is
+  // actually wrong. planReport should treat it the same as a clean run.
+  it('treats status "violations" with an empty list as clean', () => {
+    const plan = planReport(
+      report({ status: 'violations', violations: [] }),
+      root
+    );
+    expect(plan).toEqual({ kind: 'clean', useCaseCount: 1 });
   });
 });
 
