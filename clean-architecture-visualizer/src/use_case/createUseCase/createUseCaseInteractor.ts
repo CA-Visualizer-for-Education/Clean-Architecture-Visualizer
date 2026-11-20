@@ -40,10 +40,14 @@ export class CreateUseCaseInteractor implements CreateUseCaseInputBoundary {
         return;
       }
 
-      // Find base directories
-      const useCaseDir = await this.fileAccess.bfsFindDir(currPath, 'use_case');
+      // Find base directories in the main source, not build output or tests
+      const sourcePath = (await this.fileAccess.getSourcePath()) ?? currPath;
+      const useCaseDir = await this.fileAccess.bfsFindDir(
+        sourcePath,
+        'use_case'
+      );
       const interfaceAdapterDir = await this.fileAccess.bfsFindDir(
-        currPath,
+        sourcePath,
         'interface_adapter'
       );
 

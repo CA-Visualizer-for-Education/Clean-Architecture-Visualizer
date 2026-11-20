@@ -18,9 +18,10 @@ export class CreateFeatureInteractor implements CreateFeatureInputBoundary {
       // Want to remove all spaces from the name of the feature
       const feature = new UseCaseName(inputData.getFeatureName()).value;
       const currPath = await this.fileAccess.getCurrentPath();
-      // If "features" the directory doesn't exist, abort
+      // If "features" the directory doesn't exist in the main source, abort
+      const sourcePath = (await this.fileAccess.getSourcePath()) ?? currPath;
       const featuresDirectory = await this.fileAccess.bfsFindDir(
-        currPath,
+        sourcePath,
         'features'
       );
       if (!featuresDirectory) {

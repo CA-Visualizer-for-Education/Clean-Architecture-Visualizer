@@ -13,12 +13,10 @@ export class FileAccess implements FileAccessInterface {
    * @returns A list of the names of each use case.
    */
   async getUseCases(): Promise<string[]> {
-    const currPath = process.cwd();
-
-    const srcPath = await this.bfsFindDir(currPath, 'src');
+    const srcPath = await this.getSourcePath();
     if (!srcPath) return [];
 
-    const featuresPath = await this.bfsFindDir(currPath, 'features');
+    const featuresPath = await this.bfsFindDir(srcPath, 'features');
     if (featuresPath) {
       // Extract all of the features in the features directory
       const allFeatures = await fs.readdir(featuresPath, {
@@ -56,8 +54,7 @@ export class FileAccess implements FileAccessInterface {
    * @param paths a map that takes file names to their relative paths.
    */
   async getFilePaths(node: string, paths: Map<string, string>): Promise<void> {
-    const currPath = process.cwd();
-    const srcPath = await this.bfsFindDir(currPath, 'src');
+    const srcPath = await this.getSourcePath();
 
     if (!srcPath) {
       return;
@@ -554,5 +551,18 @@ export class FileAccess implements FileAccessInterface {
    */
   async getCurrentPath(): Promise<string> {
     return process.cwd();
+  }
+
+  /**
+   * Get the folder that holds the project's main source: `src/main` when it
+   * exists, as in Maven and Gradle projects, otherwise `src`. Searching from
+   * here skips build output such as `target/classes` and tests in `src/test`.
+   * @returns the path of the folder, or null if the project has no src.
+   */
+  async getSourcePath(): Promise<string | null> {
+    const srcPath = await this.bfsFindDir(process.cwd(), 'src');
+    if (!srcPath) return null;
+    const mainPath = path.join(srcPath, 'main');
+    return (await this.exists(mainPath)) ? mainPath : srcPath;
   }
 }

@@ -443,6 +443,9 @@ class MockFileAccess implements FileAccessInterface {
   async getCurrentPath(): Promise<string> {
     return '/mock/path';
   }
+  async getSourcePath(): Promise<string | null> {
+    return '/mock/path/src';
+  }
   async bfsFindDir(_curr: string, _target: string): Promise<string | null> {
     return null;
   }
