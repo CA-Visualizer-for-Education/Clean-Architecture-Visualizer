@@ -1,32 +1,39 @@
 // biome-ignore-all lint/suspicious/noExplicitAny: these tests reach the Interactor's private members until it is split up (#269)
-import { beforeEach, describe, expect, it, jest } from '@jest/globals';
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  jest,
+} from '@jest/globals';
 import { CleanArchAccess } from '../../../src/data_access/cleanArchInfoAccess.js';
 import { FileAccess } from '../../../src/data_access/fileAccess.js';
 import type { FileAccessInterface } from '../../../src/data_access/fileAccessInterface.js';
-import { SessionDBAccess } from '../../../src/data_access/sessionDBAccess.js';
-import { useCaseGraph } from '../../../src/entity/useCaseGraph.js';
+import { SessionDbAccess } from '../../../src/data_access/sessionDBAccess.js';
+import { UseCaseGraph } from '../../../src/entity/useCaseGraph.js';
 import { GraphVerificationPresenter } from '../../../src/interface_adapter/graphVerification/graphVerificationPresenter.js';
-import type { cleanNode } from '../../../src/types/cleanNode.js';
+import type { CleanNode } from '../../../src/types/cleanNode.js';
 import type { Relationship } from '../../../src/types/relationship.js';
 import { GraphVerificationInteractor } from '../../../src/use_case/graphVerification/graphVerificationInteractor.js';
 import { GraphVerificationOutputData } from '../../../src/use_case/graphVerification/graphVerificationOutputData.js';
 
 const genericFileAccess = new FileAccess();
 const genericNeighbourAccess = new CleanArchAccess();
-const genericDBAccess = new SessionDBAccess();
+const genericDbAccess = new SessionDbAccess();
 const presenter = new GraphVerificationPresenter(
   new GraphVerificationOutputData()
 );
 
-function makeUseCaseGraphs(types: string[]): useCaseGraph[] {
-  const useCaseGraphs: useCaseGraph[] = [];
+function makeUseCaseGraphs(types: string[]): UseCaseGraph[] {
+  const useCaseGraphs: UseCaseGraph[] = [];
   types.forEach((type) => {
     switch (type) {
       case 'empty':
-        useCaseGraphs.push(new useCaseGraph('empty'));
+        useCaseGraphs.push(new UseCaseGraph('empty'));
         break;
       case 'good': {
-        const goodUseCase = new useCaseGraph('good');
+        const goodUseCase = new UseCaseGraph('good');
         goodUseCase.setNodeNeighbour('useCaseInteractor', 'entities');
         goodUseCase.setNodeNeighbour('dataAccess', 'database');
         goodUseCase.setNodeNeighbour('view', 'viewModel');
@@ -35,7 +42,7 @@ function makeUseCaseGraphs(types: string[]): useCaseGraph[] {
         break;
       }
       case 'single': {
-        const singleViolation = new useCaseGraph('single');
+        const singleViolation = new UseCaseGraph('single');
         singleViolation.addFile('view', 'root/src/views/view.java');
         singleViolation.addFile('viewModel', 'root/src/views/viewModel.java');
         singleViolation.addFile('entity', 'root/src/entity/entity.java');
@@ -45,7 +52,7 @@ function makeUseCaseGraphs(types: string[]): useCaseGraph[] {
         break;
       }
       case 'multiple': {
-        const multipleViolations = new useCaseGraph('multiple');
+        const multipleViolations = new UseCaseGraph('multiple');
         multipleViolations.setNodeNeighbour('entities', 'view');
         multipleViolations.setNodeNeighbour('controller', 'entities');
         useCaseGraphs.push(multipleViolations);
@@ -60,7 +67,7 @@ describe('Ensures that resolveLayer correctly identifies layers from their file 
   const genericInteractor = new GraphVerificationInteractor(
     genericFileAccess,
     genericNeighbourAccess,
-    genericDBAccess,
+    genericDbAccess,
     presenter
   );
 
@@ -101,7 +108,7 @@ describe('Ensures that resolveLayer correctly identifies layers from their file 
   const genericInteractor = new GraphVerificationInteractor(
     genericFileAccess,
     genericNeighbourAccess,
-    genericDBAccess,
+    genericDbAccess,
     presenter
   );
 
@@ -139,7 +146,7 @@ describe('Ensures that resolveLayer correctly identifies layers from their file 
 });
 
 describe('Ensures that verifyOutNeighbours correctly classifies the number of Clean violations', () => {
-  function getAllViolations(graphs: useCaseGraph[]): number {
+  function getAllViolations(graphs: UseCaseGraph[]): number {
     let result = 0;
     graphs.forEach((element) => {
       result += element.getViolationCount();
@@ -180,9 +187,9 @@ describe('Ensures that verifyOutNeighbours correctly classifies the number of Cl
     const interactor = new GraphVerificationInteractor(
       genericFileAccess,
       genericNeighbourAccess,
-      genericDBAccess,
+      genericDbAccess,
       presenter,
-      useCaseGraphList as useCaseGraph[]
+      useCaseGraphList as UseCaseGraph[]
     );
     await (interactor as any).verifyOutNeighbours();
     const violationCount = getAllViolations(
@@ -194,7 +201,7 @@ describe('Ensures that verifyOutNeighbours correctly classifies the number of Cl
 
 describe('Ensures that populateDatabase correctly populates the database', () => {
   describe('use case and violation counts', () => {
-    const testCases: [string, useCaseGraph[], number, number][] = [
+    const testCases: [string, UseCaseGraph[], number, number][] = [
       ['Empty use case list sets 0 use cases and 0 violations', [], 0, 0],
       [
         'Single use case with no violations',
@@ -214,7 +221,7 @@ describe('Ensures that populateDatabase correctly populates the database', () =>
     it.each(testCases)(
       '%s',
       async (_, useCaseGraphList, expectedUseCases, expectedViolations) => {
-        const dbAccess = new SessionDBAccess();
+        const dbAccess = new SessionDbAccess();
         const interactor = new GraphVerificationInteractor(
           genericFileAccess,
           genericNeighbourAccess,
@@ -233,7 +240,7 @@ describe('Ensures that populateDatabase correctly populates the database', () =>
 
   describe('use cases are stored correctly', () => {
     it('stores all use cases with correct ids and names', async () => {
-      const dbAccess = new SessionDBAccess();
+      const dbAccess = new SessionDbAccess();
       const interactor = new GraphVerificationInteractor(
         genericFileAccess,
         genericNeighbourAccess,
@@ -251,7 +258,7 @@ describe('Ensures that populateDatabase correctly populates the database', () =>
     });
 
     it('stores violation edges on the correct use case', async () => {
-      const dbAccess = new SessionDBAccess();
+      const dbAccess = new SessionDbAccess();
       const interactor = new GraphVerificationInteractor(
         genericFileAccess,
         genericNeighbourAccess,
@@ -269,7 +276,7 @@ describe('Ensures that populateDatabase correctly populates the database', () =>
 
   describe('edges are stored correctly', () => {
     it('stores VALID edges from use case neighbour maps', async () => {
-      const dbAccess = new SessionDBAccess();
+      const dbAccess = new SessionDbAccess();
       const interactor = new GraphVerificationInteractor(
         genericFileAccess,
         genericNeighbourAccess,
@@ -285,7 +292,7 @@ describe('Ensures that populateDatabase correctly populates the database', () =>
     });
 
     it('marks violation edges as INCORRECT_DEPENDENCY', async () => {
-      const dbAccess = new SessionDBAccess();
+      const dbAccess = new SessionDbAccess();
       const interactor = new GraphVerificationInteractor(
         genericFileAccess,
         genericNeighbourAccess,
@@ -301,8 +308,8 @@ describe('Ensures that populateDatabase correctly populates the database', () =>
     });
 
     it('marks non-violation edges as VALID', async () => {
-      const dbAccess = new SessionDBAccess();
-      const uc = new useCaseGraph('valid');
+      const dbAccess = new SessionDbAccess();
+      const uc = new UseCaseGraph('valid');
       uc.setNodeNeighbour('view', 'viewModel');
 
       const interactor = new GraphVerificationInteractor(
@@ -320,9 +327,9 @@ describe('Ensures that populateDatabase correctly populates the database', () =>
     });
 
     it('deduplicates edges across use cases', async () => {
-      const dbAccess = new SessionDBAccess();
-      const uc1 = new useCaseGraph('uc1');
-      const uc2 = new useCaseGraph('uc2');
+      const dbAccess = new SessionDbAccess();
+      const uc1 = new UseCaseGraph('uc1');
+      const uc2 = new UseCaseGraph('uc2');
       uc1.setNodeNeighbour('view', 'viewModel');
       uc2.setNodeNeighbour('view', 'viewModel');
 
@@ -344,7 +351,7 @@ describe('Ensures that populateDatabase correctly populates the database', () =>
 
   describe('nodes are stored correctly', () => {
     it('marks nodes involved in violations as VIOLATION', async () => {
-      const dbAccess = new SessionDBAccess();
+      const dbAccess = new SessionDbAccess();
       const interactor = new GraphVerificationInteractor(
         genericFileAccess,
         genericNeighbourAccess,
@@ -362,8 +369,8 @@ describe('Ensures that populateDatabase correctly populates the database', () =>
     });
 
     it('marks missing nodes as MISSING', async () => {
-      const dbAccess = new SessionDBAccess();
-      const uc = new useCaseGraph('sparse');
+      const dbAccess = new SessionDbAccess();
+      const uc = new UseCaseGraph('sparse');
       uc.setNodeNeighbour('view', 'viewModel'); // only two nodes present
 
       const interactor = new GraphVerificationInteractor(
@@ -436,6 +443,9 @@ class MockFileAccess implements FileAccessInterface {
   async getCurrentPath(): Promise<string> {
     return '/mock/path';
   }
+  async getSourcePath(): Promise<string | null> {
+    return '/mock/path/src';
+  }
   async bfsFindDir(_curr: string, _target: string): Promise<string | null> {
     return null;
   }
@@ -451,30 +461,42 @@ describe('Imports across use cases are caught and seperate from normal violation
   const fileMockContents = new Map<string, Relationship[]>();
   const fileMockPaths = new Map<string, string>();
 
-  const externalInOrder: useCaseGraph[] = [];
-  const firstUseCase = new useCaseGraph('first');
-  firstUseCase.addFile('firstInteractor', '/mock/path/firstInteractor.ts');
-  firstUseCase.addFile('firstOutputData', '/mock/path/firstOutputData.ts');
+  const externalInOrder: UseCaseGraph[] = [];
+  const firstUseCase = new UseCaseGraph('first');
+  firstUseCase.addFile(
+    'firstInteractor',
+    '/mock/path/use_case/first/firstInteractor.ts'
+  );
+  firstUseCase.addFile(
+    'firstOutputData',
+    '/mock/path/use_case/first/firstOutputData.ts'
+  );
   externalInOrder.push(firstUseCase);
 
-  const secondUseCase = new useCaseGraph('second');
-  secondUseCase.addFile('secondInteractor', '/mock/path/secondInteractor.ts');
-  secondUseCase.addFile('secondOutputData', '/mock/path/secondOutputData.ts');
+  const secondUseCase = new UseCaseGraph('second');
+  secondUseCase.addFile(
+    'secondInteractor',
+    '/mock/path/use_case/second/secondInteractor.ts'
+  );
+  secondUseCase.addFile(
+    'secondOutputData',
+    '/mock/path/use_case/second/secondOutputData.ts'
+  );
   externalInOrder.push(secondUseCase);
 
-  fileMockContents.set('/mock/path/firstInteractor.ts', [
+  fileMockContents.set('/mock/path/use_case/first/firstInteractor.ts', [
     {
-      fileName: '/mock/path/firstOutputData.ts',
+      fileName: '/mock/path/use_case/first/firstOutputData.ts',
       relationshipType: 'dependency',
     },
   ]);
-  fileMockContents.set('/mock/path/secondInteractor.ts', [
+  fileMockContents.set('/mock/path/use_case/second/secondInteractor.ts', [
     {
-      fileName: '/mock/path/secondOutputData.ts',
+      fileName: '/mock/path/use_case/second/secondOutputData.ts',
       relationshipType: 'dependency',
     },
     {
-      fileName: '/mock/path/firstOutputData.ts',
+      fileName: '/mock/path/use_case/first/firstOutputData.ts',
       relationshipType: 'dependency',
     },
   ]);
@@ -482,45 +504,63 @@ describe('Imports across use cases are caught and seperate from normal violation
   //This implementation needs to use distinct use case names for the MockFileAccess contents to not overlap
   //  One potential fix could be to re-make the contents in the it.each testing block
   //  but this is an easier implementation, and will work for fewer test cases.
-  const externalOutOfOrder: useCaseGraph[] = [];
-  const thirdUseCase = new useCaseGraph('third');
-  thirdUseCase.addFile('thirdInteractor', '/mock/path/thirdInteractor.ts');
-  thirdUseCase.addFile('thirdOutputData', '/mock/path/thirdOutputData.ts');
+  const externalOutOfOrder: UseCaseGraph[] = [];
+  const thirdUseCase = new UseCaseGraph('third');
+  thirdUseCase.addFile(
+    'thirdInteractor',
+    '/mock/path/use_case/third/thirdInteractor.ts'
+  );
+  thirdUseCase.addFile(
+    'thirdOutputData',
+    '/mock/path/use_case/third/thirdOutputData.ts'
+  );
   externalOutOfOrder.push(thirdUseCase);
 
-  const fourthUseCase = new useCaseGraph('fourth');
-  fourthUseCase.addFile('fourthInteractor', '/mock/path/fourthInteractor.ts');
-  fourthUseCase.addFile('fourthOutputData', '/mock/path/fourthOutputData.ts');
+  const fourthUseCase = new UseCaseGraph('fourth');
+  fourthUseCase.addFile(
+    'fourthInteractor',
+    '/mock/path/use_case/fourth/fourthInteractor.ts'
+  );
+  fourthUseCase.addFile(
+    'fourthOutputData',
+    '/mock/path/use_case/fourth/fourthOutputData.ts'
+  );
   externalOutOfOrder.push(fourthUseCase);
 
-  fileMockContents.set('/mock/path/thirdInteractor.ts', [
+  fileMockContents.set('/mock/path/use_case/third/thirdInteractor.ts', [
     {
-      fileName: '/mock/path/thirdOutputData.ts',
+      fileName: '/mock/path/use_case/third/thirdOutputData.ts',
       relationshipType: 'dependency',
     },
   ]);
-  fileMockContents.set('/mock/path/fourthInteractor.ts', [
+  fileMockContents.set('/mock/path/use_case/fourth/fourthInteractor.ts', [
     {
-      fileName: '/mock/path/fourthOutputData.ts',
+      fileName: '/mock/path/use_case/fourth/fourthOutputData.ts',
       relationshipType: 'dependency',
     },
   ]);
-  fileMockContents.set('/mock/path/fourthOutputData.ts', [
+  fileMockContents.set('/mock/path/use_case/fourth/fourthOutputData.ts', [
     {
-      fileName: '/mock/path/thirdInteractor.ts',
+      fileName: '/mock/path/use_case/third/thirdInteractor.ts',
       relationshipType: 'dependency',
     },
   ]);
 
-  const normalViolation: useCaseGraph[] = [];
-  const normalUseCase = new useCaseGraph('normal');
-  normalUseCase.addFile('normalInteractor', '/mock/path/normalInteractor.ts');
-  normalUseCase.addFile('normalOutputData', '/mock/path/normalOutputData.ts');
+  const normalViolation: UseCaseGraph[] = [];
+  const normalUseCase = new UseCaseGraph('normal');
+  normalUseCase.addFile(
+    'normalInteractor',
+    '/mock/path/use_case/normal/normalInteractor.ts'
+  );
+  normalUseCase.addFile(
+    'normalOutputData',
+    '/mock/path/use_case/normal/normalOutputData.ts'
+  );
   normalViolation.push(normalUseCase);
 
-  fileMockContents.set('/mock/path/normalOutputData.ts', [
+  fileMockContents.set('/mock/path/use_case/normal/normalOutputData.ts', [
     {
-      fileName: '/mock/path/normalInteractor.ts',
+      fileName: '/mock/path/use_case/normal/normalInteractor.ts',
       relationshipType: 'dependency',
     },
   ]);
@@ -536,8 +576,8 @@ describe('Imports across use cases are caught and seperate from normal violation
 
   const testCases: [
     string,
-    useCaseGraph[],
-    Array<[[cleanNode, cleanNode]] | []>,
+    UseCaseGraph[],
+    Array<[[CleanNode, CleanNode]] | []>,
   ][] = [
     [
       'Cross use case imports are violations even if otherwise CA valid',
@@ -557,7 +597,7 @@ describe('Imports across use cases are caught and seperate from normal violation
   ];
   it.each(testCases)('%s', async (_, useCaseGraphList, expectedViolations) => {
     const mockFileAccess = new MockFileAccess(fileMockContents, fileMockPaths);
-    const dbAccess = new SessionDBAccess();
+    const dbAccess = new SessionDbAccess();
     const presenter = new GraphVerificationPresenter(
       new GraphVerificationOutputData()
     );
@@ -566,7 +606,7 @@ describe('Imports across use cases are caught and seperate from normal violation
       genericNeighbourAccess,
       dbAccess,
       presenter,
-      useCaseGraphList as useCaseGraph[]
+      useCaseGraphList as UseCaseGraph[]
     );
     await (interactor as any).buildFilePaths();
     await (interactor as any).developOutNeighbours();
@@ -575,9 +615,9 @@ describe('Imports across use cases are caught and seperate from normal violation
   });
 });
 
-describe('useCaseGraph edge type storage', () => {
+describe('UseCaseGraph edge type storage', () => {
   it('stores and retrieves edge types', () => {
-    const graph = new useCaseGraph('test');
+    const graph = new UseCaseGraph('test');
     graph.setNodeNeighbour('controller', 'inputBoundary');
     graph.setEdgeType('controller', 'inputBoundary', 'implements');
 
@@ -585,14 +625,14 @@ describe('useCaseGraph edge type storage', () => {
   });
 
   it('defaults to dependency when no type is set', () => {
-    const graph = new useCaseGraph('test');
+    const graph = new UseCaseGraph('test');
     graph.setNodeNeighbour('view', 'viewModel');
 
     expect(graph.getEdgeType('view', 'viewModel')).toBe('dependency');
   });
 
   it('stores multiple edge types independently', () => {
-    const graph = new useCaseGraph('test');
+    const graph = new UseCaseGraph('test');
     graph.setNodeNeighbour('controller', 'inputBoundary');
     graph.setNodeNeighbour('presenter', 'outputBoundary');
     graph.setEdgeType('controller', 'inputBoundary', 'dependency');
@@ -661,7 +701,7 @@ describe('Ensures buildFilePaths returns all files in correct maps.', () => {
     const interactor = new GraphVerificationInteractor(
       mockFileAccess,
       genericNeighbourAccess,
-      genericDBAccess,
+      genericDbAccess,
       presenter
     );
     await (interactor as any).buildFilePaths();
@@ -747,7 +787,7 @@ describe('Ensures buildFilePaths returns all files in correct maps.', () => {
     const interactor = new GraphVerificationInteractor(
       mockFileAccess,
       genericNeighbourAccess,
-      genericDBAccess,
+      genericDbAccess,
       presenter
     );
     await (interactor as any).buildFilePaths();
@@ -774,7 +814,7 @@ describe('Ensures developOutNeighbours maps the files to all of the use cases th
     const interactor = new GraphVerificationInteractor(
       mockFileAccess,
       genericNeighbourAccess,
-      genericDBAccess,
+      genericDbAccess,
       presenter
     );
 
@@ -800,7 +840,7 @@ describe('Ensures developOutNeighbours maps the files to all of the use cases th
       'usecase1InputData.java',
       'root/src/use_case/usecase1/usecase1InputData.java'
     );
-    (interactor as any).useCaseGraphList.push(new useCaseGraph('usecase1'));
+    (interactor as any).useCaseGraphList.push(new UseCaseGraph('usecase1'));
     (interactor as any).useCaseGraphList[0].addFile(
       'usecase1InputData.java',
       'root/src/use_case/usecase1/usecase1InputData.java'
@@ -895,7 +935,7 @@ describe('Ensures developOutNeighbours maps the files to all of the use cases th
     const interactor = new GraphVerificationInteractor(
       mockFileAccess,
       genericNeighbourAccess,
-      genericDBAccess,
+      genericDbAccess,
       presenter
     );
 
@@ -921,7 +961,7 @@ describe('Ensures developOutNeighbours maps the files to all of the use cases th
       'usecase1InputData.java',
       'root/src/features/feature1/usecase1/usecase/usecase1InputData.java'
     );
-    (interactor as any).useCaseGraphList.push(new useCaseGraph('usecase1'));
+    (interactor as any).useCaseGraphList.push(new UseCaseGraph('usecase1'));
     (interactor as any).useCaseGraphList[0].addFile(
       'usecase1InputData.java',
       'root/src/features/feature1/usecase1/usecase/usecase1InputData.java'
@@ -1016,7 +1056,7 @@ describe('Ensures developOutNeighbours maps the files to all of the use cases th
     const interactor = new GraphVerificationInteractor(
       mockFileAccess,
       genericNeighbourAccess,
-      genericDBAccess,
+      genericDbAccess,
       presenter
     );
 
@@ -1028,8 +1068,8 @@ describe('Ensures developOutNeighbours maps the files to all of the use cases th
       'usecase2Controller.java',
       'root/src/interface_adapter/usecase2/usecase2Controller.java'
     );
-    (interactor as any).useCaseGraphList.push(new useCaseGraph('usecase1'));
-    (interactor as any).useCaseGraphList.push(new useCaseGraph('usecase2'));
+    (interactor as any).useCaseGraphList.push(new UseCaseGraph('usecase1'));
+    (interactor as any).useCaseGraphList.push(new UseCaseGraph('usecase2'));
     (interactor as any).useCaseGraphList[0].addFile(
       'usecase1InputData.java',
       'root/src/use_case/usecase1/usecase1InputData.java'
@@ -1133,7 +1173,7 @@ describe('Ensures developOutNeighbours maps the files to all of the use cases th
     const interactor = new GraphVerificationInteractor(
       mockFileAccess,
       genericNeighbourAccess,
-      genericDBAccess,
+      genericDbAccess,
       presenter
     );
 
@@ -1145,8 +1185,8 @@ describe('Ensures developOutNeighbours maps the files to all of the use cases th
       'usecase2Controller.java',
       'root/src/features/feature2/usecase2/interface_adapter/usecase2Controller.java'
     );
-    (interactor as any).useCaseGraphList.push(new useCaseGraph('usecase1'));
-    (interactor as any).useCaseGraphList.push(new useCaseGraph('usecase2'));
+    (interactor as any).useCaseGraphList.push(new UseCaseGraph('usecase1'));
+    (interactor as any).useCaseGraphList.push(new UseCaseGraph('usecase2'));
     (interactor as any).useCaseGraphList[0].addFile(
       'usecase1InputData.java',
       'root/src/features/feature1/usecase1/use_case/usecase1InputData.java'
@@ -1250,7 +1290,7 @@ describe('Ensures developOutNeighbours maps the files to all of the use cases th
     const interactor = new GraphVerificationInteractor(
       mockFileAccess,
       genericNeighbourAccess,
-      genericDBAccess,
+      genericDbAccess,
       presenter
     );
 
@@ -1276,7 +1316,7 @@ describe('Ensures developOutNeighbours maps the files to all of the use cases th
       'usecase1InputData.java',
       'root/src/use_case/usecase1/usecase1InputData.java'
     );
-    (interactor as any).useCaseGraphList.push(new useCaseGraph('usecase1'));
+    (interactor as any).useCaseGraphList.push(new UseCaseGraph('usecase1'));
     (interactor as any).useCaseGraphList[0].addFile(
       'usecase1InputData.java',
       'root/src/use_case/usecase1/usecase1InputData.java'
@@ -1371,7 +1411,7 @@ describe('Ensures developOutNeighbours maps the files to all of the use cases th
     const interactor = new GraphVerificationInteractor(
       mockFileAccess,
       genericNeighbourAccess,
-      genericDBAccess,
+      genericDbAccess,
       presenter
     );
 
@@ -1397,7 +1437,7 @@ describe('Ensures developOutNeighbours maps the files to all of the use cases th
       'usecase1InputData.java',
       'root/src/features/feature1/usecase1/use_case/usecase1InputData.java'
     );
-    (interactor as any).useCaseGraphList.push(new useCaseGraph('usecase1'));
+    (interactor as any).useCaseGraphList.push(new UseCaseGraph('usecase1'));
     (interactor as any).useCaseGraphList[0].addFile(
       'usecase1InputData.java',
       'root/src/features/feature1/usecase1/use_case/usecase1InputData.java'
@@ -1492,7 +1532,7 @@ describe('Ensures developOutNeighbours maps the files to all of the use cases th
     const interactor = new GraphVerificationInteractor(
       mockFileAccess,
       genericNeighbourAccess,
-      genericDBAccess,
+      genericDbAccess,
       presenter
     );
 
@@ -1510,7 +1550,7 @@ describe('Ensures developOutNeighbours maps the files to all of the use cases th
       (interactor as any).externalFilePaths.set(fileName, filePath);
     }
 
-    (interactor as any).useCaseGraphList.push(new useCaseGraph('usecase1'));
+    (interactor as any).useCaseGraphList.push(new UseCaseGraph('usecase1'));
 
     const fileMap2 = new Map<string, string>();
     fileMap2.set(
@@ -1676,7 +1716,7 @@ describe('Ensures developOutNeighbours maps the files to all of the use cases th
     const interactor = new GraphVerificationInteractor(
       mockFileAccess,
       genericNeighbourAccess,
-      genericDBAccess,
+      genericDbAccess,
       presenter
     );
 
@@ -1694,7 +1734,7 @@ describe('Ensures developOutNeighbours maps the files to all of the use cases th
       (interactor as any).externalFilePaths.set(fileName, filePath);
     }
 
-    (interactor as any).useCaseGraphList.push(new useCaseGraph('usecase1'));
+    (interactor as any).useCaseGraphList.push(new UseCaseGraph('usecase1'));
 
     const fileMap2 = new Map<string, string>();
     fileMap2.set(
@@ -1860,7 +1900,7 @@ describe('Ensures developOutNeighbours maps the files to all of the use cases th
     const interactor = new GraphVerificationInteractor(
       mockFileAccess,
       genericNeighbourAccess,
-      genericDBAccess,
+      genericDbAccess,
       presenter
     );
 
@@ -1878,7 +1918,7 @@ describe('Ensures developOutNeighbours maps the files to all of the use cases th
       (interactor as any).externalFilePaths.set(fileName, filePath);
     }
 
-    (interactor as any).useCaseGraphList.push(new useCaseGraph('usecase1'));
+    (interactor as any).useCaseGraphList.push(new UseCaseGraph('usecase1'));
 
     const fileMap2 = new Map<string, string>();
     fileMap2.set(
@@ -2055,7 +2095,7 @@ describe('Relationship types are passed through to edge storage', () => {
     const fileMockContents = new Map<string, Relationship[]>();
     const fileMockPaths = new Map<string, string>();
 
-    const uc = new useCaseGraph('test');
+    const uc = new UseCaseGraph('test');
     uc.addFile('testInteractor.ts', '/mock/path/testInteractor.ts');
     uc.addFile('testInputBoundary.ts', '/mock/path/testInputBoundary.ts');
 
@@ -2074,7 +2114,7 @@ describe('Relationship types are passed through to edge storage', () => {
     fileMockContents.set('/mock/path/testInputBoundary.ts', []);
 
     const mockFileAccess = new MockFileAccess(fileMockContents, fileMockPaths);
-    const dbAccess = new SessionDBAccess();
+    const dbAccess = new SessionDbAccess();
     const presenter = new GraphVerificationPresenter(
       new GraphVerificationOutputData()
     );
@@ -2100,7 +2140,7 @@ describe('Relationship types are passed through to edge storage', () => {
     const fileMockContents = new Map<string, Relationship[]>();
     const fileMockPaths = new Map<string, string>();
 
-    const uc = new useCaseGraph('test2');
+    const uc = new UseCaseGraph('test2');
     uc.addFile('test2Interactor.ts', '/mock/path/test2Interactor.ts');
     uc.addFile('test2OutputData.ts', '/mock/path/test2OutputData.ts');
 
@@ -2116,7 +2156,7 @@ describe('Relationship types are passed through to edge storage', () => {
     fileMockContents.set('/mock/path/test2OutputData.ts', []);
 
     const mockFileAccess = new MockFileAccess(fileMockContents, fileMockPaths);
-    const dbAccess = new SessionDBAccess();
+    const dbAccess = new SessionDbAccess();
     const presenter = new GraphVerificationPresenter(
       new GraphVerificationOutputData()
     );
@@ -2157,7 +2197,7 @@ describe('Relationship types are passed through to edge storage', () => {
         '/mock/use_case/login/LoginInputBoundary.java',
       ],
     ];
-    const uc = new useCaseGraph('login');
+    const uc = new UseCaseGraph('login');
     const fileMockPaths = new Map<string, string>();
     for (const [name, filePath] of files) {
       uc.addFile(name, filePath);
@@ -2178,7 +2218,7 @@ describe('Relationship types are passed through to edge storage', () => {
       },
     ]);
 
-    const dbAccess = new SessionDBAccess();
+    const dbAccess = new SessionDbAccess();
     const interactor = new GraphVerificationInteractor(
       new MockFileAccess(fileMockContents, fileMockPaths),
       genericNeighbourAccess,
@@ -2202,18 +2242,18 @@ describe('Relationship types are passed through to edge storage', () => {
   });
 
   it('keeps IMPLEMENTS when an earlier use case only has a dependency on the same nodes', () => {
-    const dependsOnly = new useCaseGraph('first');
+    const dependsOnly = new UseCaseGraph('first');
     dependsOnly.setNodeNeighbour('presenter', 'outputBoundary');
     dependsOnly.setEdgeType('presenter', 'outputBoundary', 'dependency');
 
-    const implementsToo = new useCaseGraph('second');
+    const implementsToo = new UseCaseGraph('second');
     implementsToo.setNodeNeighbour('presenter', 'outputBoundary');
     implementsToo.setEdgeType('presenter', 'outputBoundary', 'implements');
 
     const interactor = new GraphVerificationInteractor(
       new MockFileAccess(new Map(), new Map()),
       genericNeighbourAccess,
-      new SessionDBAccess(),
+      new SessionDbAccess(),
       new GraphVerificationPresenter(new GraphVerificationOutputData()),
       [dependsOnly, implementsToo]
     );
@@ -2229,14 +2269,14 @@ describe('Relationship types are passed through to edge storage', () => {
 
 describe('Clean Architecture rules', () => {
   const verify = async (
-    edges: [cleanNode, cleanNode][]
-  ): Promise<[cleanNode, cleanNode][]> => {
-    const uc = new useCaseGraph('rules');
+    edges: [CleanNode, CleanNode][]
+  ): Promise<[CleanNode, CleanNode][]> => {
+    const uc = new UseCaseGraph('rules');
     for (const [from, to] of edges) uc.setNodeNeighbour(from, to);
     const interactor = new GraphVerificationInteractor(
       new MockFileAccess(new Map(), new Map()),
       genericNeighbourAccess,
-      new SessionDBAccess(),
+      new SessionDbAccess(),
       new GraphVerificationPresenter(new GraphVerificationOutputData()),
       [uc]
     );
@@ -2255,6 +2295,242 @@ describe('Clean Architecture rules', () => {
       ['entities', 'controller'],
       ['inputBoundary', 'outputData'],
       ['dataAccessInterface', 'dataAccess'],
+    ]);
+  });
+});
+
+describe('Files belong to a use case by their folder, not by the rest of their path', () => {
+  // The clone folder 'ca-login' contains the use case name 'login'.
+  const project = '/home/student/ca-login';
+  const root = `${project}/src/main/java`;
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  // Runs cave verify from the project folder, as a student would.
+  const verify = async (
+    useCases: string[],
+    files: string[],
+    imports: Record<string, string[]>,
+    projectFolder = project
+  ): Promise<GraphVerificationInteractor> => {
+    jest.spyOn(process, 'cwd').mockReturnValue(projectFolder);
+    const fileAccess = {
+      getUseCases: jest.fn<any>().mockResolvedValue(useCases),
+      getFileImports: jest.fn<any>(async (filePath: string) =>
+        (imports[filePath] ?? []).map((fileName) => ({
+          fileName,
+          relationshipType: 'dependency',
+        }))
+      ),
+    } as any;
+    const interactor = new GraphVerificationInteractor(
+      fileAccess,
+      genericNeighbourAccess,
+      new SessionDbAccess(),
+      new GraphVerificationPresenter(new GraphVerificationOutputData())
+    );
+    for (const file of files) {
+      const filePath = `${projectFolder}/src/main/java/${file}`;
+      (interactor as any).internalFilePaths.set(
+        filePath.split('/').at(-1),
+        filePath
+      );
+    }
+    await (interactor as any).buildUseCaseGraphs();
+    await (interactor as any).developOutNeighbours();
+    await (interactor as any).verifyOutNeighbours();
+    return interactor;
+  };
+
+  const fileNamesInUseCase = (
+    interactor: GraphVerificationInteractor,
+    name: string
+  ) =>
+    [
+      ...(interactor as any).useCaseGraphList
+        .find((g: UseCaseGraph) => g.getName() === name)
+        .getFiles()
+        .keys(),
+    ].sort();
+
+  it('assigns files to their own use case when the clone folder contains a use case name', async () => {
+    const interactor = await verify(
+      ['login', 'logout'],
+      [
+        'use_case/login/LoginInteractor.java',
+        'use_case/logout/LogoutInteractor.java',
+        'interface_adapter/logout/LogoutPresenter.java',
+        'interface_adapter/ViewManagerModel.java',
+      ],
+      {
+        [`${root}/interface_adapter/logout/LogoutPresenter.java`]: [
+          'interface_adapter.ViewManagerModel',
+        ],
+      }
+    );
+
+    expect(fileNamesInUseCase(interactor, 'login')).toEqual([
+      'LoginInteractor.java',
+    ]);
+    expect(fileNamesInUseCase(interactor, 'logout')).toEqual([
+      'LogoutInteractor.java',
+      'LogoutPresenter.java',
+    ]);
+    expect(interactor.getCrossUseCaseEdges()).toEqual([[], []]);
+  });
+
+  it("allows a presenter to import another use case's view model", async () => {
+    const interactor = await verify(
+      ['login', 'logout'],
+      [
+        'interface_adapter/login/LoginViewModel.java',
+        'interface_adapter/logout/LogoutPresenter.java',
+      ],
+      {
+        [`${root}/interface_adapter/logout/LogoutPresenter.java`]: [
+          'interface_adapter.login.LoginViewModel',
+        ],
+      }
+    );
+
+    expect(interactor.getCrossUseCaseEdges()).toEqual([[], []]);
+    expect((interactor as any).crossUseCaseFiles.size).toBe(0);
+  });
+
+  it("still flags a controller that imports another use case's file", async () => {
+    const interactor = await verify(
+      ['login', 'logout'],
+      [
+        'use_case/login/LoginInputData.java',
+        'interface_adapter/logout/LogoutController.java',
+      ],
+      {
+        [`${root}/interface_adapter/logout/LogoutController.java`]: [
+          'use_case.login.LoginInputData',
+        ],
+      }
+    );
+
+    expect(interactor.getCrossUseCaseEdges()).toEqual([
+      [],
+      [['controller', 'inputData']],
+    ]);
+  });
+
+  it('assigns files to their use case when a folder above the project is named features', async () => {
+    const interactor = await verify(
+      ['login'],
+      ['use_case/login/LoginInteractor.java'],
+      {},
+      '/home/student/features/proj'
+    );
+
+    expect(fileNamesInUseCase(interactor, 'login')).toEqual([
+      'LoginInteractor.java',
+    ]);
+  });
+
+  it('assigns files to their use case when packaging by module', async () => {
+    const interactor = await verify(
+      ['EnrollStudent', 'DropStudent'],
+      [
+        'features/Enrollment/EnrollStudent/use_case/EnrollStudentInteractor.java',
+        'features/Enrollment/EnrollStudent/interface_adapter/EnrollStudentController.java',
+        'features/Enrollment/DropStudent/use_case/DropStudentInteractor.java',
+      ],
+      {}
+    );
+
+    expect(fileNamesInUseCase(interactor, 'EnrollStudent')).toEqual([
+      'EnrollStudentController.java',
+      'EnrollStudentInteractor.java',
+    ]);
+    expect(fileNamesInUseCase(interactor, 'DropStudent')).toEqual([
+      'DropStudentInteractor.java',
+    ]);
+  });
+
+  it('matches use case folders regardless of case', async () => {
+    const interactor = await verify(
+      ['Login'],
+      [
+        'use_case/Login/LoginInteractor.java',
+        'interface_adapter/login/LoginController.java',
+      ],
+      {}
+    );
+
+    expect(fileNamesInUseCase(interactor, 'Login')).toEqual([
+      'LoginController.java',
+      'LoginInteractor.java',
+    ]);
+  });
+
+  it('assigns files to their use case when a folder above the project is named src', async () => {
+    const interactor = await verify(
+      ['login'],
+      ['use_case/login/LoginInteractor.java'],
+      {},
+      '/home/student/src/proj'
+    );
+
+    expect(fileNamesInUseCase(interactor, 'login')).toEqual([
+      'LoginInteractor.java',
+    ]);
+  });
+
+  it('assigns files to a use case named src', async () => {
+    const interactor = await verify(
+      ['src', 'login'],
+      [
+        'use_case/src/SrcInputData.java',
+        'interface_adapter/src/SrcController.java',
+        'use_case/login/LoginInteractor.java',
+      ],
+      {}
+    );
+
+    expect(fileNamesInUseCase(interactor, 'src')).toEqual([
+      'SrcController.java',
+      'SrcInputData.java',
+    ]);
+  });
+
+  it('assigns files to use cases named after layer folders', async () => {
+    const interactor = await verify(
+      ['use_case', 'interface_adapter'],
+      [
+        'use_case/use_case/UseCaseInteractor.java',
+        'interface_adapter/interface_adapter/InterfaceAdapterController.java',
+      ],
+      {}
+    );
+
+    expect(fileNamesInUseCase(interactor, 'use_case')).toEqual([
+      'UseCaseInteractor.java',
+    ]);
+    expect(fileNamesInUseCase(interactor, 'interface_adapter')).toEqual([
+      'InterfaceAdapterController.java',
+    ]);
+  });
+
+  it('assigns files to a use case named features when packaging by module', async () => {
+    const interactor = await verify(
+      ['features', 'Login'],
+      [
+        'features/Auth/features/use_case/FeaturesInteractor.java',
+        'features/Auth/Login/use_case/LoginInteractor.java',
+      ],
+      {}
+    );
+
+    expect(fileNamesInUseCase(interactor, 'features')).toEqual([
+      'FeaturesInteractor.java',
+    ]);
+    expect(fileNamesInUseCase(interactor, 'Login')).toEqual([
+      'LoginInteractor.java',
     ]);
   });
 });

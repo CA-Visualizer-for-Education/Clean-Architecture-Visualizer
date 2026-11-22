@@ -1,5 +1,6 @@
 import path from 'node:path';
 import type { FileAccessInterface } from '../../data_access/fileAccessInterface.js';
+import { UseCaseName } from '../../entity/useCaseName.js';
 import type { CreateFeatureInputBoundary } from './createFeatureInputBoundary.js';
 import type { CreateFeatureInputData } from './createFeatureInputData.js';
 import type { CreateFeatureOutputBoundary } from './createFeatureOutputBoundary.js';
@@ -14,11 +15,13 @@ export class CreateFeatureInteractor implements CreateFeatureInputBoundary {
 
   async execute(inputData: CreateFeatureInputData): Promise<void> {
     try {
-      const feature = inputData.getFeatureName();
+      // Want to remove all spaces from the name of the feature
+      const feature = new UseCaseName(inputData.getFeatureName()).value;
       const currPath = await this.fileAccess.getCurrentPath();
-      // If "features" the directory doesn't exist, abort
+      // If "features" the directory doesn't exist in the main source, abort
+      const sourcePath = (await this.fileAccess.getSourcePath()) ?? currPath;
       const featuresDirectory = await this.fileAccess.bfsFindDir(
-        currPath,
+        sourcePath,
         'features'
       );
       if (!featuresDirectory) {

@@ -1,22 +1,22 @@
 // This file contains all the logic for displaying the CA Diagram, including fetching the data and handling loading/error states.
-// The actual rendering of the diagram is delegated to CADiagramView, which is a pure presentational component that receives all
+// The actual rendering of the diagram is delegated to CaDiagramView, which is a pure presentational component that receives all
 // the data it needs as props.
 
 import { CircularProgress, Container, Typography } from '@mui/material';
 import { useParams } from 'react-router-dom';
-import type { cleanLayer } from '../../../../src/types/clean-layer';
-import type { cleanNode } from '../../../../src/types/cleanNode';
+import type { CleanLayer } from '../../../../src/types/clean-layer';
+import type { CleanNode } from '../../../../src/types/cleanNode';
 import { useInteraction } from '../../actions/useAnalysis';
 import type {
   CAComponentType,
-  CALayer,
-  CANode,
+  CaLayer,
+  CaNode,
   InteractionDetail,
 } from '../../lib/types';
-import { CADiagramView } from './CADiagramView';
+import { CaDiagramView } from './CADiagramView';
 import type { NodeClickInfo } from './CANodeView';
 
-const componentLayerMap: Record<CAComponentType, CALayer> = {
+const componentLayerMap: Record<CAComponentType, CaLayer> = {
   Controller: 'InterfaceAdapters',
   Presenter: 'InterfaceAdapters',
   View: 'Frameworks',
@@ -32,7 +32,7 @@ const componentLayerMap: Record<CAComponentType, CALayer> = {
   Database: 'Frameworks',
 };
 
-const cleanNodeToCAComponentType: Record<cleanNode, CAComponentType> = {
+const cleanNodeToCAComponentType: Record<CleanNode, CAComponentType> = {
   controller: 'Controller',
   presenter: 'Presenter',
   viewModel: 'ViewModel',
@@ -48,14 +48,14 @@ const cleanNodeToCAComponentType: Record<cleanNode, CAComponentType> = {
   useCaseInteractor: 'Interactor',
 };
 
-const cleanLayerToCALayer: Record<cleanLayer, CALayer> = {
+const cleanLayerToCaLayer: Record<CleanLayer, CaLayer> = {
   interfaceAdapters: 'InterfaceAdapters',
   frameworksAndDrivers: 'Frameworks',
   enterpriseBusinessRules: 'EnterpriseBusinessRules',
   applicationBusinessRules: 'ApplicationBusinessRules',
 };
 
-const getNodeByType = (nodes: CANode[], type: CAComponentType): CANode => {
+const getNodeByType = (nodes: CaNode[], type: CAComponentType): CaNode => {
   const node = nodes.find((candidate) => candidate.type === type);
   return (
     node ?? {
@@ -72,12 +72,12 @@ const getNodeByType = (nodes: CANode[], type: CAComponentType): CANode => {
  * Converts node and edge data from backend to frontend types
  *
  * Specifically:
- * - `cleanNode` to `CAComponentType`
- * - `cleanLayer` to `CALayer`
+ * - `CleanNode` to `CAComponentType`
+ * - `CleanLayer` to `CaLayer`
  *
  * Note: `data` is actually not an `InteractionDetail` object since `data.nodes[number].type`
- * is really of type `cleanNode` (backend type) rather than `CAComponentType` (frontend type).
- * Likewise, `data.nodes[number].layer` is really of type `cleanLayer` rather than `CALayer`.
+ * is really of type `CleanNode` (backend type) rather than `CAComponentType` (frontend type).
+ * Likewise, `data.nodes[number].layer` is really of type `CleanLayer` rather than `CaLayer`.
  *
  * However `useInteractor`, the hook that makes the API call to retrieve `data` from the
  * backend, has return type declared (incorrectly) as `InteractionDetail`. Thus to avoid
@@ -91,13 +91,13 @@ function formatInteractionData(data: InteractionDetail): InteractionDetail {
     ...data,
     nodes: data.nodes.map((node) => ({
       ...node,
-      type: cleanNodeToCAComponentType[node.type as cleanNode],
-      layer: cleanLayerToCALayer[node.layer as cleanLayer],
+      type: cleanNodeToCAComponentType[node.type as CleanNode],
+      layer: cleanLayerToCaLayer[node.layer as CleanLayer],
     })),
   };
 }
 
-export function CADiagram({
+export function CaDiagram({
   onNodeClick,
 }: {
   onNodeClick?: (info: NodeClickInfo) => void;
@@ -173,7 +173,7 @@ export function CADiagram({
   const edges = interactionData.edges;
 
   return (
-    <CADiagramView
+    <CaDiagramView
       controller={controller}
       presenter={presenter}
       viewModel={viewModel}

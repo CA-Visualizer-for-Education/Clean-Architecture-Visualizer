@@ -15,6 +15,7 @@ export function makeMockFileAccess(): jest.Mocked<FileAccessInterface> {
     getLineNumber: jest.fn<FileAccessInterface['getLineNumber']>(),
     createDirectory: jest.fn<FileAccessInterface['createDirectory']>(),
     getCurrentPath: jest.fn<FileAccessInterface['getCurrentPath']>(),
+    getSourcePath: jest.fn<FileAccessInterface['getSourcePath']>(),
     bfsFindDir: jest.fn<FileAccessInterface['bfsFindDir']>(),
     exists: jest.fn<FileAccessInterface['exists']>(),
     createFile: jest.fn<FileAccessInterface['createFile']>(),

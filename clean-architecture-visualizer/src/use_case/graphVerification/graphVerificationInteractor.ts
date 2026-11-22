@@ -1,9 +1,10 @@
+import path from 'node:path';
 import type { CleanArchInfoAccessInterface } from '../../data_access/cleanArchInfoAccessInterface.js';
 import type { FileAccessInterface } from '../../data_access/fileAccessInterface.js';
-import type { SessionDBAccessInterface } from '../../data_access/sessionDBAccessInterface.js';
-import { useCaseGraph } from '../../entity/useCaseGraph.js';
-import type { cleanLayer } from '../../types/clean-layer.js';
-import type { cleanNode } from '../../types/cleanNode.js';
+import type { SessionDbAccessInterface } from '../../data_access/sessionDBAccessInterface.js';
+import { UseCaseGraph } from '../../entity/useCaseGraph.js';
+import type { CleanLayer } from '../../types/clean-layer.js';
+import type { CleanNode } from '../../types/cleanNode.js';
 import type { RelationshipType } from '../../types/relationship.js';
 import type {
   EdgeStorage,
@@ -19,6 +20,7 @@ export class GraphVerificationInteractor
   implements GraphVerificationInputBoundary
 {
   private readonly internalDirectories = ['use_case', 'interface_adapter'];
+  private readonly featuresDirectory = 'features';
   // Both singular and plural spellings are listed because projects differ
   // (e.g. `view` vs `views`, `entity` vs `entities`). A directory that does
   // not exist simply contributes no files.
@@ -36,18 +38,18 @@ export class GraphVerificationInteractor
   private readonly externalFilePaths = new Map<string, string>();
 
   // The node of files <File Name, Node>
-  private readonly externalNodes: Record<string, cleanNode> = {};
+  private readonly externalNodes: Record<string, CleanNode> = {};
 
-  private crossUseCaseEdges: [cleanNode, cleanNode][][] = [];
+  private crossUseCaseEdges: [CleanNode, CleanNode][][] = [];
   private crossUseCaseFiles = new Set<string>();
   private outputData: GraphVerificationOutputData;
 
   constructor(
     private readonly fileAccess: FileAccessInterface,
     private readonly cleanArchInfoAccess: CleanArchInfoAccessInterface,
-    private readonly db: SessionDBAccessInterface,
+    private readonly db: SessionDbAccessInterface,
     private readonly presenter: GraphVerificationOutputBoundary,
-    private readonly useCaseGraphList: useCaseGraph[] = [],
+    private readonly useCaseGraphList: UseCaseGraph[] = [],
     outputData: GraphVerificationOutputData = new GraphVerificationOutputData()
   ) {
     this.outputData = outputData;
@@ -55,8 +57,8 @@ export class GraphVerificationInteractor
 
   async execute(inputData: GraphVerificationInputData): Promise<void> {
     // restart db
-    this.db.resetDB();
-    const formatForCLI = inputData.isToCommandLine();
+    this.db.resetDb();
+    const formatForCli = inputData.isToCommandLine();
 
     // main use case logic
     await this.buildFilePaths();
@@ -66,7 +68,7 @@ export class GraphVerificationInteractor
     await this.populateDatabase();
 
     // Paths are defined as <File Name, File Path>
-    if (formatForCLI) {
+    if (formatForCli) {
       this.prepareOutput();
       this.presenter.prepareSuccessView();
     }
@@ -79,9 +81,12 @@ export class GraphVerificationInteractor
   private async buildFilePaths(): Promise<void> {
     // Must now account for packaging by module -- if features exists, packaging by module
     const currPath = process.cwd();
-    if (await this.fileAccess.bfsFindDir(currPath, 'features')) {
+    if (await this.fileAccess.bfsFindDir(currPath, this.featuresDirectory)) {
       await Promise.all([
-        this.fileAccess.getFilePaths('features', this.internalFilePaths),
+        this.fileAccess.getFilePaths(
+          this.featuresDirectory,
+          this.internalFilePaths
+        ),
         ...this.externalDirectories.map((dir) =>
           this.fileAccess.getFilePaths(dir, this.externalFilePaths)
         ),
@@ -99,14 +104,14 @@ export class GraphVerificationInteractor
   }
 
   /**
-   * Create a useCaseGraph for each use case, and assign files to that use case.
+   * Create a UseCaseGraph for each use case, and assign files to that use case.
    */
   private async buildUseCaseGraphs(): Promise<void> {
     const useCases = await this.fileAccess.getUseCases();
     for (const useCase of useCases) {
-      const graph = new useCaseGraph(useCase);
+      const graph = new UseCaseGraph(useCase);
       for (const [fileName, filePath] of this.internalFilePaths) {
-        if (filePath.toLowerCase().includes(useCase.toLowerCase())) {
+        if (this.isInUseCase(filePath, useCase)) {
           graph.addFile(fileName, filePath);
         }
       }
@@ -140,7 +145,7 @@ export class GraphVerificationInteractor
     // allEdges will store all of the edges in the form of (fromNodePath, toNodePath, relationshipType)
     const allEdges: [string, string, RelationshipType][] = [];
     // map use case graph names to graphs
-    const useCaseGraphNamesToGraph = new Map<string, useCaseGraph>();
+    const useCaseGraphNamesToGraph = new Map<string, UseCaseGraph>();
     for (const graph of this.useCaseGraphList) {
       useCaseGraphNamesToGraph.set(graph.getName(), graph);
     }
@@ -171,10 +176,11 @@ export class GraphVerificationInteractor
             .replace(/\.[^.]+$/, '')
             .toLowerCase();
 
-          const targetIsShared = !this.belongsToOtherUseCase(
-            target.filePath,
-            graph.getName()
-          );
+          // A presenter may update any use case's view model, for example to
+          // switch screens, since both are in the interface adapters layer.
+          const targetIsShared =
+            (fromNode === 'presenter' && toNode === 'viewModel') ||
+            !this.belongsToOtherUseCase(target.filePath, graph.getName());
 
           //Check if the imported file is an external file path
           if (
@@ -289,10 +295,10 @@ export class GraphVerificationInteractor
         const currGraph = useCaseGraphNamesToGraph.get(useCaseGraphName);
         currGraph?.addFile(fromNodePath.split('/').at(-1) ?? '', fromNodePath);
         currGraph?.addFile(toNodePath.split('/').at(-1) ?? '', toNodePath);
-        currGraph?.setNodeNeighbour(fromNode as cleanNode, toNode as cleanNode);
+        currGraph?.setNodeNeighbour(fromNode as CleanNode, toNode as CleanNode);
         currGraph?.setEdgeType(
-          fromNode as cleanNode,
-          toNode as cleanNode,
+          fromNode as CleanNode,
+          toNode as CleanNode,
           relationshipType
         );
       }
@@ -379,7 +385,7 @@ export class GraphVerificationInteractor
    * @param importPath the path to a file.
    * @returns
    */
-  private resolveNode(importPath: string): cleanNode | null {
+  private resolveNode(importPath: string): CleanNode | null {
     if (!importPath) {
       console.warn('resolveNode called with undefined/empty importPath');
       return null;
@@ -422,7 +428,7 @@ export class GraphVerificationInteractor
    * @param importPath the path to a file.
    * @returns
    */
-  private resolveLayer(importPath: string): cleanLayer | undefined {
+  private resolveLayer(importPath: string): CleanLayer | undefined {
     importPath = importPath.toLowerCase().replace(/_/g, '');
     if (importPath.includes('viewmodel') || importPath.includes('viewmanager'))
       return 'interfaceAdapters'; // must be verified before 'view'
@@ -483,7 +489,7 @@ export class GraphVerificationInteractor
    */
   private resolveImportTarget(
     importPath: string
-  ): { fileName: string; filePath: string; node: cleanNode } | null {
+  ): { fileName: string; filePath: string; node: CleanNode } | null {
     for (const fileMap of [this.internalFilePaths, this.externalFilePaths]) {
       const fileName = this.resolveImportToFileName(fileMap, importPath);
       if (!fileName) continue;
@@ -501,7 +507,7 @@ export class GraphVerificationInteractor
     const validMap = await this.cleanArchInfoAccess.getValidOutNeighbours();
 
     for (const graph of this.useCaseGraphList) {
-      for (const node of Object.keys(validMap) as cleanNode[]) {
+      for (const node of Object.keys(validMap) as CleanNode[]) {
         const actualNeighbours = graph.getNodeNeighbours(node);
         const validNeighbours = validMap[node];
 
@@ -564,15 +570,15 @@ export class GraphVerificationInteractor
       // There shouldn't be any violation nodes missing since violation nodes are
       // derived from violation edges and violation edges come from edges between
       // nodes that exist in and belong to the graph
-      const violationNodes = new Set<cleanNode>();
+      const violationNodes = new Set<CleanNode>();
       for (const [from, to] of uc.getViolationEdges()) {
         violationNodes.add(from);
         violationNodes.add(to);
       }
-      const nodeTypesSeen = new Set<cleanNode>();
+      const nodeTypesSeen = new Set<CleanNode>();
       for (const filePath of uc.getFiles().values()) {
         const nodeType = this.resolveNode(filePath);
-        nodeTypesSeen.add(nodeType as cleanNode);
+        nodeTypesSeen.add(nodeType as CleanNode);
         seenIds.add(filePath);
         // We get the file name and if it is an external file, we add it to list of files to add later
         // If it doesn't have the external file yet, set it and move on
@@ -581,10 +587,10 @@ export class GraphVerificationInteractor
         result.push({
           id: `${filePath}-${uc.getName()}`,
           filePath: filePath,
-          type: nodeType as cleanNode,
-          layer: this.resolveLayerFromNode(nodeType as cleanNode),
+          type: nodeType as CleanNode,
+          layer: this.resolveLayerFromNode(nodeType as CleanNode),
           status:
-            violationNodes.has(nodeType as cleanNode) ||
+            violationNodes.has(nodeType as CleanNode) ||
             this.crossUseCaseFiles.has(filePath)
               ? 'VIOLATION'
               : 'VALID',
@@ -656,8 +662,8 @@ export class GraphVerificationInteractor
 
       const neighbourMap = uc.getNeighbourMap();
       for (const [fromNode, neighbours] of Object.entries(neighbourMap) as [
-        cleanNode,
-        cleanNode[],
+        CleanNode,
+        CleanNode[],
       ][]) {
         for (const toNode of neighbours) {
           const id = `${fromNode}->${toNode}`;
@@ -693,7 +699,7 @@ export class GraphVerificationInteractor
   /**
    * Fallback layer resolution by node type, for missing nodes that have no matching file.
    */
-  private resolveLayerFromNode(node: cleanNode): cleanLayer {
+  private resolveLayerFromNode(node: CleanNode): CleanLayer {
     switch (node) {
       case 'controller':
       case 'presenter':
@@ -769,7 +775,7 @@ export class GraphVerificationInteractor
     }
     this.outputData.setOutputData(lines, lineColours);
   }
-  getCrossUseCaseEdges(): [cleanNode, cleanNode][][] {
+  getCrossUseCaseEdges(): [CleanNode, CleanNode][][] {
     return structuredClone(this.crossUseCaseEdges);
   }
 
@@ -777,11 +783,47 @@ export class GraphVerificationInteractor
     filePath: string,
     currentName: string
   ): boolean {
-    const lowerPath = filePath.toLowerCase();
     return this.useCaseGraphList.some(
       (g) =>
-        g.getName() !== currentName &&
-        lowerPath.includes(g.getName().toLowerCase())
+        g.getName() !== currentName && this.isInUseCase(filePath, g.getName())
     );
+  }
+
+  /**
+   * Check whether a file is in a use case's folder, ignoring case, since a
+   * project may write `use_case/Login/` but `interface_adapter/login/`.
+   * @param filePath the path to a file.
+   * @param useCase the name of a use case.
+   * @returns true if the file's use case folder has that name.
+   */
+  private isInUseCase(filePath: string, useCase: string): boolean {
+    return (
+      this.useCaseFolderOf(filePath)?.toLowerCase() === useCase.toLowerCase()
+    );
+  }
+
+  /**
+   * Find the name of the use case folder a file is in: the folder after
+   * `features/<feature>/` when packaging by module, otherwise the folder
+   * after `use_case/` or `interface_adapter/`. The path is read from the
+   * project folder down, so folders above the project are skipped, and the
+   * first match is taken, so a use case may share a name with a layer folder.
+   * @param filePath the path to a file.
+   * @returns the folder name, or undefined if the file is not in one.
+   */
+  private useCaseFolderOf(filePath: string): string | undefined {
+    const fromProject = path.relative(process.cwd(), filePath);
+    const projectPath =
+      fromProject.startsWith('..') || path.isAbsolute(fromProject)
+        ? filePath
+        : fromProject;
+    const allFolders = projectPath.split(/[\\/]/).slice(0, -1);
+    const folders = allFolders.slice(allFolders.indexOf('src') + 1);
+    const featuresIndex = folders.indexOf(this.featuresDirectory);
+    if (featuresIndex !== -1) return folders[featuresIndex + 2];
+    const layerFolderIndex = folders.findIndex((folder) =>
+      this.internalDirectories.includes(folder)
+    );
+    return layerFolderIndex === -1 ? undefined : folders[layerFolderIndex + 1];
   }
 }

@@ -1,7 +1,7 @@
 import chalk from 'chalk';
 import type { CleanArchAccess } from '../data_access/cleanArchInfoAccess.js';
 import type { FileAccess } from '../data_access/fileAccess.js';
-import type { SessionDBAccess } from '../data_access/sessionDBAccess.js';
+import type { SessionDbAccess } from '../data_access/sessionDBAccess.js';
 import { CreateModuleUseCaseController } from '../interface_adapter/CreateModuleUseCase/createModuleUseCaseController.js';
 import { CreateModuleUseCasePresenter } from '../interface_adapter/CreateModuleUseCase/createModuleUseCasePresenter.js';
 import { CreateFeatureController } from '../interface_adapter/createFeature/createFeatureController.js';
@@ -31,7 +31,7 @@ import { preloadDependencies } from '../utils/ast-preload.js';
 export class AppBuilder {
   private fileAccess?: FileAccess;
   private cleanArchAccess?: CleanArchAccess;
-  private db?: SessionDBAccess;
+  private db?: SessionDbAccess;
 
   withFileAccess(fileAccess: FileAccess): this {
     this.fileAccess = fileAccess;
@@ -43,7 +43,7 @@ export class AppBuilder {
     return this;
   }
 
-  withSessionDBAccess(db: SessionDBAccess): this {
+  withSessionDbAccess(db: SessionDbAccess): this {
     this.db = db;
     return this;
   }
@@ -51,7 +51,7 @@ export class AppBuilder {
   private requireDeps() {
     if (!this.fileAccess || !this.cleanArchAccess || !this.db) {
       throw new Error(
-        'FileAccess, CleanArchAccess, and SessionDBAccess must be set'
+        'FileAccess, CleanArchAccess, and SessionDbAccess must be set'
       );
     }
     return {
@@ -94,7 +94,7 @@ export class AppBuilder {
     await startCommand({ backendOnly, db });
   }
 
-  async runCLIGraphVerification(): Promise<void> {
+  async runCliGraphVerification(): Promise<void> {
     const { fileAccess, cleanArchAccess, db } = this.requireDeps();
     await preloadDependencies(process.cwd(), fileAccess);
     const outputData = new GraphVerificationOutputData();
@@ -184,7 +184,7 @@ export class AppBuilder {
   }
 
   async runEndProject(): Promise<void> {
-    this.db?.resetDB();
+    this.db?.resetDb();
     await stopServer();
   }
 }

@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from '@jest/globals';
-import { SessionDBAccess } from '../../../src/data_access/sessionDBAccess.js';
+import { SessionDbAccess } from '../../../src/data_access/sessionDBAccess.js';
 import { GetFilesWithViolationsInteractor } from '../../../src/use_case/getFilesWithViolations/getFilesWithViolationsInteractor.js';
 import type {
   FilesWithViolationsResponse,
@@ -7,7 +7,7 @@ import type {
 } from '../../../src/use_case/getFilesWithViolations/getFilesWithViolationsOutputData.js';
 import { RecordingOutputData } from '../doubles/recording-output-data.js';
 
-const genericDBAccess = new SessionDBAccess();
+const genericDbAccess = new SessionDbAccess();
 
 // The Output Data classes have private fields, so the recording double needs a cast.
 function makeOutputData(): GetFilesWithViolationsOutputData &
@@ -18,18 +18,18 @@ function makeOutputData(): GetFilesWithViolationsOutputData &
 
 describe('GetFilesWithViolationsInteractor', () => {
   beforeEach(() => {
-    genericDBAccess.resetDB();
+    genericDbAccess.resetDb();
   });
 
   it('returns the file paths of nodes with VIOLATION status', async () => {
-    genericDBAccess.upsertNode({
+    genericDbAccess.upsertNode({
       id: 'node-1',
       type: 'entities',
       layer: 'enterpriseBusinessRules',
       filePath: 'src/entities/Student.java',
       status: 'VIOLATION',
     });
-    genericDBAccess.upsertNode({
+    genericDbAccess.upsertNode({
       id: 'node-2',
       type: 'useCaseInteractor',
       layer: 'applicationBusinessRules',
@@ -39,7 +39,7 @@ describe('GetFilesWithViolationsInteractor', () => {
 
     const outputData = makeOutputData();
     const interactor = new GetFilesWithViolationsInteractor(
-      genericDBAccess,
+      genericDbAccess,
       outputData
     );
 
@@ -55,21 +55,21 @@ describe('GetFilesWithViolationsInteractor', () => {
   });
 
   it('excludes nodes that are not in VIOLATION status', async () => {
-    genericDBAccess.upsertNode({
+    genericDbAccess.upsertNode({
       id: 'node-bad',
       type: 'controller',
       layer: 'interfaceAdapters',
       filePath: 'src/interface_adapters/BadController.java',
       status: 'VIOLATION',
     });
-    genericDBAccess.upsertNode({
+    genericDbAccess.upsertNode({
       id: 'node-valid',
       type: 'controller',
       layer: 'interfaceAdapters',
       filePath: 'src/interface_adapters/GoodController.java',
       status: 'VALID',
     });
-    genericDBAccess.upsertNode({
+    genericDbAccess.upsertNode({
       id: 'node-missing',
       type: 'presenter',
       layer: 'interfaceAdapters',
@@ -78,7 +78,7 @@ describe('GetFilesWithViolationsInteractor', () => {
 
     const outputData = makeOutputData();
     const interactor = new GetFilesWithViolationsInteractor(
-      genericDBAccess,
+      genericDbAccess,
       outputData
     );
 
@@ -92,14 +92,14 @@ describe('GetFilesWithViolationsInteractor', () => {
   it('deduplicates file paths when multiple violation nodes share a file', async () => {
     const filePath = 'src/use_case/EnrollStudent.java';
 
-    genericDBAccess.upsertNode({
+    genericDbAccess.upsertNode({
       id: 'node-1',
       type: 'useCaseInteractor',
       layer: 'applicationBusinessRules',
       filePath: filePath,
       status: 'VIOLATION',
     });
-    genericDBAccess.upsertNode({
+    genericDbAccess.upsertNode({
       id: 'node-2',
       type: 'inputBoundary',
       layer: 'applicationBusinessRules',
@@ -109,7 +109,7 @@ describe('GetFilesWithViolationsInteractor', () => {
 
     const outputData = makeOutputData();
     const interactor = new GetFilesWithViolationsInteractor(
-      genericDBAccess,
+      genericDbAccess,
       outputData
     );
 
@@ -119,14 +119,14 @@ describe('GetFilesWithViolationsInteractor', () => {
   });
 
   it('filters out violation nodes that have no file path', async () => {
-    genericDBAccess.upsertNode({
+    genericDbAccess.upsertNode({
       id: 'node-real',
       type: 'entities',
       layer: 'enterpriseBusinessRules',
       filePath: 'src/entities/Student.java',
       status: 'VIOLATION',
     });
-    genericDBAccess.upsertNode({
+    genericDbAccess.upsertNode({
       id: 'node-missing',
       type: 'controller',
       layer: 'interfaceAdapters',
@@ -135,7 +135,7 @@ describe('GetFilesWithViolationsInteractor', () => {
 
     const outputData = makeOutputData();
     const interactor = new GetFilesWithViolationsInteractor(
-      genericDBAccess,
+      genericDbAccess,
       outputData
     );
 
@@ -145,7 +145,7 @@ describe('GetFilesWithViolationsInteractor', () => {
   });
 
   it('returns an empty files array when there are no violations', async () => {
-    genericDBAccess.upsertNode({
+    genericDbAccess.upsertNode({
       id: 'node-valid',
       type: 'controller',
       layer: 'interfaceAdapters',
@@ -155,7 +155,7 @@ describe('GetFilesWithViolationsInteractor', () => {
 
     const outputData = makeOutputData();
     const interactor = new GetFilesWithViolationsInteractor(
-      genericDBAccess,
+      genericDbAccess,
       outputData
     );
 
@@ -168,21 +168,21 @@ describe('GetFilesWithViolationsInteractor', () => {
   it('counts total_violations by node, not by unique file', async () => {
     const filePath = 'src/use_case/EnrollStudent.java';
 
-    genericDBAccess.upsertNode({
+    genericDbAccess.upsertNode({
       id: 'node-1',
       type: 'useCaseInteractor',
       layer: 'applicationBusinessRules',
       filePath: filePath,
       status: 'VIOLATION',
     });
-    genericDBAccess.upsertNode({
+    genericDbAccess.upsertNode({
       id: 'node-2',
       type: 'inputBoundary',
       layer: 'applicationBusinessRules',
       filePath: filePath,
       status: 'VIOLATION',
     });
-    genericDBAccess.upsertNode({
+    genericDbAccess.upsertNode({
       id: 'node-3',
       type: 'controller',
       layer: 'interfaceAdapters',
@@ -191,7 +191,7 @@ describe('GetFilesWithViolationsInteractor', () => {
 
     const outputData = makeOutputData();
     const interactor = new GetFilesWithViolationsInteractor(
-      genericDBAccess,
+      genericDbAccess,
       outputData
     );
 

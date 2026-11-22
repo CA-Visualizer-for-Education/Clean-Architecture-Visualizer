@@ -13,5 +13,201 @@
       "to": "frontend/src/actions/use-template.ts"
     }
   ],
-  "identifiers": []
+  "identifiers": [
+    {
+      "file": "src/types/clean-layer.ts",
+      "from": "cleanLayer",
+      "to": "CleanLayer"
+    },
+    {
+      "file": "src/types/cleanNode.ts",
+      "from": "cleanNode",
+      "to": "CleanNode"
+    },
+    {
+      "file": "src/types/neighbourMap.ts",
+      "from": "neighbourMap",
+      "to": "NeighborMap"
+    },
+    {
+      "file": "src/entity/useCaseGraph.ts",
+      "from": "useCaseGraph",
+      "to": "UseCaseGraph"
+    },
+    {
+      "file": "src/database/sessionDb.ts",
+      "from": "SessionDB",
+      "to": "SessionDb"
+    },
+    {
+      "file": "src/data_access/sessionDBAccessInterface.ts",
+      "from": "SessionDBAccessInterface",
+      "to": "SessionDbAccessInterface"
+    },
+    {
+      "file": "src/data_access/sessionDBAccessInterface.ts",
+      "from": "resetDB",
+      "to": "resetDb"
+    },
+    {
+      "file": "src/data_access/sessionDBAccess.ts",
+      "from": "SessionDBAccess",
+      "to": "SessionDbAccess"
+    },
+    {
+      "file": "src/data_access/sessionDBAccess.ts",
+      "from": "resetDB",
+      "to": "resetDb"
+    },
+    {
+      "file": "src/app/appBuilder.ts",
+      "from": "runCLIGraphVerification",
+      "to": "runCliGraphVerification"
+    },
+    {
+      "file": "src/app/appBuilder.ts",
+      "from": "withSessionDBAccess",
+      "to": "withSessionDbAccess"
+    },
+    {
+      "file": "src/use_case/graphVerification/graphVerificationInteractor.ts",
+      "from": "formatForCLI",
+      "to": "formatForCli"
+    },
+    {
+      "file": "src/use_case/getUseCaseInfo/getUseCaseInfoInteractor.ts",
+      "from": "nodeFromDB",
+      "to": "nodeFromDb"
+    },
+    {
+      "file": "tests/backend/use_cases/getFilesWithViolations.test.ts",
+      "from": "genericDBAccess",
+      "to": "genericDbAccess"
+    },
+    {
+      "file": "tests/backend/use_cases/getProjectSummary.test.ts",
+      "from": "genericDBAccess",
+      "to": "genericDbAccess"
+    },
+    {
+      "file": "tests/backend/use_cases/getUseCaseInfo.test.ts",
+      "from": "genericDBAccess",
+      "to": "genericDbAccess"
+    },
+    {
+      "file": "tests/backend/use_cases/getViolations.test.ts",
+      "from": "genericDBAccess",
+      "to": "genericDbAccess"
+    },
+    {
+      "file": "tests/backend/use_cases/graphVerification.test.ts",
+      "from": "genericDBAccess",
+      "to": "genericDbAccess"
+    },
+    {
+      "file": "tests/backend/use_cases/endProject.test.ts",
+      "from": "sessionDBAccessPath",
+      "to": "sessionDbAccessPath"
+    },
+    {
+      "file": "tests/backend/use_cases/endProject.test.ts",
+      "from": "SessionDBAccess",
+      "to": "SessionDbAccess"
+    },
+    {
+      "file": "tests/backend/use_cases/init-project.test.ts",
+      "from": "ROOT_PATH",
+      "to": "rootPath"
+    },
+    {
+      "file": "tests/backend/use_cases/initModuleProject.test.ts",
+      "from": "ROOT_PATH",
+      "to": "rootPath"
+    },
+    {
+      "file": "frontend/src/lib/types.ts",
+      "from": "CALayer",
+      "to": "CaLayer"
+    },
+    {
+      "file": "frontend/src/lib/types.ts",
+      "from": "CALayerKey",
+      "to": "CaLayerKey"
+    },
+    {
+      "file": "frontend/src/lib/types.ts",
+      "from": "CANodeStatus",
+      "to": "CaNodeStatus"
+    },
+    {
+      "file": "frontend/src/lib/types.ts",
+      "from": "CAEdgeType",
+      "to": "CaEdgeType"
+    },
+    {
+      "file": "frontend/src/lib/types.ts",
+      "from": "CAEdgeStatus",
+      "to": "CaEdgeStatus"
+    },
+    {
+      "file": "frontend/src/lib/types.ts",
+      "from": "CANode",
+      "to": "CaNode"
+    },
+    {
+      "file": "frontend/src/lib/types.ts",
+      "from": "CAEdge",
+      "to": "CaEdge"
+    },
+    {
+      "file": "frontend/src/components/diagram/CADiagram.tsx",
+      "from": "CADiagram",
+      "to": "CaDiagram"
+    },
+    {
+      "file": "frontend/src/components/diagram/CADiagram.tsx",
+      "from": "cleanLayerToCALayer",
+      "to": "cleanLayerToCaLayer"
+    },
+    {
+      "file": "frontend/src/components/diagram/CADiagramView.tsx",
+      "from": "CADiagramView",
+      "to": "CaDiagramView"
+    },
+    {
+      "file": "frontend/src/components/diagram/CADiagramView.tsx",
+      "from": "CADiagramViewProps",
+      "to": "CaDiagramViewProps"
+    },
+    {
+      "file": "frontend/src/components/diagram/CANodeView/index.tsx",
+      "from": "CANodeView",
+      "to": "CaNodeView"
+    },
+    {
+      "file": "frontend/src/components/diagram/CANodeView/index.tsx",
+      "from": "CANodeViewProps",
+      "to": "CaNodeViewProps"
+    },
+    {
+      "file": "frontend/src/api/getUseCaseDiagramData.ts",
+      "from": "toCANodes",
+      "to": "toCaNodes"
+    },
+    {
+      "file": "frontend/src/api/getUseCaseDiagramData.ts",
+      "from": "toCAEdges",
+      "to": "toCaEdges"
+    },
+    {
+      "file": "frontend/src/api/getUseCaseDiagramData.ts",
+      "from": "file_path",
+      "to": "filePath"
+    },
+    {
+      "file": "src/use_case/getViolations/GetViolationsInteractor.ts",
+      "from": "line_number",
+      "to": "lineNumber"
+    }
+  ]
 }

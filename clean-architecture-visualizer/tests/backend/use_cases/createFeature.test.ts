@@ -32,17 +32,28 @@ describe('CreateFeatureInteractor', () => {
     return interactor.execute(new CreateFeatureInputData(name));
   }
 
+  it('rejects invalid names before creating files', async () => {
+    await runInteractor('../Login');
+
+    expect(mockPresenter.showFailView).toHaveBeenCalledWith(
+      expect.stringContaining('use letters and digits, starting with a letter')
+    );
+    expect(mockPresenter.showSuccessView).not.toHaveBeenCalled();
+    expect(mockFileAccess.createDirectory).not.toHaveBeenCalled();
+    expect(mockFileAccess.createFile).not.toHaveBeenCalled();
+  });
+
   it('Successfully adds feature to features directory.', async () => {
     mockFileAccess.getCurrentPath.mockResolvedValue('/root/src');
     mockFileAccess.bfsFindDir.mockResolvedValue('/root/src/features');
     mockFileAccess.exists.mockResolvedValue(false);
-    await runInteractor('new_feature');
+    await runInteractor('newFeature');
 
     expect(mockFileAccess.createDirectory).toHaveBeenCalledWith(
-      '/root/src/features/new_feature'
+      '/root/src/features/newFeature'
     );
 
-    expect(outputData.getFeature()).toBe('new_feature');
+    expect(outputData.getFeature()).toBe('newFeature');
     expect(mockPresenter.showSuccessView).toHaveBeenCalled();
     expect(mockPresenter.showFailView).not.toHaveBeenCalled();
   });
@@ -59,7 +70,7 @@ describe('CreateFeatureInteractor', () => {
     mockFileAccess.getCurrentPath.mockResolvedValue('/root/src');
     mockFileAccess.bfsFindDir.mockResolvedValue('/root/src/features');
     mockFileAccess.exists.mockResolvedValue(true);
-    await runInteractor('new_feature');
+    await runInteractor('newFeature');
     expect(mockPresenter.showSuccessView).not.toHaveBeenCalled();
     expect(mockPresenter.showFailView).toHaveBeenCalled();
   });
@@ -71,7 +82,7 @@ describe('CreateFeatureInteractor', () => {
     mockFileAccess.createDirectory.mockRejectedValue(
       new Error('Failed to create directory.')
     );
-    await runInteractor('new_feature');
+    await runInteractor('newFeature');
     expect(mockPresenter.showSuccessView).not.toHaveBeenCalled();
     expect(mockPresenter.showFailView).toHaveBeenCalled();
   });

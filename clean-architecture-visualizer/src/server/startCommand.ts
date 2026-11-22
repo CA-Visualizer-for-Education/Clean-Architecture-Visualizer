@@ -2,12 +2,12 @@ import { exec } from 'node:child_process';
 import type { AddressInfo } from 'node:net';
 import chalk from 'chalk';
 
-import type { SessionDBAccessInterface } from '../data_access/sessionDBAccessInterface.js';
+import type { SessionDbAccessInterface } from '../data_access/sessionDBAccessInterface.js';
 import { startServer, stopServer } from './server.js';
 
 export async function startCommand(options: {
   backendOnly: boolean;
-  db: SessionDBAccessInterface;
+  db: SessionDbAccessInterface;
 }): Promise<void> {
   const devServer = await startServer(options.backendOnly, options.db);
   const { port } = devServer.address() as AddressInfo;

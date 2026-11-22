@@ -1,5 +1,6 @@
 import path from 'node:path';
 import type { FileAccessInterface } from '../../data_access/fileAccessInterface.js';
+import { UseCaseName } from '../../entity/useCaseName.js';
 import type { CreateUseCaseInputBoundary } from './createUseCaseInputBoundary.js';
 import type { CreateUseCaseInputData } from './createUseCaseInputData.js';
 import type { CreateUseCaseOutputBoundary } from './createUseCaseOutputBoundary.js';
@@ -14,7 +15,7 @@ export class CreateUseCaseInteractor implements CreateUseCaseInputBoundary {
 
   async execute(inputData: CreateUseCaseInputData): Promise<void> {
     try {
-      const useCaseName = inputData.getUseCaseName();
+      const useCaseName = new UseCaseName(inputData.getUseCaseName()).value;
       const currPath = await this.fileAccess.getCurrentPath();
 
       // Find the language directory -- makes assumption only one directory is named after language
@@ -39,10 +40,14 @@ export class CreateUseCaseInteractor implements CreateUseCaseInputBoundary {
         return;
       }
 
-      // Find base directories
-      const useCaseDir = await this.fileAccess.bfsFindDir(currPath, 'use_case');
+      // Find base directories in the main source, not build output or tests
+      const sourcePath = (await this.fileAccess.getSourcePath()) ?? currPath;
+      const useCaseDir = await this.fileAccess.bfsFindDir(
+        sourcePath,
+        'use_case'
+      );
       const interfaceAdapterDir = await this.fileAccess.bfsFindDir(
-        currPath,
+        sourcePath,
         'interface_adapter'
       );
 

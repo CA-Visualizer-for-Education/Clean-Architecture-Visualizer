@@ -1,5 +1,6 @@
 import path from 'node:path';
 import type { FileAccessInterface } from '../../data_access/fileAccessInterface.js';
+import { UseCaseName } from '../../entity/useCaseName.js';
 import type { CreateModuleUseCaseInputBoundary } from './createModuleUseCaseInputBoundary.js';
 import type { CreateModuleUseCaseInputData } from './createModuleUseCaseInputData.js';
 import type { CreateModuleUseCaseOutputBoundary } from './createModuleUseCaseOutputBoundary.js';
@@ -16,8 +17,9 @@ export class CreateModuleUseCaseInteractor
 
   async execute(inputData: CreateModuleUseCaseInputData): Promise<void> {
     try {
-      const feature = inputData.getFeatureName();
-      const usecase = inputData.getUseCaseName();
+      // remove all spaces from use case name and feature name
+      const feature = new UseCaseName(inputData.getFeatureName()).value;
+      const usecase = new UseCaseName(inputData.getUseCaseName()).value;
       const currPath = await this.fileAccess.getCurrentPath();
       // Find the language directory -- makes assumption only one directory is named after language
       let extension: string | undefined;
@@ -41,9 +43,10 @@ export class CreateModuleUseCaseInteractor
         return;
       }
 
-      // check if features directory exists
+      // check if features directory exists in the main source
+      const sourcePath = (await this.fileAccess.getSourcePath()) ?? currPath;
       const featuresDirectory = await this.fileAccess.bfsFindDir(
-        currPath,
+        sourcePath,
         'features'
       );
       if (!featuresDirectory) {

@@ -3,30 +3,30 @@
 
 import { Box, Container, Typography } from '@mui/material';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import type { CAEdge, CANode } from './../../lib/types';
-import { CANodeView, type NodeClickInfo } from './CANodeView';
+import type { CaEdge, CaNode } from './../../lib/types';
+import { CaNodeView, type NodeClickInfo } from './CANodeView';
 import { Edge, type EdgeRouteHint } from './Edge';
 
-type CADiagramViewProps = {
-  controller: CANode;
-  presenter: CANode;
-  viewModel: CANode;
-  entities: CANode;
-  inputData: CANode;
-  inputBoundary: CANode;
-  interactor: CANode;
-  outputBoundary: CANode;
-  outputData: CANode;
-  dataAccessInterface: CANode;
-  view: CANode;
-  dataAccess: CANode;
-  database: CANode;
-  edges: CAEdge[];
+type CaDiagramViewProps = {
+  controller: CaNode;
+  presenter: CaNode;
+  viewModel: CaNode;
+  entities: CaNode;
+  inputData: CaNode;
+  inputBoundary: CaNode;
+  interactor: CaNode;
+  outputBoundary: CaNode;
+  outputData: CaNode;
+  dataAccessInterface: CaNode;
+  view: CaNode;
+  dataAccess: CaNode;
+  database: CaNode;
+  edges: CaEdge[];
   areNodesInteractive?: boolean;
   onNodeClick?: (info: NodeClickInfo) => void;
 };
 
-export function CADiagramView({
+export function CaDiagramView({
   controller,
   presenter,
   viewModel,
@@ -43,7 +43,7 @@ export function CADiagramView({
   edges,
   areNodesInteractive = false,
   onNodeClick,
-}: CADiagramViewProps) {
+}: CaDiagramViewProps) {
   const diagramContainerRef = useRef<HTMLDivElement | null>(null);
   const diagramContentRef = useRef<HTMLDivElement | null>(null);
   const [layoutVersion, setLayoutVersion] = useState(0);
@@ -121,7 +121,7 @@ export function CADiagramView({
     database,
   ]);
 
-  const resolveArrowHeadType = (edgeType: CAEdge['type']) => {
+  const resolveArrowHeadType = (edgeType: CaEdge['type']) => {
     if (edgeType === 'ASSOCIATION') return 'none' as const;
     if (edgeType === 'IMPLEMENTS') return 'hollowTriangle' as const;
     return 'filledTriangle' as const;
@@ -267,17 +267,17 @@ export function CADiagramView({
                   height: '100%',
                 }}
               >
-                <CANodeView
+                <CaNodeView
                   {...controller}
                   isInteractive={areNodesInteractive}
                   onNodeClick={onNodeClick}
                 />
-                <CANodeView
+                <CaNodeView
                   {...presenter}
                   isInteractive={areNodesInteractive}
                   onNodeClick={onNodeClick}
                 />
-                <CANodeView
+                <CaNodeView
                   {...viewModel}
                   isInteractive={areNodesInteractive}
                   onNodeClick={onNodeClick}
@@ -312,38 +312,38 @@ export function CADiagramView({
                   columnGap: { xs: 0.5, sm: 0.75, md: 1 },
                 }}
               >
-                <CANodeView
+                <CaNodeView
                   {...inputData}
                   isInteractive={areNodesInteractive}
                   onNodeClick={onNodeClick}
                 />
                 <Box />
-                <CANodeView
+                <CaNodeView
                   {...inputBoundary}
                   isInteractive={areNodesInteractive}
                   onNodeClick={onNodeClick}
                 />
                 <Box />
                 <Box />
-                <CANodeView
+                <CaNodeView
                   {...interactor}
                   isInteractive={areNodesInteractive}
                   onNodeClick={onNodeClick}
                 />
-                <CANodeView
+                <CaNodeView
                   {...outputBoundary}
                   isInteractive={areNodesInteractive}
                   onNodeClick={onNodeClick}
                 />
                 <Box />
-                <CANodeView
+                <CaNodeView
                   {...outputData}
                   isInteractive={areNodesInteractive}
                   onNodeClick={onNodeClick}
                 />
                 <Box />
                 <Box />
-                <CANodeView
+                <CaNodeView
                   {...dataAccessInterface}
                   isInteractive={areNodesInteractive}
                   onNodeClick={onNodeClick}
@@ -385,7 +385,7 @@ export function CADiagramView({
                   },
                 }}
               >
-                <CANodeView
+                <CaNodeView
                   {...entities}
                   isInteractive={areNodesInteractive}
                   onNodeClick={onNodeClick}
@@ -457,7 +457,7 @@ export function CADiagramView({
                   pb: { xs: 0.35, sm: 0.55, md: 0.75 },
                 }}
               >
-                <CANodeView
+                <CaNodeView
                   {...view}
                   isInteractive={areNodesInteractive}
                   onNodeClick={onNodeClick}
@@ -478,7 +478,7 @@ export function CADiagramView({
                   }}
                 >
                   <Box />
-                  <CANodeView
+                  <CaNodeView
                     {...dataAccess}
                     isInteractive={areNodesInteractive}
                     onNodeClick={onNodeClick}
@@ -492,7 +492,7 @@ export function CADiagramView({
                   pb: { xs: 0.35, sm: 0.55, md: 0.75 },
                 }}
               >
-                <CANodeView
+                <CaNodeView
                   {...database}
                   isInteractive={areNodesInteractive}
                   onNodeClick={onNodeClick}

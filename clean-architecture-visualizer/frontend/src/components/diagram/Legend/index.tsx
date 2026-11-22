@@ -1,8 +1,8 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import '../../../i18n/config';
-import type { ArrowHeadType, CAEdge, CANode } from '../../../lib/types';
-import { CANodeView } from '../CANodeView';
+import type { ArrowHeadType, CaEdge, CaNode } from '../../../lib/types';
+import { CaNodeView } from '../CANodeView';
 import { Edge } from '../Edge';
 import {
   EdgeAnchorEnd,
@@ -19,7 +19,7 @@ import {
 type LegendEdgeItemProps = {
   label: string;
   arrowHeadType: ArrowHeadType;
-  status: CAEdge['status'];
+  status: CaEdge['status'];
 };
 
 function LegendEdgeItem({ label, arrowHeadType, status }: LegendEdgeItemProps) {
@@ -29,14 +29,14 @@ function LegendEdgeItem({ label, arrowHeadType, status }: LegendEdgeItemProps) {
   // Keeps the generated IDs unique and safe for DOM use.
   const id = useId().replace(/:/g, '_');
 
-  const startNode: CANode = {
+  const startNode: CaNode = {
     id: `legend-edge-start-${id}`,
     type: 'Controller',
     layer: 'InterfaceAdapters',
     status: 'VALID',
   };
 
-  const endNode: CANode = {
+  const endNode: CaNode = {
     id: `legend-edge-end-${id}`,
     type: 'Presenter',
     layer: 'InterfaceAdapters',
@@ -104,14 +104,14 @@ function LegendEdgeItem({ label, arrowHeadType, status }: LegendEdgeItemProps) {
 
 type LegendNodeItemProps = {
   label: string;
-  node: CANode;
+  node: CaNode;
 };
 
 function LegendNodeItem({ label, node }: LegendNodeItemProps) {
   return (
     <NodeLegendItem spacing={1}>
       <LegendMedia>
-        <CANodeView {...node} isInteractive={false} />
+        <CaNodeView {...node} isInteractive={false} />
       </LegendMedia>
       <LegendLabel variant="body2">{label}</LegendLabel>
     </NodeLegendItem>

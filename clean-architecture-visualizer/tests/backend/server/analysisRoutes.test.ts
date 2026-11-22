@@ -1,30 +1,31 @@
 import type { AddressInfo } from 'node:net';
 import { afterEach, beforeEach, describe, expect, it } from '@jest/globals';
-import { SessionDBAccess } from '../../../src/data_access/sessionDBAccess.js';
-import { useCaseGraph } from '../../../src/entity/useCaseGraph.js';
+import { SessionDbAccess } from '../../../src/data_access/sessionDBAccess.js';
+import { UseCaseGraph } from '../../../src/entity/useCaseGraph.js';
 import { startServer, stopServer } from '../../../src/server/server.js';
 
 describe('analysis routes', () => {
-  let db: SessionDBAccess;
+  let db: SessionDbAccess;
   let baseUrl: string;
 
   beforeEach(async () => {
-    db = new SessionDBAccess();
-    db.resetDB();
+    db = new SessionDbAccess();
+    db.resetDb();
 
     const server = await startServer(true, db);
-    const { port } = server.address() as AddressInfo;
+    const { port, address } = server.address() as AddressInfo;
+    expect(address).toBe('127.0.0.1');
     baseUrl = `http://localhost:${port}/api`;
   });
 
   afterEach(async () => {
     await stopServer();
-    db.resetDB();
+    db.resetDb();
   });
 
   it('serves data written to the session DB after the server started', async () => {
     // Mirrors `cave start`: graph verification fills the DB after the routes exist.
-    const graph = new useCaseGraph('login');
+    const graph = new UseCaseGraph('login');
     graph.setViolation(['view', 'controller']);
     db.setProjectName('csc207-project');
     db.setNumUseCases(1);

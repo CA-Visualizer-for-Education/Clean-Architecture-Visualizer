@@ -53,7 +53,7 @@ Now the use case can rely on a precondition: the name it receives is trimmed and
 `"Log In"` becomes the folder `LogIn/` and the file `LogInController.java`, so the name, with its spaces removed, must be a legal class name. That rule doesn't depend on how the name arrived, so it lives in a small **value object** in `src/entity/`. It isn't an Entity in the glossary's sense, since nothing loads it from storage, but it holds a rule of the problem domain, so it lives in the same innermost layer. Any code holding a `UseCaseName` knows it's valid.
 
 ```ts
-// src/entity/use-case-name.ts
+// src/entity/useCaseName.ts
 export class UseCaseName {
   readonly value: string;
 
@@ -141,4 +141,4 @@ An outer layer may check something again to give the user a quicker or clearer m
 
 ## Where CAVE is today
 
-CAVE's controllers don't clean anything yet: they pass the raw value straight to the use case, and the use cases do all the checking. The use cases only remove spaces from names; there's no `UseCaseName` class yet. Issue #275 proposes moving input cleaning into the controllers. Removing spaces from names is a business rule, so it stays in the use case. For why each rule goes where it does, see [Where does input cleaning go?](./Input-Cleaning.md).
+CAVE's controllers don't clean anything yet: they pass the raw value straight to the use case, and the use cases do all the checking. The three template-creation interactors use `UseCaseName` to remove spaces and reject names that are not letters and digits starting with a letter. Invalid names are reported through the presenter before any filesystem access. Issue #275 proposes moving input cleaning into the controllers. Removing spaces from names is a business rule, so it stays in the use case. For why each rule goes where it does, see [Where does input cleaning go?](./Input-Cleaning.md).

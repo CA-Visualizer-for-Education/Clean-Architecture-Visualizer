@@ -14,10 +14,10 @@ When Cave runs, it creates a session file at:
 
 For example on macOS/Linux this is typically `/tmp/clean-arch-cli-session.json`, and on Windows `C:\Users\<you>\AppData\Local\Temp\clean-arch-cli-session.json`.
 
-The `SessionDB` class is a generic key-value store that reads and writes this file synchronously. It is typed against `SessionData`, which defines the full shape of everything Cave tracks about your project.
+The `SessionDb` class is a generic key-value store that reads and writes this file synchronously. It is typed against `SessionData`, which defines the full shape of everything Cave tracks about your project.
 
 :::note
-Always call `.load()` before any read operation — the in-memory state is not automatically synced from disk. Whenever an instance of the `SessionDBAccess` is created `.load()` is run.
+Always call `.load()` before any read operation — the in-memory state is not automatically synced from disk. Whenever an instance of the `SessionDbAccess` is created `.load()` is run.
 :::
 
 ## SessionData Structure
@@ -42,10 +42,10 @@ Each entry in the `useCases` array contains:
 | ---------------- | -------------------------- | ------------------------------------- |
 | `id`             | `string`                   | Unique identifier                     |
 | `name`           | `string`                   | Use case name                         |
-| `outNeighbours`  | `neighbourMap`             | Adjacency map of node dependencies    |
+| `outNeighbours`  | `NeighborMap`              | Adjacency map of node dependencies    |
 | `fileKeys`       | `string[]`                 | References into the `files` array     |
-| `violationEdges` | `[cleanNode, cleanNode][]` | Edges that violate clean architecture |
-| `missingNodes`   | `cleanNode[]`              | Expected nodes that were not found    |
+| `violationEdges` | `[CleanNode, CleanNode][]` | Edges that violate clean architecture |
+| `missingNodes`   | `CleanNode[]`              | Expected nodes that were not found    |
 
 ## Storage Types
 
@@ -58,7 +58,7 @@ Represents a single scanned file:
 | `filePath` | `string`                                                          | Absolute path to the file                    |
 | `fileType` | `"java" \| "python" \| "javascript" \| "typescript" \| "unknown"` | The programming language of the source file  |
 | `layer`    | `cleanLayer`                                                      | Which clean architecture layer it belongs to |
-| `node`     | `cleanNode`                                                       | The node type it represents                  |
+| `node`     | `CleanNode`                                                       | The node type it represents                  |
 
 ### `EdgeStorage`
 
@@ -81,7 +81,7 @@ Represents a single node in the architecture graph:
 | `id`       | `string`                              | Unique node identifier         |
 | `name`     | `string?`                             | Display name                   |
 | `filePath` | `string?`                             | Path to the corresponding file |
-| `type`     | `cleanNode`                           | Node type classification       |
+| `type`     | `CleanNode`                           | Node type classification       |
 | `layer`    | `cleanLayer`                          | Clean architecture layer       |
 | `status`   | `"VALID" \| "MISSING" \| "VIOLATION"` | Health status of the node      |
 
@@ -107,12 +107,12 @@ Cave recognises the following node types across all layers:
 | `controller` `presenter` `viewModel`                                          | Interface Adapters         |
 | `view` `dataAccess` `dataAccessInterface` `database`                          | Frameworks & Drivers       |
 
-## `neighbourMap`
+## `NeighborMap`
 
-The `neighbourMap` type describes which node types each node is allowed (or found) to depend on:
+The `NeighborMap` type describes which node types each node is allowed (or found) to depend on:
 
 ```typescript
-type neighbourMap = Record<cleanNode, cleanNode[]>;
+type NeighborMap = Record<CleanNode, CleanNode[]>;
 ```
 
 For example, a `controller` entry in the map would list all the node types it has outgoing dependencies to. This is used to detect violations — if a dependency points inward past the allowed boundary, it is flagged as `INCORRECT_DEPENDENCY`.

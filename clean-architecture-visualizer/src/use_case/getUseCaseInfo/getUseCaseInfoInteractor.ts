@@ -1,4 +1,4 @@
-import type { SessionDBAccessInterface } from '../../data_access/sessionDBAccessInterface.js';
+import type { SessionDbAccessInterface } from '../../data_access/sessionDBAccessInterface.js';
 import type { EdgeStorage, NodeStorage } from '../../types/sessionData.js';
 import type { GetUseCaseInfoInputBoundary } from './getUseCaseInfoInputBoundary.js';
 import type { GetUseCaseInfoInputData } from './getUseCaseInfoInputData.js';
@@ -11,7 +11,7 @@ import type {
 
 export class GetUseCaseInfoInteractor implements GetUseCaseInfoInputBoundary {
   constructor(
-    private readonly db: SessionDBAccessInterface,
+    private readonly db: SessionDbAccessInterface,
     private readonly outputData: GetUseCaseInfoOutputData
   ) {}
 
@@ -61,7 +61,7 @@ export class GetUseCaseInfoInteractor implements GetUseCaseInfoInputBoundary {
    * (VALID / VIOLATION) is stored per use case.
    */
   private buildNodes(
-    useCase: ReturnType<SessionDBAccessInterface['getUseCaseById']> & {},
+    useCase: ReturnType<SessionDbAccessInterface['getUseCaseById']> & {},
     edges: UseCaseEdgeResponse[]
   ): UseCaseNodeResponse[] {
     const allNodes = this.db.getAllNodes();
@@ -95,7 +95,7 @@ export class GetUseCaseInfoInteractor implements GetUseCaseInfoInputBoundary {
       }
     }
 
-    // 3. Missing nodes — one entry per missing cleanNode type
+    // 3. Missing nodes — one entry per missing CleanNode type
     for (const missingType of useCase.missingNodes) {
       if (byType.has(missingType)) continue;
       add(
@@ -112,7 +112,7 @@ export class GetUseCaseInfoInteractor implements GetUseCaseInfoInputBoundary {
    * up in EdgeStorage for status information.
    */
   private buildEdges(
-    useCase: ReturnType<SessionDBAccessInterface['getUseCaseById']> & {}
+    useCase: ReturnType<SessionDbAccessInterface['getUseCaseById']> & {}
   ): UseCaseEdgeResponse[] {
     const result: UseCaseEdgeResponse[] = [];
 

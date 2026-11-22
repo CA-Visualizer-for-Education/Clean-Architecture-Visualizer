@@ -26,11 +26,13 @@ export default defineConfig({
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('')`. */
+    // biome-ignore lint/style/useNamingConvention: Playwright defines baseURL
     baseURL: 'http://localhost:5173',
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
 
+    // biome-ignore lint/style/useNamingConvention: Playwright defines extraHTTPHeaders
     extraHTTPHeaders: {
       'x-test-mode': 'true',
     },
@@ -81,6 +83,7 @@ export default defineConfig({
     reuseExistingServer: !process.env.CI,
     cwd: './',
     env: {
+      // biome-ignore lint/style/useNamingConvention: Vite defines VITE_ environment keys in CONSTANT_CASE
       VITE_TEST_MODE: 'true',
     },
   },
