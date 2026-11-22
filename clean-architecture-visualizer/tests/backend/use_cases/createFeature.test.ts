@@ -58,21 +58,6 @@ describe('CreateFeatureInteractor', () => {
     expect(mockPresenter.showFailView).not.toHaveBeenCalled();
   });
 
-  it('Successfully adds feature to features directory that has space in name.', async () => {
-    mockFileAccess.getCurrentPath.mockResolvedValue('/root/src');
-    mockFileAccess.bfsFindDir.mockResolvedValue('/root/src/features');
-    mockFileAccess.exists.mockResolvedValue(false);
-    await runInteractor('new feature with spaces');
-
-    expect(mockFileAccess.createDirectory).toHaveBeenCalledWith(
-      '/root/src/features/newfeaturewithspaces'
-    );
-
-    expect(outputData.getFeature()).toBe('newfeaturewithspaces');
-    expect(mockPresenter.showSuccessView).toHaveBeenCalled();
-    expect(mockPresenter.showFailView).not.toHaveBeenCalled();
-  });
-
   it('Fails to add feature because features directory does not exist.', async () => {
     mockFileAccess.getCurrentPath.mockResolvedValue('/root/src');
     mockFileAccess.bfsFindDir.mockResolvedValue(null);

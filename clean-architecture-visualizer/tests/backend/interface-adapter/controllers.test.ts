@@ -85,3 +85,50 @@ describe('Controllers build input data and pass it to the input boundary', () =>
     );
   });
 });
+
+describe('Controllers clean raw input before building input data', () => {
+  it('CreateFeatureController removes spaces from the feature name', async () => {
+    const boundary = makeBoundary<CreateFeatureInputData>();
+    await new CreateFeatureController(boundary).execute(
+      'new feature with spaces'
+    );
+    expect(boundary.execute).toHaveBeenCalledWith(
+      new CreateFeatureInputData('newfeaturewithspaces')
+    );
+  });
+
+  it('CreateModuleUseCaseController removes spaces from both names', async () => {
+    const boundary = makeBoundary<CreateModuleUseCaseInputData>();
+    await new CreateModuleUseCaseController(boundary).execute(
+      'user auth',
+      'log in'
+    );
+    expect(boundary.execute).toHaveBeenCalledWith(
+      new CreateModuleUseCaseInputData('userauth', 'login')
+    );
+  });
+
+  it('CreateUseCaseController removes spaces from the use case name', async () => {
+    const boundary = makeBoundary<CreateUseCaseInputData>();
+    await new CreateUseCaseController(boundary).execute('log in');
+    expect(boundary.execute).toHaveBeenCalledWith(
+      new CreateUseCaseInputData('login')
+    );
+  });
+
+  it('InitModuleProjectController trims and lowercases the language', async () => {
+    const boundary = makeBoundary<InitModuleProjectInputData>();
+    await new InitModuleProjectController(boundary).execute('  Java ');
+    expect(boundary.execute).toHaveBeenCalledWith(
+      new InitModuleProjectInputData('java')
+    );
+  });
+
+  it('InitProjectController trims and lowercases the language', async () => {
+    const boundary = makeBoundary<InitProjectInputData>();
+    await new InitProjectController(boundary).execute('  Java ');
+    expect(boundary.execute).toHaveBeenCalledWith(
+      new InitProjectInputData('java')
+    );
+  });
+});
