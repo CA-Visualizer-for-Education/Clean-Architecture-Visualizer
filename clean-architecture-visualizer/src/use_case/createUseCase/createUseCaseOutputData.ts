@@ -1,4 +1,5 @@
 export class CreateUseCaseOutputData {
+  private error: string | null = null;
   private useCase = '';
 
   setUseCase(useCase: string): void {
@@ -7,5 +8,14 @@ export class CreateUseCaseOutputData {
 
   getUseCase(): string {
     return this.useCase;
+  }
+
+  // Why the use case failed, or null when it succeeded.
+  setError(error: string): void {
+    this.error = error;
+  }
+
+  getError(): string | null {
+    return this.error;
   }
 }

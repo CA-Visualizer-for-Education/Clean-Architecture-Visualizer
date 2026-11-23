@@ -15,10 +15,7 @@ describe('CreateFeatureInteractor', () => {
     mockFileAccess = makeMockFileAccess();
 
     mockPresenter = {
-      showSuccessView:
-        jest.fn<CreateModuleUseCaseOutputBoundary['showSuccessView']>(),
-      showFailView:
-        jest.fn<CreateModuleUseCaseOutputBoundary['showFailView']>(),
+      execute: jest.fn<CreateModuleUseCaseOutputBoundary['execute']>(),
     };
 
     outputData = new CreateModuleUseCaseOutputData();
@@ -38,10 +35,10 @@ describe('CreateFeatureInteractor', () => {
   it('rejects invalid feature names before creating files', async () => {
     await runInteractor('../Login', 'Login');
 
-    expect(mockPresenter.showFailView).toHaveBeenCalledWith(
+    expect(outputData.getError()).toEqual(
       expect.stringContaining('use letters and digits, starting with a letter')
     );
-    expect(mockPresenter.showSuccessView).not.toHaveBeenCalled();
+    expect(mockPresenter.execute).toHaveBeenCalledTimes(1);
     expect(mockFileAccess.createDirectory).not.toHaveBeenCalled();
     expect(mockFileAccess.createFile).not.toHaveBeenCalled();
   });
@@ -49,10 +46,10 @@ describe('CreateFeatureInteractor', () => {
   it('rejects invalid use case names before creating files', async () => {
     await runInteractor('Accounts', '../Login');
 
-    expect(mockPresenter.showFailView).toHaveBeenCalledWith(
+    expect(outputData.getError()).toEqual(
       expect.stringContaining('use letters and digits, starting with a letter')
     );
-    expect(mockPresenter.showSuccessView).not.toHaveBeenCalled();
+    expect(mockPresenter.execute).toHaveBeenCalledTimes(1);
     expect(mockFileAccess.createDirectory).not.toHaveBeenCalled();
     expect(mockFileAccess.createFile).not.toHaveBeenCalled();
   });
@@ -89,8 +86,8 @@ describe('CreateFeatureInteractor', () => {
 
     expect(outputData.getFeature()).toBe('newFeature');
     expect(outputData.getUseCase()).toBe('newUseCase');
-    expect(mockPresenter.showSuccessView).toHaveBeenCalled();
-    expect(mockPresenter.showFailView).not.toHaveBeenCalled();
+    expect(mockPresenter.execute).toHaveBeenCalledTimes(1);
+    expect(outputData.getError()).toBeNull();
   });
 
   it('Successfully creates files in specified directories in specified use case in specified feature in python.', async () => {
@@ -123,8 +120,8 @@ describe('CreateFeatureInteractor', () => {
 
     expect(outputData.getFeature()).toBe('newFeature');
     expect(outputData.getUseCase()).toBe('newUseCase');
-    expect(mockPresenter.showSuccessView).toHaveBeenCalled();
-    expect(mockPresenter.showFailView).not.toHaveBeenCalled();
+    expect(mockPresenter.execute).toHaveBeenCalledTimes(1);
+    expect(outputData.getError()).toBeNull();
   });
 
   it('Successfully creates files in specified directories in specified use case in specified feature in javascript.', async () => {
@@ -160,8 +157,8 @@ describe('CreateFeatureInteractor', () => {
 
     expect(outputData.getFeature()).toBe('newFeature');
     expect(outputData.getUseCase()).toBe('newUseCase');
-    expect(mockPresenter.showSuccessView).toHaveBeenCalled();
-    expect(mockPresenter.showFailView).not.toHaveBeenCalled();
+    expect(mockPresenter.execute).toHaveBeenCalledTimes(1);
+    expect(outputData.getError()).toBeNull();
   });
 
   it('Successfully creates files in specified directories in specified use case in specified feature in typescript.', async () => {
@@ -198,8 +195,8 @@ describe('CreateFeatureInteractor', () => {
 
     expect(outputData.getFeature()).toBe('newFeature');
     expect(outputData.getUseCase()).toBe('newUseCase');
-    expect(mockPresenter.showSuccessView).toHaveBeenCalled();
-    expect(mockPresenter.showFailView).not.toHaveBeenCalled();
+    expect(mockPresenter.execute).toHaveBeenCalledTimes(1);
+    expect(outputData.getError()).toBeNull();
   });
 
   it('Fails to create files because features directory does not exist.', async () => {
@@ -209,8 +206,8 @@ describe('CreateFeatureInteractor', () => {
       .mockResolvedValueOnce('/root/src/python')
       .mockResolvedValueOnce(null);
     await runInteractor('newFeature', 'newUseCase');
-    expect(mockPresenter.showSuccessView).not.toHaveBeenCalled();
-    expect(mockPresenter.showFailView).toHaveBeenCalledWith(
+    expect(mockPresenter.execute).toHaveBeenCalledTimes(1);
+    expect(outputData.getError()).toEqual(
       'The features directory does not exist. Please initialize the project first.'
     );
   });
@@ -227,8 +224,8 @@ describe('CreateFeatureInteractor', () => {
       .mockImplementationOnce(async (_, dirName) => `/root/src/${dirName}`)
       .mockImplementationOnce(async (_, _dirName) => null);
     await runInteractor('newFeature', 'newUseCase');
-    expect(mockPresenter.showSuccessView).not.toHaveBeenCalled();
-    expect(mockPresenter.showFailView).toHaveBeenCalledWith(
+    expect(mockPresenter.execute).toHaveBeenCalledTimes(1);
+    expect(outputData.getError()).toEqual(
       'The input feature does not exist in the features directory. Please choose a feature that does exist or create this feature.'
     );
   });
@@ -245,8 +242,8 @@ describe('CreateFeatureInteractor', () => {
         async (_, dirName) => `/root/src/features/newFeature/${dirName}`
       );
     await runInteractor('newFeature', 'newUseCase');
-    expect(mockPresenter.showSuccessView).not.toHaveBeenCalled();
-    expect(mockPresenter.showFailView).toHaveBeenCalledWith(
+    expect(mockPresenter.execute).toHaveBeenCalledTimes(1);
+    expect(outputData.getError()).toEqual(
       'The input usecase already exists. Please choose a different name.'
     );
   });
@@ -262,8 +259,8 @@ describe('CreateFeatureInteractor', () => {
         async (_, dirName) => `/root/src/features/blah/${dirName}`
       );
     await runInteractor('newFeature', 'newUseCase');
-    expect(mockPresenter.showSuccessView).not.toHaveBeenCalled();
-    expect(mockPresenter.showFailView).toHaveBeenCalledWith(
+    expect(mockPresenter.execute).toHaveBeenCalledTimes(1);
+    expect(outputData.getError()).toEqual(
       'The input usecase already exists. Please choose a different name.'
     );
   });
@@ -280,8 +277,8 @@ describe('CreateFeatureInteractor', () => {
       .mockImplementationOnce(async (_, _dirName) => null);
     mockFileAccess.createDirectory.mockRejectedValue(new Error('Disk Full'));
     await runInteractor('newFeature', 'newUseCase');
-    expect(mockPresenter.showSuccessView).not.toHaveBeenCalled();
-    expect(mockPresenter.showFailView).toHaveBeenCalled();
+    expect(mockPresenter.execute).toHaveBeenCalledTimes(1);
+    expect(outputData.getError()).not.toBeNull();
   });
 
   it('Fails if an unexpected error occurs during file creation.', async () => {
@@ -298,8 +295,8 @@ describe('CreateFeatureInteractor', () => {
       new Error('Failed to create directory.')
     );
     await runInteractor('newFeature', 'newUseCase');
-    expect(mockPresenter.showSuccessView).not.toHaveBeenCalled();
-    expect(mockPresenter.showFailView).toHaveBeenCalled();
+    expect(mockPresenter.execute).toHaveBeenCalledTimes(1);
+    expect(outputData.getError()).not.toBeNull();
   });
 
   it('Fails if there is no specified language.', async () => {
@@ -311,7 +308,7 @@ describe('CreateFeatureInteractor', () => {
       .mockResolvedValue(null)
       .mockResolvedValue(null);
     await runInteractor('newFeature', 'newUseCase');
-    expect(mockPresenter.showSuccessView).not.toHaveBeenCalled();
-    expect(mockPresenter.showFailView).toHaveBeenCalled();
+    expect(mockPresenter.execute).toHaveBeenCalledTimes(1);
+    expect(outputData.getError()).not.toBeNull();
   });
 });

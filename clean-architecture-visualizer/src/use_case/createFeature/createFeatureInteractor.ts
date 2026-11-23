@@ -15,35 +15,41 @@ export class CreateFeatureInteractor implements CreateFeatureInputBoundary {
 
   async execute(inputData: CreateFeatureInputData): Promise<void> {
     try {
-      // Want to remove all spaces from the name of the feature
-      const feature = new UseCaseName(inputData.getFeatureName()).value;
-      const currPath = await this.fileAccess.getCurrentPath();
-      // If "features" the directory doesn't exist in the main source, abort
-      const sourcePath = (await this.fileAccess.getSourcePath()) ?? currPath;
-      const featuresDirectory = await this.fileAccess.bfsFindDir(
-        sourcePath,
-        'features'
-      );
-      if (!featuresDirectory) {
-        this.presenter.showFailView(
-          'There is no features directory. Initialize the project first.'
-        );
-        return;
-      }
-
-      const targetFeaturePath = path.join(featuresDirectory, feature);
-      if (await this.fileAccess.exists(targetFeaturePath)) {
-        this.presenter.showFailView('This feature already exists.');
-        return;
-      }
-
-      await this.fileAccess.createDirectory(targetFeaturePath);
-      this.outputData.setFeature(feature);
-      this.presenter.showSuccessView();
+      await this.createFeature(inputData);
     } catch (error) {
-      if (error instanceof Error) {
-        this.presenter.showFailView(error.message);
-      }
+      this.outputData.setError(
+        error instanceof Error ? error.message : String(error)
+      );
     }
+    this.presenter.execute();
+  }
+
+  // Throws when the feature can't be created. execute catches every error
+  // and records it in the output data.
+  private async createFeature(
+    inputData: CreateFeatureInputData
+  ): Promise<void> {
+    // Want to remove all spaces from the name of the feature
+    const feature = new UseCaseName(inputData.getFeatureName()).value;
+    const currPath = await this.fileAccess.getCurrentPath();
+    // If "features" the directory doesn't exist in the main source, abort
+    const sourcePath = (await this.fileAccess.getSourcePath()) ?? currPath;
+    const featuresDirectory = await this.fileAccess.bfsFindDir(
+      sourcePath,
+      'features'
+    );
+    if (!featuresDirectory) {
+      throw new Error(
+        'There is no features directory. Initialize the project first.'
+      );
+    }
+
+    const targetFeaturePath = path.join(featuresDirectory, feature);
+    if (await this.fileAccess.exists(targetFeaturePath)) {
+      throw new Error('This feature already exists.');
+    }
+
+    await this.fileAccess.createDirectory(targetFeaturePath);
+    this.outputData.setFeature(feature);
   }
 }

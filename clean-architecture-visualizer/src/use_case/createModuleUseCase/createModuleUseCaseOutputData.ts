@@ -1,4 +1,5 @@
 export class CreateModuleUseCaseOutputData {
+  private error: string | null = null;
   private feature = '';
   private usecase = '';
 
@@ -16,5 +17,14 @@ export class CreateModuleUseCaseOutputData {
 
   getUseCase(): string {
     return this.usecase;
+  }
+
+  // Why the use case failed, or null when it succeeded.
+  setError(error: string): void {
+    this.error = error;
+  }
+
+  getError(): string | null {
+    return this.error;
   }
 }

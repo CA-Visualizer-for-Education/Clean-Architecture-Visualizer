@@ -70,7 +70,7 @@ export class GraphVerificationInteractor
     // Paths are defined as <File Name, File Path>
     if (formatForCli) {
       this.prepareOutput();
-      this.presenter.prepareSuccessView();
+      this.presenter.execute();
     }
   }
 

@@ -7,7 +7,11 @@ export class GraphVerificationPresenter
 {
   constructor(private readonly outputData: GraphVerificationOutputData) {}
 
-  prepareSuccessView(): void {
+  execute(): void {
+    this.prepareSuccessView();
+  }
+
+  private prepareSuccessView(): void {
     const lineContent = this.outputData.getLineContent();
     const lineColour = this.outputData.getLineColour();
     for (let line = 0; line < lineContent.length; line++) {

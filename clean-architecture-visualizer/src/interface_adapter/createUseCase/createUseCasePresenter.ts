@@ -3,22 +3,29 @@ import type { CreateUseCaseOutputBoundary } from '../../use_case/createUseCase/c
 import type { CreateUseCaseOutputData } from '../../use_case/createUseCase/createUseCaseOutputData.js';
 
 export class CreateUseCasePresenter implements CreateUseCaseOutputBoundary {
-  private error: string | null = null;
-
   constructor(private readonly outputData: CreateUseCaseOutputData) {}
 
-  showSuccessView() {
+  execute(): void {
+    const error = this.outputData.getError();
+    if (error === null) {
+      this.showSuccessView();
+    } else {
+      this.showFailView(error);
+    }
+  }
+
+  // Acts as a pseudo view model: server routes read this to pick a status.
+  getError(): string | null {
+    return this.outputData.getError();
+  }
+
+  private showSuccessView(): void {
     console.log(
       chalk.green(`Usecase ${this.outputData.getUseCase()} has been created.`)
     );
   }
 
-  showFailView(error: string) {
+  private showFailView(error: string): void {
     console.log(chalk.red(error));
-    this.error = error;
-  }
-
-  getError(): string | null {
-    return this.error;
   }
 }

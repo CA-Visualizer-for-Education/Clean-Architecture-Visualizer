@@ -1,4 +1,4 @@
+// The presenter reads the output data and decides which view to show.
 export interface CreateFeatureOutputBoundary {
-  showSuccessView(): void;
-  showFailView(error: string): void;
+  execute(): void;
 }

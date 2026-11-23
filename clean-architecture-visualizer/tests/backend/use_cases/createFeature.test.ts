@@ -15,9 +15,7 @@ describe('CreateFeatureInteractor', () => {
     mockFileAccess = makeMockFileAccess();
 
     mockPresenter = {
-      showSuccessView:
-        jest.fn<CreateFeatureOutputBoundary['showSuccessView']>(),
-      showFailView: jest.fn<CreateFeatureOutputBoundary['showFailView']>(),
+      execute: jest.fn<CreateFeatureOutputBoundary['execute']>(),
     };
 
     outputData = new CreateFeatureOutputData();
@@ -35,10 +33,10 @@ describe('CreateFeatureInteractor', () => {
   it('rejects invalid names before creating files', async () => {
     await runInteractor('../Login');
 
-    expect(mockPresenter.showFailView).toHaveBeenCalledWith(
+    expect(outputData.getError()).toEqual(
       expect.stringContaining('use letters and digits, starting with a letter')
     );
-    expect(mockPresenter.showSuccessView).not.toHaveBeenCalled();
+    expect(mockPresenter.execute).toHaveBeenCalledTimes(1);
     expect(mockFileAccess.createDirectory).not.toHaveBeenCalled();
     expect(mockFileAccess.createFile).not.toHaveBeenCalled();
   });
@@ -54,8 +52,8 @@ describe('CreateFeatureInteractor', () => {
     );
 
     expect(outputData.getFeature()).toBe('newFeature');
-    expect(mockPresenter.showSuccessView).toHaveBeenCalled();
-    expect(mockPresenter.showFailView).not.toHaveBeenCalled();
+    expect(mockPresenter.execute).toHaveBeenCalledTimes(1);
+    expect(outputData.getError()).toBeNull();
   });
 
   it('Successfully adds feature to features directory that has space in name.', async () => {
@@ -69,16 +67,16 @@ describe('CreateFeatureInteractor', () => {
     );
 
     expect(outputData.getFeature()).toBe('newfeaturewithspaces');
-    expect(mockPresenter.showSuccessView).toHaveBeenCalled();
-    expect(mockPresenter.showFailView).not.toHaveBeenCalled();
+    expect(mockPresenter.execute).toHaveBeenCalledTimes(1);
+    expect(outputData.getError()).toBeNull();
   });
 
   it('Fails to add feature because features directory does not exist.', async () => {
     mockFileAccess.getCurrentPath.mockResolvedValue('/root/src');
     mockFileAccess.bfsFindDir.mockResolvedValue(null);
     await runInteractor('blah');
-    expect(mockPresenter.showSuccessView).not.toHaveBeenCalled();
-    expect(mockPresenter.showFailView).toHaveBeenCalled();
+    expect(mockPresenter.execute).toHaveBeenCalledTimes(1);
+    expect(outputData.getError()).not.toBeNull();
   });
 
   it('Fails to add feature that already exists.', async () => {
@@ -86,8 +84,8 @@ describe('CreateFeatureInteractor', () => {
     mockFileAccess.bfsFindDir.mockResolvedValue('/root/src/features');
     mockFileAccess.exists.mockResolvedValue(true);
     await runInteractor('newFeature');
-    expect(mockPresenter.showSuccessView).not.toHaveBeenCalled();
-    expect(mockPresenter.showFailView).toHaveBeenCalled();
+    expect(mockPresenter.execute).toHaveBeenCalledTimes(1);
+    expect(outputData.getError()).not.toBeNull();
   });
 
   it('Fails if unexpected error occurs during directory creation.', async () => {
@@ -98,7 +96,7 @@ describe('CreateFeatureInteractor', () => {
       new Error('Failed to create directory.')
     );
     await runInteractor('newFeature');
-    expect(mockPresenter.showSuccessView).not.toHaveBeenCalled();
-    expect(mockPresenter.showFailView).toHaveBeenCalled();
+    expect(mockPresenter.execute).toHaveBeenCalledTimes(1);
+    expect(outputData.getError()).not.toBeNull();
   });
 });
