@@ -1,0 +1,124 @@
+name: publish-vscode-extension
+
+# Publishes the VSCode extension to the Marketplace.
+#
+# Release:  bump "version" in vscode-extension/package.json, merge to main, then
+#           git tag extension-v<version> && git push origin extension-v<version>
+# Dry run:  Actions tab -> publish-vscode-extension -> Run workflow (dry_run on)
+#           builds and tests the .vsix and uploads it as an artifact, without publishing.
+#
+# Tags use the "extension-v" prefix because release-gate.yml already runs on
+# every tag starting with "v" (engine releases).
+#
+# Needs repository secret VSCE_PAT (Azure DevOps token, "Marketplace (Manage)"
+# scope). Optional secret OVSX_PAT also publishes to Open VSX.
+
+on:
+  push:
+    tags: ['extension-v*']
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Build and test only; do not publish'
+        type: boolean
+        default: true
+
+permissions:
+  contents: write # to create the GitHub release with the .vsix attached
+
+concurrency:
+  group: publish-vscode-extension
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    # Optional: create an environment named "marketplace" in the repo settings
+    # with required reviewers to make each publish wait for a manual approval.
+    environment: marketplace
+    env:
+      DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # The extension build bundles the engine from source, so it needs the
+      # engine's dependencies too.
+      - uses: ./.github/actions/setup-node-env
+        with:
+          working-directory: ./clean-architecture-visualizer
+
+      - uses: ./.github/actions/setup-node-env
+        with:
+          working-directory: ./vscode-extension
+
+      - name: Read extension version
+        id: version
+        working-directory: ./vscode-extension
+        run: echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
+
+      - name: Check the tag matches package.json
+        if: github.event_name == 'push'
+        run: |
+          expected="extension-v${{ steps.version.outputs.version }}"
+          if [ "$GITHUB_REF_NAME" != "$expected" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match package.json version (expected $expected). Bump the version in vscode-extension/package.json or fix the tag."
+            exit 1
+          fi
+
+      - name: Engine tests
+        run: npm test
+        working-directory: ./clean-architecture-visualizer
+
+      - name: Extension type check
+        run: npm run typecheck
+        working-directory: ./vscode-extension
+
+      - name: Extension tests
+        run: npm test
+        working-directory: ./vscode-extension
+
+      - name: Build and package .vsix
+        working-directory: ./vscode-extension
+        run: |
+          npm run build
+          npx vsce package --no-dependencies --out "cave-vscode-${{ steps.version.outputs.version }}.vsix"
+
+      - name: Upload .vsix artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cave-vscode-${{ steps.version.outputs.version }}
+          path: vscode-extension/*.vsix
+
+      - name: Publish to VSCode Marketplace
+        if: env.DRY_RUN != 'true'
+        working-directory: ./vscode-extension
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+        run: |
+          if [ -z "$VSCE_PAT" ]; then
+            echo "::error::Repository secret VSCE_PAT is not set, so the extension cannot be published."
+            exit 1
+          fi
+          npx vsce publish --packagePath "cave-vscode-${{ steps.version.outputs.version }}.vsix"
+
+      - name: Publish to Open VSX (optional)
+        if: env.DRY_RUN != 'true'
+        working-directory: ./vscode-extension
+        env:
+          OVSX_PAT: ${{ secrets.OVSX_PAT }}
+        run: |
+          if [ -z "$OVSX_PAT" ]; then
+            echo "OVSX_PAT is not set; skipping Open VSX."
+            exit 0
+          fi
+          npx --yes ovsx publish "cave-vscode-${{ steps.version.outputs.version }}.vsix" --pat "$OVSX_PAT"
+
+      - name: Create GitHub release with the .vsix
+        if: github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" vscode-extension/*.vsix \
+            --title "VSCode extension ${{ steps.version.outputs.version }}" \
+            --generate-notes

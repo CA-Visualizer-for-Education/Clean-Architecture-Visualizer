@@ -2,7 +2,7 @@
   "name": "cave-vscode",
   "displayName": "CAVE: Clean Architecture Verifier",
   "description": "Check that your project follows Clean Architecture, with each violation shown on the import line that breaks a dependency rule.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "publisher": "CA-Visualizer-for-Education",
   "license": "MIT",
   "repository": {

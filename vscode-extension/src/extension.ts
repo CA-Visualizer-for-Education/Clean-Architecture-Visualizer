@@ -22,7 +22,9 @@ const GREEN = '\x1b[32m';
 const YELLOW = '\x1b[33m';
 const BOLD = '\x1b[1m';
 const DIM = '\x1b[2m';
+const UNDERLINE = '\x1b[4m';
 const RESET = '\x1b[0m';
+const SEPARATOR = '-'.repeat(60);
 
 let terminal: vscode.Terminal | undefined;
 let terminalWriter: vscode.EventEmitter<string> | undefined;
@@ -55,7 +57,9 @@ async function printToTerminal(lines: string[]): Promise<void> {
   const ready = caveTerminal();
   terminal?.show(true); // true: keep focus in the editor
   await ready;
-  terminalWriter?.fire(lines.join('\r\n') + '\r\n\r\n');
+  terminalWriter?.fire(
+    [SEPARATOR, ...lines, SEPARATOR].join('\r\n') + '\r\n\r\n'
+  );
 }
 
 function terminalReport(plan: ReportPlan, projectRoot: string): string[] {
@@ -76,7 +80,7 @@ function terminalReport(plan: ReportPlan, projectRoot: string): string[] {
   for (const d of plan.diagnostics) {
     // "file:line" is clickable in the VSCode terminal.
     const where = `${path.relative(projectRoot, d.absolutePath)}:${d.line + 1}`;
-    lines.push(`  ${YELLOW}⚠${RESET} ${where}`, `    Clean Architecture Violation: ${d.message} ${DIM}(${d.code})${RESET}`);
+    lines.push(`  ${YELLOW}⚠${RESET} ${UNDERLINE}${where}${RESET}`, `    Clean Architecture Violation: ${d.message} ${DIM}(${d.code})${RESET}`);
   }
   for (const v of plan.unlocated) {
     lines.push(`  ${YELLOW}⚠${RESET} (no file location)`, `    Clean Architecture Violation: ${describeUnlocated(v)}`);
@@ -127,7 +131,7 @@ async function verify(context: vscode.ExtensionContext): Promise<void> {
   const folder = await pickWorkspaceFolder();
   if (!folder) {
     vscode.window.showWarningMessage(
-      'Clean Architecture Violation: open your project folder first, then run "Clean Architecture: Verify".'
+      'CAVE: open your project folder first, then run "CAVE: Verify Clean Architecture".'
     );
     return;
   }
@@ -138,7 +142,7 @@ async function verify(context: vscode.ExtensionContext): Promise<void> {
   const projectRoot = resolveProjectRoot(folder.uri.fsPath, setting);
   if (!fs.existsSync(projectRoot)) {
     vscode.window.showErrorMessage(
-      `Clean Architecture Violation: the folder set in "cave.projectRoot" does not exist: ${projectRoot}`
+      `CAVE: the folder set in "cave.projectRoot" does not exist: ${projectRoot}`
     );
     return;
   }
@@ -247,7 +251,7 @@ function show(plan: ReportPlan): void {
   } else {
     vscode.window
       .showWarningMessage(
-        `CAVE found ${total} Clean Architecture violation(s). See the Problems panel.`,
+        `CAVE found ${total} Clean Architecture violation(s).`,
         'Open Problems'
       )
       .then((choice) => {
