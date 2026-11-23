@@ -15,9 +15,7 @@ describe('CreateUseCaseInteractor', () => {
     mockFileAccess = makeMockFileAccess();
 
     mockPresenter = {
-      showSuccessView:
-        jest.fn<CreateUseCaseOutputBoundary['showSuccessView']>(),
-      showFailView: jest.fn<CreateUseCaseOutputBoundary['showFailView']>(),
+      execute: jest.fn<CreateUseCaseOutputBoundary['execute']>(),
     };
 
     outputData = new CreateUseCaseOutputData();
@@ -35,10 +33,10 @@ describe('CreateUseCaseInteractor', () => {
   it('rejects invalid names before creating files', async () => {
     await runInteractor('../Login');
 
-    expect(mockPresenter.showFailView).toHaveBeenCalledWith(
+    expect(outputData.getError()).toEqual(
       expect.stringContaining('use letters and digits, starting with a letter')
     );
-    expect(mockPresenter.showSuccessView).not.toHaveBeenCalled();
+    expect(mockPresenter.execute).toHaveBeenCalledTimes(1);
     expect(mockFileAccess.createDirectory).not.toHaveBeenCalled();
     expect(mockFileAccess.createFile).not.toHaveBeenCalled();
   });
@@ -78,8 +76,8 @@ describe('CreateUseCaseInteractor', () => {
 
     // Verify success signal
     expect(outputData.getUseCase()).toBe('LoginUser');
-    expect(mockPresenter.showSuccessView).toHaveBeenCalled();
-    expect(mockPresenter.showFailView).not.toHaveBeenCalled();
+    expect(mockPresenter.execute).toHaveBeenCalledTimes(1);
+    expect(outputData.getError()).toBeNull();
   });
 
   it('successfully creates directories and files for a valid use case name in python', async () => {
@@ -115,8 +113,8 @@ describe('CreateUseCaseInteractor', () => {
 
     // Verify success signal
     expect(outputData.getUseCase()).toBe('LoginUser');
-    expect(mockPresenter.showSuccessView).toHaveBeenCalled();
-    expect(mockPresenter.showFailView).not.toHaveBeenCalled();
+    expect(mockPresenter.execute).toHaveBeenCalledTimes(1);
+    expect(outputData.getError()).toBeNull();
   });
 
   it('successfully creates directories and files for a valid use case name in javascript', async () => {
@@ -155,8 +153,8 @@ describe('CreateUseCaseInteractor', () => {
 
     // Verify success signal
     expect(outputData.getUseCase()).toBe('LoginUser');
-    expect(mockPresenter.showSuccessView).toHaveBeenCalled();
-    expect(mockPresenter.showFailView).not.toHaveBeenCalled();
+    expect(mockPresenter.execute).toHaveBeenCalledTimes(1);
+    expect(outputData.getError()).toBeNull();
   });
 
   it('successfully creates directories and files for a valid use case name in typescript', async () => {
@@ -196,8 +194,8 @@ describe('CreateUseCaseInteractor', () => {
 
     // Verify success signal
     expect(outputData.getUseCase()).toBe('LoginUser');
-    expect(mockPresenter.showSuccessView).toHaveBeenCalled();
-    expect(mockPresenter.showFailView).not.toHaveBeenCalled();
+    expect(mockPresenter.execute).toHaveBeenCalledTimes(1);
+    expect(outputData.getError()).toBeNull();
   });
 
   it('fails and sets output data to false if directories are not found', async () => {
@@ -211,8 +209,8 @@ describe('CreateUseCaseInteractor', () => {
     await runInteractor('Test');
 
     // Assert
-    expect(mockPresenter.showSuccessView).not.toHaveBeenCalled();
-    expect(mockPresenter.showFailView).toHaveBeenCalledWith(
+    expect(mockPresenter.execute).toHaveBeenCalledTimes(1);
+    expect(outputData.getError()).toEqual(
       'Could not find use_case or interface_adapter, try initiating project first.'
     );
     // Ensure no files were attempted to be created
@@ -233,8 +231,8 @@ describe('CreateUseCaseInteractor', () => {
     await runInteractor('Test');
 
     // Assert
-    expect(mockPresenter.showSuccessView).not.toHaveBeenCalled();
-    expect(mockPresenter.showFailView).toHaveBeenCalledWith(
+    expect(mockPresenter.execute).toHaveBeenCalledTimes(1);
+    expect(outputData.getError()).toEqual(
       'Usecase Test already exists. Please choose a different name.'
     );
     // Ensure no files or directories were attempted to be created
@@ -254,8 +252,8 @@ describe('CreateUseCaseInteractor', () => {
     await runInteractor('Test');
 
     // Assert
-    expect(mockPresenter.showSuccessView).not.toHaveBeenCalled();
-    expect(mockPresenter.showFailView).toHaveBeenCalled();
+    expect(mockPresenter.execute).toHaveBeenCalledTimes(1);
+    expect(outputData.getError()).not.toBeNull();
   });
 
   it('fails if there is no programming language directory', async () => {
@@ -271,7 +269,7 @@ describe('CreateUseCaseInteractor', () => {
     await runInteractor('Test');
 
     // Assert
-    expect(mockPresenter.showSuccessView).not.toHaveBeenCalled();
-    expect(mockPresenter.showFailView).toHaveBeenCalled();
+    expect(mockPresenter.execute).toHaveBeenCalledTimes(1);
+    expect(outputData.getError()).not.toBeNull();
   });
 });

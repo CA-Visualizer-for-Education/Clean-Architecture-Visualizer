@@ -5,11 +5,23 @@ import type { CreateModuleUseCaseOutputData } from '../../use_case/createModuleU
 export class CreateModuleUseCasePresenter
   implements CreateModuleUseCaseOutputBoundary
 {
-  private error: string | null = null;
-
   constructor(private readonly outputData: CreateModuleUseCaseOutputData) {}
 
-  showSuccessView(): void {
+  execute(): void {
+    const error = this.outputData.getError();
+    if (error === null) {
+      this.showSuccessView();
+    } else {
+      this.showFailView(error);
+    }
+  }
+
+  // Acts as a pseudo view model: server routes read this to pick a status.
+  getError(): string | null {
+    return this.outputData.getError();
+  }
+
+  private showSuccessView(): void {
     console.log(
       chalk.green(
         `Usecase ${this.outputData.getUseCase()} in feature ${this.outputData.getFeature()} has been created.`
@@ -17,12 +29,7 @@ export class CreateModuleUseCasePresenter
     );
   }
 
-  showFailView(error: string): void {
+  private showFailView(error: string): void {
     console.log(chalk.red(error));
-    this.error = error;
-  }
-
-  getError(): string | null {
-    return this.error;
   }
 }

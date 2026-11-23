@@ -25,7 +25,7 @@ import { CreateUseCaseOutputData } from '../../../src/use_case/createUseCase/cre
 // the same folders at the same depth.
 describe('Project folders are found in the main source, not build output or tests', () => {
   let project: string;
-  const presenter = { showSuccessView: jest.fn(), showFailView: jest.fn() };
+  const presenter = { execute: jest.fn() };
 
   const makeFolders = async (...folders: string[]) => {
     for (const folder of folders) {
