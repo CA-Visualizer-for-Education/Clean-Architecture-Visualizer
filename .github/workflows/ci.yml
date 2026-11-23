@@ -57,6 +57,13 @@ jobs:
         run: npm run package
         working-directory: ./vscode-extension
 
+      # Download from the run's Summary page to try a PR's build in VSCode.
+      - name: Upload .vsix
+        uses: actions/upload-artifact@v4
+        with:
+          name: cave-vscode-vsix
+          path: vscode-extension/*.vsix
+
   frontend-validation:
     runs-on: ubuntu-latest
     steps:

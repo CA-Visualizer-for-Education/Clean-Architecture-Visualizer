@@ -10,8 +10,12 @@ name: publish-vscode-extension
 # Tags use the "extension-v" prefix because release-gate.yml already runs on
 # every tag starting with "v" (engine releases).
 #
-# Needs repository secret VSCE_PAT (Azure DevOps token, "Marketplace (Manage)"
-# scope). Optional secret OVSX_PAT also publishes to Open VSX.
+# Publishing uses Marketplace Trusted Publishing (GitHub OIDC), not a token:
+# Azure DevOps global PATs are retired on 2026-12-01. One-time setup: in
+# https://marketplace.visualstudio.com/manage -> your publisher ->
+# Trusted Publishing, add a GitHub policy for this repository and this
+# workflow file (publish-vscode-extension.yml), environment "marketplace".
+# Optional secret OVSX_PAT also publishes to Open VSX.
 
 on:
   push:
@@ -25,6 +29,7 @@ on:
 
 permissions:
   contents: write # to create the GitHub release with the .vsix attached
+  id-token: write # lets the Marketplace verify this workflow (Trusted Publishing)
 
 concurrency:
   group: publish-vscode-extension
@@ -82,25 +87,18 @@ jobs:
         working-directory: ./vscode-extension
         run: |
           npm run build
-          npx vsce package --no-dependencies --out "cave-vscode-${{ steps.version.outputs.version }}.vsix"
+          npx vsce package --no-dependencies --out "clean-architecture-visualizer-${{ steps.version.outputs.version }}.vsix"
 
       - name: Upload .vsix artifact
         uses: actions/upload-artifact@v4
         with:
-          name: cave-vscode-${{ steps.version.outputs.version }}
+          name: clean-architecture-visualizer-${{ steps.version.outputs.version }}
           path: vscode-extension/*.vsix
 
       - name: Publish to VSCode Marketplace
         if: env.DRY_RUN != 'true'
         working-directory: ./vscode-extension
-        env:
-          VSCE_PAT: ${{ secrets.VSCE_PAT }}
-        run: |
-          if [ -z "$VSCE_PAT" ]; then
-            echo "::error::Repository secret VSCE_PAT is not set, so the extension cannot be published."
-            exit 1
-          fi
-          npx vsce publish --packagePath "cave-vscode-${{ steps.version.outputs.version }}.vsix"
+        run: npx vsce publish --oidc --packagePath "clean-architecture-visualizer-${{ steps.version.outputs.version }}.vsix"
 
       - name: Publish to Open VSX (optional)
         if: env.DRY_RUN != 'true'
@@ -112,7 +110,7 @@ jobs:
             echo "OVSX_PAT is not set; skipping Open VSX."
             exit 0
           fi
-          npx --yes ovsx publish "cave-vscode-${{ steps.version.outputs.version }}.vsix" --pat "$OVSX_PAT"
+          npx --yes ovsx publish "clean-architecture-visualizer-${{ steps.version.outputs.version }}.vsix" --pat "$OVSX_PAT"
 
       - name: Create GitHub release with the .vsix
         if: github.event_name == 'push'
